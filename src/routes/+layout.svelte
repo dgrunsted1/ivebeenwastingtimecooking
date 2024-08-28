@@ -26,7 +26,7 @@
 						{/if} -->
 					</div>
 					<div class="navbar-center">
-					<a class=" normal-case py-1 text-sm md:text-xl" href="/">www.ivebeenwastingtime.com</a>
+					<a class=" normal-case py-1 text-sm md:text-xl" href="/">i'vebeenwastingtimecooking</a>
 					</div>
 					<div class="navbar-end">
 						<div class="dropdown dropdown-end">
