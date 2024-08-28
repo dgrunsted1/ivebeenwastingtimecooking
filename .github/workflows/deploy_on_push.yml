@@ -20,7 +20,7 @@ jobs:
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
             [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
             git fetch --all
-            git reset --hard origin/master
+            git reset --hard origin/Master
             # git status
             # npm install
             # npm run build
