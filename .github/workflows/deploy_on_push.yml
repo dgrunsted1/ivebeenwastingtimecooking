@@ -24,4 +24,5 @@ jobs:
             npm install
             npm run build
             sudo systemctl restart ivebeenwastingtime  
-            systemctl status ivebeenwastingtime       
+            systemctl status ivebeenwastingtime   
+                
