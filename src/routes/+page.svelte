@@ -1,6 +1,6 @@
 <script>
     const pages = [{
-        gif: `https://db.ivebeenwastingtime.com/api/files/716b9n2y44y92zp/0oq9ib2ekr0wkjf/my_project_31_9G37Ylanui.gif?thumb=400x0`,
+        gif: `https://db.ivebeenwastingtime.com/api/files/716b9n2y44y92zp/1v2pt8h8glmy7o1/my_project_1_copyCVePJ4.gif?thumb=400x0`,
         text: "add a recipe easily from your favorite website, a book, or a video"
     },{
         gif: `https://db.ivebeenwastingtime.com/api/files/716b9n2y44y92zp/i0xx644lq8874uc/my_project_34_copy_0_tIWm7ouO9W.gif?thumb=400x0`,
@@ -20,11 +20,11 @@
 
 <div class="flex flex-col space-y-96 py-32 p-5">
     {#each pages as page}
-        <div class="flex flex-row w-full items-center border border-primary bg-neutral rounded-lg">
+        <div class="flex flex-col md:flex-row w-full items-center border border-primary bg-primary rounded-lg">
             <div class="w-2/3 p-2 ">
                 <img src={page.gif} alt="gif of {page.text}" class="w-full rounded-lg"/>
             </div>
-            <p class="p-10 w-1/3">{page.text}</p>
+            <p class="p-10 md:w-1/3 text-black">{page.text}</p>
         </div>
     {/each}
 </div>
