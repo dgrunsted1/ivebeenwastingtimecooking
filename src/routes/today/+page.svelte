@@ -165,7 +165,7 @@
 
     <div id="main">
         <div class="flex justify-center pb-1">
-            <h1 class="text-xl h-6">{todays_menu.title ? todays_menu.title : ""}</h1>
+            <h1 class="text-xl h-6 text-ellipsis overflow-hidden text-center">{todays_menu.title ? todays_menu.title : ""}</h1>
         </div>
         <div id="content" class="flex flex-col md:flex-row md:space-x-3 md:mx-2">
             <div id="left_column" class="{tab == "recipe_list" ? "" : "hidden"}  md:w-1/2">
