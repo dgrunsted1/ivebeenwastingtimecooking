@@ -25,3 +25,4 @@ jobs:
             npm run build
             systemctl restart ivebeenwastingtime  
             systemctl status ivebeenwastingtime
+            
