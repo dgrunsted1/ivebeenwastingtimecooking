@@ -1,11 +1,30 @@
 <script>
-export let data;
+    const pages = [{
+        gif: `https://db.ivebeenwastingtime.com/api/files/716b9n2y44y92zp/0oq9ib2ekr0wkjf/my_project_31_9G37Ylanui.gif?thumb=400x0`,
+        text: "add a recipe easily from your favorite website, a book, or a video"
+    },{
+        gif: `https://db.ivebeenwastingtime.com/api/files/716b9n2y44y92zp/i0xx644lq8874uc/my_project_34_copy_0_tIWm7ouO9W.gif?thumb=400x0`,
+        text: "Easily see all ingredients and directions at the same time.  Add notes, blur ingredients or directions when completed, and it even has built in timers"
+    },{
+        gif: `https://db.ivebeenwastingtime.com/api/files/716b9n2y44y92zp/0oq9ib2ekr0wkjf/my_project_31_9G37Ylanui.gif?thumb=400x0`,
+        text: "quickly create menus with grocery lists based on the recipes you have added, search, filter and sort to find the perfect recipe."
+    },{
+        gif: `https://db.ivebeenwastingtime.com/api/files/716b9n2y44y92zp/hvdik0mxsukp0yk/my_project_32_4kg8mYpQdl.gif?thumb=400x0`,
+        text: "browse and search your previous menus and set one as today's menu"
+    },{
+        gif: `https://db.ivebeenwastingtime.com/api/files/716b9n2y44y92zp/88kx73q80vvo6l1/my_project_33_gmMgQzzNkG.gif?thumb=400x0`,
+        text: "your current menu will show on the today page"
+    }]
 </script>
 
-<div id="main" class="w-full flex flex-col">
-    <div id="hero" style="background-image: url('{data.hero_url}')" class="flex flex-col relative w-full h-screen m-auto bg-cover bg-no-repeat bg-center">
-        <!-- <div id="web_title" class="m-auto cursor-default md:text-5xl text-white">
-            <h1>ivebeenwastingtime</h1>
-        </div> -->
-    </div>
+
+<div class="flex flex-col space-y-96 py-32 p-5">
+    {#each pages as page}
+        <div class="flex flex-row w-full items-center border border-primary bg-neutral rounded-lg">
+            <div class="w-2/3 p-2 ">
+                <img src={page.gif} alt="gif of {page.text}" class="w-full rounded-lg"/>
+            </div>
+            <p class="p-10 w-1/3">{page.text}</p>
+        </div>
+    {/each}
 </div>
