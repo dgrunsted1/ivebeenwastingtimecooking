@@ -23,8 +23,8 @@ const selectors = {
                             item: '#structured-ingredients_1-0 > ul > li:nth-child(ITEM_INDEX)'
                         }],
             directions: [{
-                            group: '#mntl-sc-block_45-0 > *',
-                            item: '#mntl-sc-block_45-0 > li:nth-child(ITEM_INDEX) > p'
+                            group: 'ol > *',
+                            item: 'ol > li:nth-child(ITEM_INDEX) > p'
                         }]
                         // #mntl-sc-block_3-0
                         // #ingredient-list_1-0 > li:nth-child(2)
@@ -283,7 +283,7 @@ async function validate_recipe_data(recipe_data, url){
         errors.push("time");
     }
 
-    if (typeof recipe_data.servings != "string" || recipe_data.servings == ""){
+    if (typeof recipe_data.servings != "number" || recipe_data.servings == 0){
         errors.push("servings");
     }
 
