@@ -18,7 +18,7 @@
 
     onMount(async () => {
         if ($page.url.pathname == "/today"){
-            view_size_mobile = `max-h-[calc(71vh)]`;
+            view_size_mobile = `max-h-[calc(100svh-130px)]`;
             view_size_desktop = `md:max-h-[calc(100svh-120px)]`;
         }
     });

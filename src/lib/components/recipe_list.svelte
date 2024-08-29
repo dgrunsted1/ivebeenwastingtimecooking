@@ -329,7 +329,7 @@
     </div>
 </div>
 
-<div id="recipes" class="h-[68vh] md:h-[calc(100svh-125px)] overflow-y-auto space-y-2 border border-primary rounded-md md:border-none py-2">
+<div id="recipes" class="h-[calc(100svh-160px)] md:h-[calc(100svh-125px)] overflow-y-auto space-y-2 border border-primary rounded-md md:border-none py-2">
     {#if display_recipes.length}
         {#each display_recipes as curr, i}
             <div class="card card-side bg-base-200 shadow-xl h-24 card-bordered cursor-pointer mx-1" on:click={view} on:keydown={view}>

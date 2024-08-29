@@ -281,7 +281,7 @@
                             <div class="dropdown w-1/2">
                                 <input type="text" id="cuisine" placeholder="cuisine" tabindex="0" class="input input-bordered input-xs m-1 w-full cursor-text" bind:value={recipe.cuisine} on:input={filter_cuisines}/>
                                 <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box">
-                                    <div class="flex flex-col max-w-52 max-h-[50vh] overflow-y-scroll">
+                                    <div class="flex flex-col max-w-52 max-h-[50svh] overflow-y-scroll">
                                         {#each display_cuisines as cuisine}
                                             <li class="cursor-pointer" on:click={()=>{recipe.cuisine = cuisine; document.activeElement.blur();}}>{cuisine}</li>
                                         {/each}
@@ -291,7 +291,7 @@
                             <div class="dropdown dropdown-end w-1/2">
                                 <input type="text" id="country" placeholder="country" tabindex="0" class="input input-bordered input-xs m-1 cursor-text w-full" bind:value={recipe.country} on:input={filter_countries}/>
                                 <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box">
-                                    <div class="flex flex-col max-w-52 max-h-[50vh] overflow-y-scroll">
+                                    <div class="flex flex-col max-w-52 max-h-[50svh] overflow-y-scroll">
                                         {#each display_countries as country}
                                             <li class="cursor-pointer" on:click={()=>{recipe.country = country; document.activeElement.blur();}}>{country}</li>
                                         {/each}
@@ -303,7 +303,7 @@
                             <div class="dropdown w-1/2 flex">
                                 <input type="text" id="category" placeholder="category" tabindex="0" class="input input-bordered input-xs m-1 cursor-text w-full" bind:value={recipe.category} on:input={filter_categories}/>
                                 <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box mt-8">
-                                    <div class="flex flex-col max-w-52 max-h-[50vh] overflow-y-scroll">
+                                    <div class="flex flex-col max-w-52 max-h-[50svh] overflow-y-scroll">
                                         {#each display_categories as category}
                                             <li class="cursor-pointer" on:click={()=>{recipe.category = category; document.activeElement.blur();}}>{category}</li>
                                         {/each}

@@ -223,15 +223,15 @@
     </div>
     
     {#if tab == "recipe_list"}
-        <div class="{overflow_len} md:max-h-[calc(100svh-160px)] overflow-y-auto border rounded-md md:border-none">
+        <div class="h-[calc(100svh-210px)] md:max-h-[calc(100svh-160px)] overflow-y-auto border rounded-md md:border-none">
             {#if menu.length}    
                 {#each menu as recipe}
                     {#if !recipe.is_sub_recipe}
-                        <div class="img_serv_container card card-bordered card-side flex flex-row w-auto items-center my-3.5 mx-3 shadow-xl bg-base-300 md:bg-base-200">
-                            <figure class="image w-1/3 h-full">
-                                <img class="h-full" src={recipe.image} alt={recipe.title}/>
+                        <div class="img_serv_container card card-bordered card-side flex flex-row w-auto items-center my-3.5 mx-3 shadow-xl bg-base-300 md:bg-base-200 h-32">
+                            <figure class="flex justify-center items-center overflow-hidden h-full w-2/5">
+                                <img class="shrink-0 object-cover h-full w-full" src={recipe.image} alt={recipe.title}/>
                             </figure>
-                            <div class="servings_time_container flex flex-col w-2/3 ml-2.5 space-y-1 mb-2">
+                            <div class="servings_time_container flex flex-col w-3/5 ml-2.5 space-y-1 my-2">
                                 <p class="title text-xs bold md:text-xl">{recipe.title}</p>
                                 <p class="time text-xs">{recipe.time}</p>
                                 <div class="servings_container text-xs">
@@ -239,7 +239,7 @@
                                                 id={recipe.id} bind:value={mults[recipe.id]} 
                                                 on:input={update_mult}>
                                 </div>
-                                <p class="description text-xs">{recipe.description}</p>
+                                <!-- <p class="description text-xs">{recipe.description}</p> -->
                                 {#if sub_recipes && sub_recipes[recipe.id] && $page.url.pathname == "/menu"}
                                     <div class="flex flex-col space-y-2">
                                         {#each sub_recipes[recipe.id] as curr}

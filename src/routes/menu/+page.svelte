@@ -141,7 +141,7 @@
                     {/if}
                 </div>
                 <dialog id="my_modal_3" class="modal">
-                        <div class="modal-box max-w-full md:w-2/3 p-1 h-[80vh]">
+                        <div class="modal-box max-w-full md:w-2/3 p-1 h-[90svh]">
                             <form method="dialog">
                                 <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" on:click={()=>{edit_recipe = null}}>✕</button>
                             </form>
