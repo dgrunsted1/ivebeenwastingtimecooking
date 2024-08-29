@@ -324,7 +324,7 @@
             </div>
         </div>
     {#if user_menus.length > 0 || loading || no_results_found}
-        <div id="menus" class="h-[calc(100svh-55px)] md:h-[calc(100svh-90px)] overflow-y-auto border border-primary rounded-md md:border-none w-full">
+        <div id="menus" class="h-[calc(100svh-60px)] md:h-[calc(100svh-90px)] overflow-y-auto border border-primary rounded-md md:border-none w-full">
             {#if no_results_found}
                 <div class="flex flex-col justify-center items-center space-y-5 bg-base-200 mx-2 md:mx-auto p-16 border-2 border-base-300 rounded-md shadow-md  md:text-4xl mt-[30vh] max-w-md">
                     <div class="w-full flex justify-center content-center h-full">
