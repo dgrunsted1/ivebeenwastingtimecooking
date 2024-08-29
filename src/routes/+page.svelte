@@ -21,7 +21,7 @@
 <div class="flex flex-col space-y-96 py-32 p-5">
     {#each pages as page}
         <div class="flex flex-col md:flex-row w-full items-center border border-primary bg-primary rounded-lg">
-            <div class="w-2/3 p-2 ">
+            <div class="md:w-2/3 p-2">
                 <img src={page.gif} alt="gif of {page.text}" class="w-full rounded-lg"/>
             </div>
             <p class="p-10 md:w-1/3 text-black">{page.text}</p>
