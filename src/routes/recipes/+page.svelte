@@ -296,9 +296,57 @@
 
 <main class="flex flex-col w-full justify-center items-center">
   <h4>See what others are cooking</h4>
-  <div class="flex w-full justify-center flex-col md:flex-row mt-2 space-y-1 md:space-y-2">
+  <div class="flex w-full justify-center flex-col md:flex-row md:mt-2 space-y-1 md:space-y-2">
+    <div class="hidden md:flex flex-row md:flex-col mx-1 space-x-1 md:space-x-0 md:space-y-2">
+        <select bind:value={selected_category} on:change={select_cat} class="select select-sm select-bordered border-primary w-full max-w-xs pl-1">
+            <option value={null}>category</option>
+            {#each categories as curr}
+                <option>{curr.id}</option>
+            {/each}
+        </select>
+        <select bind:value={selected_country} on:change={select_cat} class="select select-sm select-bordered border-primary w-full max-w-xs pl-1">
+            <option value={null}>country</option>
+            {#each countries as curr}
+                <option>{curr.id}</option>
+            {/each}
+        </select>
+        <select bind:value={selected_cuisine} on:change={select_cat} class="select select-sm select-bordered border-primary w-full max-w-xs pl-1">
+            <option value={null}>cuisine</option>
+            {#each cuisines as curr}
+                <option>{curr.id}</option>
+            {/each}
+        </select>
+        <select bind:value={selected_author} on:change={select_cat} class="select select-sm select-bordered border-primary w-full max-w-xs pl-1">
+            <option value={null}>author</option>
+            {#each authors as curr}
+                <option>{curr.id}</option>
+            {/each}
+        </select>
+
+    </div>
     <div class="flex flex-col w-full md:w-3/4 max-w-3xl space-y-1 md:space-y-2">
-      <ul class="flex flex-col w-full max-w-3xl space-y-2 md:space-y-4 h-[calc(100svh-135px)] md:h-[calc(100svh-125px)] overflow-y-auto">
+        <div class="hidden md:flex justify-between items-center mx-1">
+            <div class="form-control md:w-auto md:max-w-xs">
+                <label class="input input-bordered input-sm input-primary flex items-center gap-2 pr-0">
+                    <input type="text" class="input h-full p-0 w-28" placeholder="Search" on:keyup={update_search} bind:value={search_val}/>
+                    <div class="w-5" on:click={()=>{search_val = ""; update_search();}} on:keydown={()=>{search_val = ""; update_search();}}>
+                        {#if search_val}
+                            <Clear size="w-3 h-3"/>
+                        {/if}
+                    </div>
+                </label>
+            </div>
+            <div class="mx-1 text-xs md:text-base">{(total_recipes_num > max_results) ? max_results : total_recipes_num} recipes</div>
+            <div class="dropdown dropdown-top md:dropdown-bottom dropdown-end">
+                  <label tabindex="0" class="btn m-1 btn-primary btn-xs md:btn-sm">{sort_val}</label>
+                  <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-max bg-primary">
+                      {#each sort_opts as opt}
+                          <li class="btn btn-xs {opt == sort_val ? 'btn-neutral': 'btn-primary'}"><a on:click={update_sort}>{opt}</a></li>
+                      {/each}
+                  </ul>
+              </div>
+            </div>
+        <ul class="flex flex-col w-full max-w-3xl space-y-2 md:space-y-4 h-[calc(100svh-135px)] md:h-[calc(100svh-125px)] overflow-y-auto">
           {#each data as item}
               <div class="card card-side bg-base-200 shadow-xl h-24 card-bordered border-primary cursor-pointer mx-1" on:keydown={window.location = `/cook_recipe/${item.url_id}/${item.servings}`} on:click={window.location = `/cook_recipe/${item.url_id}/${item.servings}`}>
                   <figure class="w-1/4 bg-cover bg-no-repeat bg-center" style="background-image: url('{item.image}')"></figure>
@@ -346,7 +394,7 @@
           threshold={100}
           on:loadMore={load_more} />
       </ul>
-      <div class="flex justify-between items-center mx-1">
+      <div class="flex justify-between items-center mx-1 md:hidden">
         <div class="form-control md:w-auto md:max-w-xs">
             <label class="input input-bordered input-sm input-primary flex items-center gap-2 pr-0">
                 <input type="text" class="input h-full p-0 w-28" placeholder="Search" on:keyup={update_search} bind:value={search_val}/>
@@ -366,9 +414,9 @@
                   {/each}
               </ul>
           </div>
+        </div>
     </div>
-    </div>
-    <div class="flex flex-row md:flex-col mx-1 space-x-1 md:space-x-0 md:space-y-2">
+    <div class="flex md:hidden flex-row md:flex-col mx-1 space-x-1 md:space-x-0 md:space-y-2">
         <select bind:value={selected_category} on:change={select_cat} class="select select-sm select-bordered border-primary w-full max-w-xs pl-1">
             <option value={null}>category</option>
             {#each categories as curr}
