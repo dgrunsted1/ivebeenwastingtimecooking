@@ -303,7 +303,7 @@ async function validate_recipe_data(recipe_data, url){
         errors.push("directions");
         msg.push({directions: recipe_data.directions});
     }
-    if (errors){
+    if (errors.length){
         const error_data = {
             "function": "missing recipe data",
             "data": msg,
