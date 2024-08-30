@@ -173,7 +173,7 @@ async function get_nyt_data(page){
 
         let title = article.querySelector("h1").textContent;
         let author = article.querySelector("h2 > a").textContent;
-        let description = article.querySelector("p").textContent;
+        let description = article.querySelector("div:nth-child(4)").textContent;
         let img = article.querySelector("img").src;
         let time = article.querySelector("dd").textContent;
 
