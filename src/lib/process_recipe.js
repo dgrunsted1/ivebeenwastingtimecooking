@@ -47,6 +47,7 @@ export const process_recipe = function(in_lines){
 }
 
 export const process_recipe_old = function(in_lines) {
+    if (!in_lines || in_lines.length == 0) return [];
     let plus_match = in_lines[0].match(/([^>]+) plus ([^>]+)/);
     if (plus_match){
         if (plus_match[1].split(" ").length > 2 && plus_match[2].split(" ").length > 2){

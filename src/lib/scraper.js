@@ -223,10 +223,12 @@ async function get_ba_data(page){
         let author = header.querySelector("span > a").textContent;
         let body = article.querySelector(".recipe__main-content");
         let description = body.querySelector(".body").textContent;
+        let time_servings = body.querySelector("[data-testid='InfoSliceList'] > ul");
+        let servings = time_servings.querySelector("li:nth-child(2) > div > p:nth-child(2)").textContent;
+        let time = time_servings.querySelector("li:nth-child(1) > div > p:nth-child(2)").textContent;
         let ingr_list = body.querySelector("[data-testid='IngredientList']");
-        let servings = ingr_list.querySelector("p").textContent;
         let ingredient_list = ingr_list.querySelectorAll("div:nth-child(3) > *");
-        if (ingredient_list.length <= 2) ingredient_list = ingr_list.querySelectorAll("div:nth-child(3) > *");
+        if (ingredient_list.length <= 2) ingredient_list = ingr_list.querySelectorAll("div > *");
         let ingredients = [];
         for (let i = 0; i < ingredient_list.length; i++){
             if (ingredient_list[i].tagName == "DIV" || ingredient_list[i].tagName == "P") {
@@ -241,7 +243,6 @@ async function get_ba_data(page){
         for (let i = 0; i < dir_list.length; i++){
             let curr_list = dir_list[i].querySelectorAll("li > *");
             for (let j = 0; j < curr_list.length; j++){
-                tags.push(ingredient_list[i].tagName+"* "+ingredient_list[i].textContent);
                 if (curr_list[j].tagName == "P") directions.push(curr_list[j].textContent);
             }
         }
@@ -251,11 +252,10 @@ async function get_ba_data(page){
             author: author,
             description: description,
             image: img,
-            time: null,
+            time: time,
             servings: servings,
             expand: {ingr_list: ingredients},
             directions: directions,
-            tags: tags
         };
     });
     return result;
@@ -263,48 +263,57 @@ async function get_ba_data(page){
 
 async function validate_recipe_data(recipe_data, url){
     let errors = [];
+    let msg = [];
     if (typeof recipe_data.title != "string" || recipe_data.title == ""){
         errors.push("title");
+        msg.push({title: recipe_data.title});
     }
 
     if (typeof recipe_data.author != "string" || recipe_data.author == ""){
         errors.push("author");
+        msg.push({author: recipe_data.author});
     }
 
     if (typeof recipe_data.description != "string" || recipe_data.description == ""){
         errors.push("description");
+        msg.push({description: recipe_data.description});
     }
 
     if (typeof recipe_data.image != "string" || recipe_data.image == ""){
         errors.push("image");
+        msg.push({image: recipe_data.image});
     }
 
     if (typeof recipe_data.time != "string" || recipe_data.time == ""){
         errors.push("time");
+        msg.push({time: recipe_data.time});
     }
 
-    if (typeof recipe_data.servings != "number" || recipe_data.servings == 0){
+    if (typeof recipe_data.servings != "number" || recipe_data.servings == 0) {
         errors.push("servings");
+        msg.push({servings: recipe_data.servings});
     }
 
     if (typeof recipe_data.expand.ingr_list != "object" || recipe_data.expand.ingr_list.length == 0){
         errors.push("ingrs");
+        msg.push({ingrs: recipe_data.expand.ingr_list});
     }
 
     if (typeof recipe_data.directions != "object" || recipe_data.directions.length == 0){
         errors.push("directions");
+        msg.push({directions: recipe_data.directions});
     }
     if (errors){
-        console.log(errors)
         const error_data = {
             "function": "missing recipe data",
-            "data": errors,
-            "message": "",
+            "data": msg,
+            "message": JSON.stringify(errors),
             "url": url
         };
         
         const error_record = await pb.collection('errors').create(error_data);
     }
+    return;
 }
 
 export const scrape = async function(url) {
@@ -345,7 +354,6 @@ export const scrape = async function(url) {
             let results = {};
             if (url.includes("www.bonappetit.com")){
                 results = await get_ba_data(page);
-                console.log({results});
             }else if (url.includes("cooking.nytimes.com")) {
                 results = await get_nyt_data(page);
 
