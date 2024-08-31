@@ -129,7 +129,9 @@
                         {#if menu_recipes.length}
                             <Menu title="New Menu" menu={menu_recipes} {mults} {page} on:update_mult={update_mult}/>
                         {:else}
-                            <h2>select recipes to add to your menu</h2>
+                            <div class="flex flex-col justify-center items-center space-y-5 mx-2 md:mx-auto p-5 rounded-md shadow-md  md:text-xl max-w-5xl">
+                                <p>select recipes to add to your menu</p>
+                            </div>
                         {/if}
                     </div>
                 </details>
@@ -137,7 +139,9 @@
                     {#if menu_recipes.length}
                         <Menu title="New Menu" menu={menu_recipes} {mults} {page} on:update_mult={update_mult}/>
                     {:else}
-                        <h2>select recipes to add to your menu</h2>
+                        <div class="flex flex-col justify-center items-center space-y-5 mx-2 md:mx-auto p-16 rounded-md shadow-md  md:text-xl max-w-5xl">
+                            <p>select recipes to add to your menu</p>
+                        </div>
                     {/if}
                 </div>
                 <dialog id="my_modal_3" class="modal">
