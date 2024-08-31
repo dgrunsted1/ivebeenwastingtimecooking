@@ -223,13 +223,13 @@
     </div>
     
     {#if tab == "recipe_list"}
-        <div class="h-[calc(100svh-210px)] md:max-h-[calc(100svh-160px)] overflow-y-auto border rounded-md md:border-none flex flex-col">
+        <div class="h-[calc(100svh-210px)] md:h-[calc(100svh-160px)] overflow-y-auto border rounded-md md:border-none flex flex-col">
             {#if menu.length}    
                 {#each menu as recipe}
                     {#if !recipe.is_sub_recipe}
                         <div class="img_serv_container card card-bordered card-side flex flex-row w-auto place-items-stretch my-3.5 mx-3 shadow-xl bg-base-300 md:bg-base-200">
                             <figure class="w-2/5">
-                                <img class="obeject-cover w-full h-full" src={recipe.image} alt={recipe.title}/>
+                                <img class="object-cover h-full" src={recipe.image} alt={recipe.title}/>
                             </figure>
                             <div class="servings_time_container flex flex-col w-3/5 ml-2.5 space-y-1 my-2">
                                 <p class="title text-xs bold md:text-xl">{recipe.title}</p>
