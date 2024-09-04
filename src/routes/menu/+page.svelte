@@ -113,7 +113,7 @@
                         on:remove_from_menu={remove_from_menu}
                         on:add_to_menu={add_to_menu} on:reset_mode={reset_mode}/>
                 </div>
-                <details class="md:hidden collapse bg-base-200 md:bg-base-100 collapse-arrow mt-1 w-full md:w-1/2">
+                <details class="md:hidden collapse bg-base-200 md:bg-base-100 collapse-arrow mt-1 w-full md:w-1/2" on:click={() => {window.scrollBy({ top: 700, left: 0, behavior: "smooth"});}}>
                     <summary class="collapse-title text-xl font-medium">
                         {#if menu_recipes.length > 0}
                             <div class="flex justify-around m-1 items-center">

@@ -147,6 +147,11 @@
         tab = e.srcElement.id;
     }
 
+    async function save_and_set_today(e){
+        save_menu(e);
+        set_todays_menu();
+    }
+
     async function save_menu(e){
         e.srcElement.innerHTML = '<span class="loading loading-dots loading-md mx-7"></span>';
         let recipe_ids = [];
@@ -170,7 +175,7 @@
         e.srcElement.disabled = true;
     }
     
-    async function set_todays_menu(e){
+    async function set_todays_menu(){
         const resultList = await pb.collection('menus').getList(1, 1, {
             filter: `user = '${$currentUser.id}' && today = True`,
             expand: ``
@@ -178,7 +183,7 @@
         if (resultList.items.length){
             const false_record = await pb.collection('menus').update(resultList.items[0].id, { "today": false});
         }
-        const true_record = await pb.collection('menus').update(id, { "made": null, "grocery_list":null, "today": true });
+        const true_record = await pb.collection('menus').update(id, { "made": false, "grocery_list":null, "today": true });
         window.location.href = "/today";
     }
 
@@ -201,7 +206,14 @@
     <div class="flex items-center p-3 justify-between">
         <input type="text" class="input input-bordered border-primary input-xs w-2/3" bind:value={menu.title}/>
         {#if $page.url.pathname == "/menu"}
-            <button class="btn btn-secondary self-end btn-xs md:btn-sm" id="save_btn" on:click={save_menu}>save menu</button>
+            <!-- <button class="btn btn-secondary self-end btn-xs md:btn-sm" id="save_btn" on:click={save_menu}>save menu</button> -->
+            <div class="dropdown dropdown-end">
+                <label tabindex="0" class="btn m-1 btn-primary btn-xs md:btn-sm">save menu</label>
+                <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-max bg-primary">
+                    <li class="btn btn-xs btn-primary p-0"><a class="p-0" on:click={save_menu}>save menu</a></li>
+                    <li class="btn btn-xs btn-primary p-0"><a class="p-0" on:click={save_and_set_today}>save and set today</a></li>
+                </ul>
+            </div>
         {:else if $page.url.pathname == "/my_menus"}
             <button class="btn btn-secondary self-end btn-xs md:btn-sm" id="today_btn" on:click={set_todays_menu}>set today</button>
         {/if}
