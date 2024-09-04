@@ -104,7 +104,6 @@ function round_amount(in_amount, mult){
 }
   
   function removePunctuationSymbolsParentheses(text) {
-
     // Remove punctuation
     text = text.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
   
@@ -140,9 +139,17 @@ function round_amount(in_amount, mult){
         if (recipe.expand.ingr_list) {
             for (let i = 0; i < recipe.expand.ingr_list.length; i++) {
                 let temp_item = {...recipe.expand.ingr_list[i]};
-                temp_item.quantity = recipe.expand.ingr_list[i].quantity * mult;
-                temp_item.checked = false;
-                grocery_list.push(temp_item);
+                grocery_list.push({
+                    "qty": recipe.expand.ingr_list[i].quantity * mult,
+                    "unit": recipe.expand.ingr_list[i].unit,
+                    "unit_plural": recipe.expand.ingr_list[i].unit_plural,
+                    "name": recipe.expand.ingr_list[i].ingredient,
+                    "checked": false,
+                    "ingrs": [
+                        recipe.expand.ingr_list[i].id
+                    ],
+                    "active": true
+                });
             }
         } 
     });
@@ -155,7 +162,7 @@ function round_amount(in_amount, mult){
 
     // Split each string into words
     strings = strings.sort((a, b) => b.length - a.length);
-    let stringWords = strings.map(s => removePunctuationSymbolsParentheses(s.ingredient).split(' '));
+    let stringWords = strings.map(s => removePunctuationSymbolsParentheses(s.name).split(' '));
     
     let groups = [];
     for (let i = 0; i < strings.length; i++) {
@@ -167,7 +174,7 @@ function round_amount(in_amount, mult){
       for (let j = 0; j < groups.length; j++) {
             for (let k = 0; k < groups[j].length; k++) {
                 let intersection = 0;
-                const str2Words = removePunctuationSymbolsParentheses(groups[j][k].ingredient).split(' ');
+                const str2Words = removePunctuationSymbolsParentheses(groups[j][k].name).split(' ');
                 str1Words.forEach(word => {
                 if (str2Words.includes(word)) {
                     intersection++;

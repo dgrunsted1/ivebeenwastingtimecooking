@@ -27,7 +27,7 @@
         if (!$currentUser) window.location.href = "/login";
         const result_list = await pb.collection('menus').getList(1, 1, {
             filter: `user="${$currentUser.id}" && today=True`,
-            expand: `recipes,recipes.notes,recipes.ingr_list, grocery_list`
+            expand: `recipes,recipes.notes,recipes.ingr_list, grocery_list, grocery_list.items`
         });
         if (result_list.items[0]){
             todays_menu = result_list.items[0];
@@ -39,13 +39,14 @@
             sub_recipe_ids = sub_recipe_ids;
 
             todays_menu.expand.recipes = todays_menu.expand.recipes.sort(sort_by_made);
-            if (!todays_menu.expand.grocery_list || !todays_menu.expand.grocery_list.list){
+            if (!todays_menu.expand.grocery_list || !todays_menu.expand.grocery_list.expand.items){
                 grocery_list = get_grocery_list(todays_menu, todays_menu.servings, todays_menu.sub_recipes);
                 grocery_list_id = create_grocery_list(grocery_list, todays_menu.id);
             } else {
-                grocery_list = groupBySimilarity(todays_menu.expand.grocery_list.list);
+                grocery_list = groupBySimilarity(todays_menu.expand.grocery_list.expand.items);
                 grocery_list_id = todays_menu.expand.grocery_list.id;
             }
+            console.log({grocery_list})
             let checked = [];
             let unchecked = [];
             for (let i = 0; i < grocery_list.length; i++){
@@ -56,8 +57,6 @@
                 }
             }
             grocery_list = unchecked.concat(checked);
-            console.log("recipes", todays_menu.expand.recipes);
-            console.log("todays_menu.made", todays_menu.made);
             for (let i = 0; i < todays_menu.expand.recipes.length; i++){
                 if (!todays_menu.made){
                     todays_menu.made = {};
@@ -66,14 +65,12 @@
                     todays_menu.made[todays_menu.expand.recipes[i].id] = false;
                 }
             }
-            console.log("todays_menu.made2", todays_menu.made);
         }
         loading = false;
     });
 
     afterUpdate(() => {
         if (todays_menu.expand) update_recipes_ready();
-        console.log(recipes_ready);
     });
 
     function update_recipes_ready(){

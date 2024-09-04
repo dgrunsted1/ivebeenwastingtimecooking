@@ -173,16 +173,12 @@
     async function set_todays_menu(e){
         const resultList = await pb.collection('menus').getList(1, 1, {
             filter: `user = '${$currentUser.id}' && today = True`,
-            expand: `grocery_list`
+            expand: ``
         });
         if (resultList.items.length){
-            const false_record = await pb.collection('menus').update(resultList.items[0].id, { "today": false, grocery_list: null });
-            if (resultList.items[0].grocery_list){
-                const grocery_list_id = resultList.items[0].grocery_list;
-                const grocery_list_record = await pb.collection('groceries').update(grocery_list_id, { "menu": null, active: false });
-            }
+            const false_record = await pb.collection('menus').update(resultList.items[0].id, { "today": false});
         }
-        const true_record = await pb.collection('menus').update(id, { "made": null, "grocer_list":null, "today": true });
+        const true_record = await pb.collection('menus').update(id, { "made": null, "grocery_list":null, "today": true });
         window.location.href = "/today";
     }
 
