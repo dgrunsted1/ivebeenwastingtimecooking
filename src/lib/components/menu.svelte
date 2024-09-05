@@ -49,7 +49,6 @@
             menu.title = "New Menu";
             if (menu.length > 1) menu.title = generate_menu_title();
         }
-        
     });
 
     function update_sub_recipes(){
@@ -158,7 +157,7 @@
         let made = {};
         for (let i = 0; i < menu.length; i++){
             recipe_ids.push(menu[i].id);
-            made[menu[i].id] = 0;
+            made[menu[i].id] = false;
         }
         const data = {
             "recipes": recipe_ids,
@@ -183,7 +182,17 @@
         if (resultList.items.length){
             const false_record = await pb.collection('menus').update(resultList.items[0].id, { "today": false});
         }
-        const true_record = await pb.collection('menus').update(id, { "made": false, "grocery_list":null, "today": true });
+        let made_menu = {};
+        for (let i = 0; i < menu.length; i++){
+            made_menu[menu[i].id] = false;
+        }
+        const true_record = await pb.collection('menus').update(id, { "made": made_menu, "grocery_list":null, "today": true });
+        const menu_log_data = {
+            "menu": true_record.id,
+            "user": $currentUser.id,
+            "complete": false
+        };
+        const menu_log_result = await pb.collection('menu_log').create(menu_log_data);
         window.location.href = "/today";
     }
 
@@ -206,7 +215,6 @@
     <div class="flex items-center p-3 justify-between">
         <input type="text" class="input input-bordered border-primary input-xs w-2/3" bind:value={menu.title}/>
         {#if $page.url.pathname == "/menu"}
-            <!-- <button class="btn btn-secondary self-end btn-xs md:btn-sm" id="save_btn" on:click={save_menu}>save menu</button> -->
             <div class="dropdown dropdown-end">
                 <label tabindex="0" class="btn m-1 btn-primary btn-xs md:btn-sm">save menu</label>
                 <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-max bg-primary">

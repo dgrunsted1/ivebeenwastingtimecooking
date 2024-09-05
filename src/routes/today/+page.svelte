@@ -129,7 +129,7 @@
             todays_menu.made[id] = true;
         }
         if (todays_menu.made[id]) log_made(id, $currentUser.id);
-        update_made(todays_menu.made, todays_menu.id);
+        update_made(todays_menu.made, todays_menu.id, $currentUser.id);
     }
 
     function update_fave_queue(e){

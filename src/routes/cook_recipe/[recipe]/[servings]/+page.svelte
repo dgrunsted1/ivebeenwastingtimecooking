@@ -71,7 +71,7 @@
             todays_menu.made[id] = true;
         }
         if (todays_menu.made[id]) log_made(id, $currentUser.id);
-        update_made(todays_menu.made, todays_menu.id);
+        update_made(todays_menu.made, todays_menu.id, $currentUser.id);
     }
 
     const update_recipe_ready = function() {
@@ -219,7 +219,7 @@
                     {/if}    
                     {#if user_logged_in}
                         {#if recipe_ready}
-                            {#if todays_menu.made && todays_menu.made[data.post.recipe.id]}
+                            {#if todays_menu.made && todays_menu.made[data.post.recipe.id] !== undefined}
                                 <input type="checkbox" class="checkbox checkbox-primary checkbox-lg p-1" id={data.post.recipe.id} bind:checked={todays_menu.made[data.post.recipe.id]} on:click|stopPropagation={toggle_made}>
                             {:else}
                                 <input type="checkbox" class="checkbox checkbox-primary checkbox-lg p-1" id={data.post.recipe.id} on:click|stopPropagation={log_made(data.post.recipe.id, $currentUser.id)}>

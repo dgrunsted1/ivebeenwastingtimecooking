@@ -109,19 +109,39 @@ export const update_grocery_item = async function(item){
     }
 }
 
-export const update_made = async function(made, id){
+export const update_made = async function(made, id, user_id){
     const data = {
         "made": made
     };
     
     const record = await pb.collection('menus').update(id, data);
-
+    let menu_completed = true;
     for (const [key, val] of Object.entries(made)){
         if (val){
             const ingr_data = {
                 "made": true
             };
             const ingr_record = await pb.collection('recipes').update(key, ingr_data);
+        } else {
+            menu_completed = false;
+        }
+    }
+    if (menu_completed){
+        const menu_log_row = await pb.collection('menu_log').getList(1, 1, {filter: `user = '${user_id}' && menu = '${id}'`, sort: `-created`});
+        if (menu_log_row.items.length){
+            const menu_log_data = {
+                "complete": true,
+                "date_completed": new Date().toISOString()
+            };
+            const menu_log_result = await pb.collection('menu_log').update(menu_log_row.items[0].id, menu_log_data);
+        } else {
+            const menu_log_data = {
+                "menu": true_record.id,
+                "user": $currentUser.id,
+                "complete": true,
+                "date_completed": new Date().toISOString()
+            };
+            const menu_log_result = await pb.collection('menu_log').create(menu_log_data);
         }
     }
 }
