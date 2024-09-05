@@ -148,9 +148,10 @@
                             {#if status != "none"}<button class="btn btn-sm p-1 btn-accent" on:click={() => remove_item(item.qty, item.unit, item.name)}><DeleteIcon/></button>{/if}
                         </div>
                     {:else}
-                        <div class="grocery_item flex relative my-2 tooltip space-x-3 justify-left items-center">
-                            {#if status != "none"}<input type="checkbox" class="checkbox checkbox-primary checkbox-lg p-1w" id="{item.name}" bind:checked={item.checked} on:change={edit_item}>{/if}
-                            <p class="text-xs text-left -indent-5 pl-5">{item.qty == 0 ? "" : item.qty} {item.unit} {item.name}</p>
+                        <div class="grocery_item flex relative my-2 tooltip space-x-3 justify-end md:justify-start items-center">
+                            {#if status != "none"}<input type="checkbox" class="hidden md:flex checkbox checkbox-primary checkbox-lg p-1" id="{item.name}" bind:checked={item.checked} on:change={edit_item}>{/if}
+                            <p class="text-xs md:text-left -indent-5 pl-5">{item.qty == 0 ? "" : item.qty} {item.unit} {item.name}</p>
+                            {#if status != "none"}<input type="checkbox" class="md:hidden checkbox checkbox-primary checkbox-lg p-1" id="{item.name}" bind:checked={item.checked} on:change={edit_item}>{/if}
                         </div>
                     {/if}
                 {/each} 
