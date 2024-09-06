@@ -19,6 +19,7 @@
     $: no_results_found = false;
 
     onMount(async () => {
+        await pb.collection('users').authRefresh();
         if (!$currentUser) window.location.href = "/login";
         const result_list = await pb.collection('menus').getList(1, 250, {
             filter: `user="${$currentUser.id}"`,
@@ -118,7 +119,7 @@
                 return;
             }
             const result_ingr = await pb.collection('ingredients').getList(1, 250, {
-                filter: `ingredient ~ '${search_str}'`,
+                filter: `ingredient ~ '${search_str}' && recipe.user="${$currentUser.id}"`,
                 expand: `recipe`
             });
             for (let i = 0; i < result_ingr.items.length; i++){
@@ -127,7 +128,7 @@
                 }
             }
             const result_recipe = await pb.collection('recipes').getList(1, 250, {
-                filter: `title ~ '${search_str}'`,
+                filter: `title ~ '${search_str}' && user="${$currentUser.id}"`,
             });
             for (let i = 0; i < result_recipe.items.length; i++){
                 if (!recipe_ids.includes(result_recipe.items[i].id)) recipe_ids.push(result_recipe.items[i].id);
@@ -137,7 +138,7 @@
                 recipe_id_string += ` || recipes ~ '${recipe_ids[i]}'`;
             }
             const result_menu = await pb.collection('menus').getList(1, 250, {
-                filter: `title ~ '${search_str}'${recipe_id_string}`,
+                filter: `title ~ '${search_str}'${recipe_id_string} && user="${$currentUser.id}"`,
                 expand: `recipes,recipes.ingr_list`
             });
             if (result_menu.items.length == 0){

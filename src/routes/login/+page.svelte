@@ -1,12 +1,17 @@
 <script>
     import { currentUser, pb } from '/src/lib/pocketbase.js';
     import { page } from '$app/stores';
+    import { onMount } from 'svelte';
 
     let username;
     let password;
     let name;
     let email;
 
+    onMount(async () => {
+      await pb.collection('users').authRefresh();
+    })
+    
     async function login() {
       const user = await pb.collection('users').authWithPassword(username, password);
       window.location = document.referrer;
@@ -26,10 +31,14 @@
             "passwordConfirm": password,
             "name":name,
             "email": email,
-            "verified": false
-        };  
+            "emailVisibility": true,
+            "paid": false,
+            "active": true
+        };
       try {
         const createdUser = await pb.collection('users').create(data);
+        console.log("sign up", createdUser.email);
+        await pb.collection('users').requestVerification(createdUser.email);
         await login();
       } catch (err) {
         for (let key in err.data.data) {

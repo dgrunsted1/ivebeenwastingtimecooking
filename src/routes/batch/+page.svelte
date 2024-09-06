@@ -6,15 +6,20 @@
     $: passed = 0;
     $: failed = 0;
     $: is_auth_user = false;
+    $: verify_email = "";
 
     const tables = ["menus_strict", "grocery_lists", "ingredients_strict", "menu_log_strict", "grocery_items", "recipes_log_strict", "recipes_strict", "sub_recipes"];
 
-    beforeUpdate(() => {
+    onMount(async () => {
+        await pb.collection('users').authRefresh();
+    });
+    beforeUpdate(async () => {
         if (!$currentUser || $currentUser.id != "67gxu7xk6x46gjy"){
             window.location.href = "/";
         } else {
             is_auth_user = true;
         }
+        console.log($currentUser)
     });
         
     const update_recipe_url_ids = async function (){
@@ -429,6 +434,10 @@
             e.srcElement.disabled = true;
         }
     }
+
+    const send_verify_email = async function() {
+        await pb.collection('users').requestVerification(verify_email);
+    }
 </script>
 
 
@@ -475,6 +484,12 @@
                 <div>
                     failed: {failed}
                 </div>
+        </div>
+        <div class="my-10 mx-5 flex">
+            <form on:submit|preventDefault={send_verify_email} class="border rounded-lg p-5">
+                <input placeholder="email" name="email" type="text" bind:value={verify_email} class="input input-bordered input-xs w-56 text-center input-accent"/>
+                <button type="submit" class="btn btn-primary">send verification email</button>
+            </form>
         </div>
     {/if}
 </div>

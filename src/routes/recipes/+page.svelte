@@ -6,6 +6,8 @@
     import {sort_recipes} from "/src/lib/sort.js";
     import Plus from "/src/lib/icons/Plus.svelte";
     import CheckMark from "/src/lib/icons/CheckMark.svelte";
+    import Alerts from "../../lib/components/alerts.svelte";
+
 
 	
 	// if the api (like in this example) just have a simple numeric pagination
@@ -41,6 +43,7 @@
     $: search_val = "";
     $: max_results = 0;
     $: just_copied = false;
+    let alert = {show: false, msg: "", title: "", type: "warning"};
     
     let total_recipes_num = 0;
 	
@@ -178,6 +181,7 @@
 	
 	onMount(async ()=> {
 		// load first batch onMount
+        await pb.collection('users').authRefresh();
 		await fetchData();
         max_results = total_recipes_num;
         categories = await pb.collection('categories').getFullList({sort: `+id`});
@@ -256,9 +260,12 @@
     async function add_recipe(e){
         if (!$currentUser){
             if (window.confirm("you must login to add this recipe to your list. Do you want to sign in?")) {
-                window.open(`login`, "Thanks for Visiting!");
+                window.open(`/login`, "Thanks for Visiting!");
             }
-        }else {
+        } else if (!$currentUser.verified){
+            show_alert("Please verify your email to add recipes", "error", "Please verify your email");
+            return;
+        } else {
             const recipe_to_add = data.filter((curr) => curr.id == e.currentTarget.id)[0];
             console.log({recipe_to_add});
             const recipe_in = {
@@ -285,12 +292,19 @@
             console.log({recipe_in});
             let recipe_result = await pb.collection('recipes').create(recipe_in);
             console.log({recipe_result});
-            just_copied = true;
+            just_copied = recipe_to_add.id;
             clearTimeout(delay_timer);
             delay_timer = setTimeout(function() {
                 just_copied = false;
             }, 2000);
         }
+    }
+
+    function show_alert(msg, type, title){
+        alert.show = true;
+        alert.msg = msg;
+        alert.type = type;
+        alert.title = title;
     }
 </script>
 
@@ -373,7 +387,7 @@
                               </div>
                               {#if !$currentUser || $currentUser.id != item.user}
                                 <div id={item.id} class="btn btn-primary btn-xs w-6 ml-2 p-0" on:click|stopPropagation={add_recipe} on:keydown|stopPropagation={add_recipe}>
-                                    {#if just_copied}
+                                    {#if just_copied == item.id}
                                         <CheckMark/>
                                     {:else}
                                         <Plus/>
@@ -444,4 +458,5 @@
 
     </div>
   </div>
+  <Alerts msg={alert.msg} type={alert.type} bind:show={alert.show} title={alert.title}/>
 </main>

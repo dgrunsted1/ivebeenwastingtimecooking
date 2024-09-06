@@ -24,6 +24,7 @@
 
 
     onMount(async () => {
+        await pb.collection('users').authRefresh();
         if (!$currentUser) window.location.href = "/login";
         const result_list = await pb.collection('menus').getList(1, 1, {
             filter: `user="${$currentUser.id}" && today=True`,

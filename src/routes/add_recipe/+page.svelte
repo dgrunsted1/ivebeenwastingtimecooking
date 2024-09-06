@@ -1,7 +1,5 @@
 <script>
     import EditRecipe from "/src/lib/components/edit_recipe.svelte";
-    import alerts from "/src/lib/components/alerts.svelte";
-    import { page } from '$app/stores';
     import { currentUser, pb } from '/src/lib/pocketbase.js';
     import { process_recipe_old } from '/src/lib/process_recipe.js';
     import { deserialize } from '$app/forms';
@@ -32,11 +30,17 @@
 
     let alert = {show: false, msg: "", title: "", type: "warning"};
 
-    onMount(() => {
+    onMount(async () => {
+        await pb.collection('users').authRefresh();
         if (!$currentUser) window.location.href = "/login";
     });
 
     async function fetch_recipe(e){
+        if (!$currentUser.verified){
+            show_alert("Please verify your email to add recipes", "error", "Please verify your email");
+            e.srcElement.value = "";
+            return;
+        }
         document.getElementById('loading').classList.remove('hidden');
         const data = new FormData(this);
 

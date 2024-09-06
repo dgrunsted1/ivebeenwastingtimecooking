@@ -20,6 +20,7 @@
 
 
     onMount(async () => {
+        await pb.collection('users').authRefresh();
         if (!$currentUser) window.location.href = "/login";
         const result_list = await pb.collection('recipes').getList(1, 250, {
             filter: `user="${$currentUser.id}"`,

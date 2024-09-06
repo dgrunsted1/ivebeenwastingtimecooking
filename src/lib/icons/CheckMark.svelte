@@ -1,5 +1,5 @@
 <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
-	  viewBox="0 0 305.002 305.002" class="w-5 primary pointer-events-none fill-success"
+	  viewBox="0 0 305.002 305.002" class="w-5 primary pointer-events-none"
 	 xml:space="preserve">
 <g>
 	<g>

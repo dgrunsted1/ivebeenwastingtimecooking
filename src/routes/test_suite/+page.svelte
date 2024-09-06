@@ -17,6 +17,7 @@ $: test_site = null;
 $: test_sites = ['www.seriouseats.com', 'cooking.nytimes.com', 'www.bonappetit.com'];
 
 onMount(async () => {
+    await pb.collection('users').authRefresh();
     if (!$currentUser) window.location.href = "/login";
     recipe_links = await pb.collection('recipes').getFullList({expand:`ingr_list`});
     if (recipe_links) document.getElementById("compare_parsers_btn").disabled = false;

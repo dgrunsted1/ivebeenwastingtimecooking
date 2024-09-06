@@ -1,4 +1,6 @@
 <script>
+    import { onMount } from "svelte";
+
     const pages = [{
         gif: `https://db.ivebeenwastingtime.com/api/files/716b9n2y44y92zp/1v2pt8h8glmy7o1/my_project_1_copyCVePJ4.gif?thumb=400x0`,
         text: "add a recipe easily from your favorite website, a book, or a video"
@@ -15,6 +17,10 @@
         gif: `https://db.ivebeenwastingtime.com/api/files/716b9n2y44y92zp/88kx73q80vvo6l1/my_project_33_gmMgQzzNkG.gif?thumb=400x0`,
         text: "your current menu will show on the today page"
     }]
+
+    onMount(async () => {
+        await pb.collection('users').authRefresh();
+    })
 </script>
 
 
