@@ -17,10 +17,7 @@
         gif: `https://db.ivebeenwastingtime.com/api/files/716b9n2y44y92zp/88kx73q80vvo6l1/my_project_33_gmMgQzzNkG.gif?thumb=400x0`,
         text: "your current menu will show on the today page"
     }]
-
-    onMount(async () => {
-        if ($currentUser) await pb.collection('users').authRefresh();
-    })
+    
 </script>
 
 
