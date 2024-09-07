@@ -8,7 +8,6 @@
     import Menu from "/src/lib/components/menu.svelte";
     import { page } from '$app/stores';
 
-
     $: user_recipes = {};
     let menu_recipes = [];
     let mults = {};
@@ -28,6 +27,14 @@
             sort: `-created`
         });
         user_recipes = result_list;
+        if ($page.params.recipe_rec != ""){
+            for (let i = 0; i < user_recipes.items.length; i++){
+                if (user_recipes.items[i].id == $page.params.recipe_rec){
+                    menu_recipes.push(user_recipes.items[i]);
+                    mults[user_recipes.items[i].id] = user_recipes.items[i].servings;
+                }
+            }
+        }
         loading = false;
     });
 

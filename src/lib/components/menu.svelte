@@ -211,10 +211,10 @@
 
 </script>
 
-<div id="menu" class="h-3/4 md:h-full w-full cursor-default">
+<div id="menu" class="h-3/4 md:h-full w-full cursor-default md:min-w-[600px]">
     <div class="flex items-center p-3 justify-between">
         <input type="text" class="input input-bordered border-primary input-xs w-2/3" bind:value={menu.title}/>
-        {#if $page.url.pathname == "/menu"}
+        {#if $page.url.pathname == "/menu" || $page.url.pathname == "/profile"}
             <div class="dropdown dropdown-end">
                 <label tabindex="0" class="btn m-1 btn-primary btn-xs md:btn-sm">save menu</label>
                 <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-max bg-primary">

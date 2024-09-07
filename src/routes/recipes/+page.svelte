@@ -388,7 +388,7 @@
                               {#if !$currentUser || $currentUser.id != item.user}
                                 <div id={item.id} class="btn btn-primary btn-xs w-6 ml-2 p-0" on:click|stopPropagation={add_recipe} on:keydown|stopPropagation={add_recipe}>
                                     {#if just_copied == item.id}
-                                        <CheckMark/>
+                                        <CheckMark color=""/>
                                     {:else}
                                         <Plus/>
                                     {/if}

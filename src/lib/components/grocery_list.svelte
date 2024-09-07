@@ -126,7 +126,7 @@
             </div>
             <button id="copy" class="btn btn-xs md:btn-sm btn-secondary cursor-copy" on:click={copy_to_clipboard}>
                 {#if just_copied}
-                <CheckMark/>
+                <CheckMark color=""/>
                 {:else}
                     copy
                 {/if}
