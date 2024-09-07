@@ -231,7 +231,8 @@ async function get_ba_data(page){
         if (ingredient_list.length <= 2) ingredient_list = ingr_list.querySelectorAll("div > *");
         let ingredients = [];
         for (let i = 0; i < ingredient_list.length; i++){
-            if (ingredient_list[i].tagName == "DIV" || ingredient_list[i].tagName == "P") {
+            if ((ingredient_list[i].tagName == "DIV" || ingredient_list[i].tagName == "P") &&
+                ingredient_list[i].querySelectorAll("*").length == 0) {
                 if (ingredients[ingredients.length - 1] && !ingredients[ingredients.length - 1].includes(" ") && !/[a-z]/i.test(ingredients[ingredients.length - 1])){
                     ingredients[ingredients.length - 1] = ingredients[ingredients.length - 1] + " " + ingredient_list[i].textContent;
                 }else ingredients.push(ingredient_list[i].textContent);
