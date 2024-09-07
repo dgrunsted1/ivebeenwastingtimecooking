@@ -217,7 +217,13 @@
             </div>
             <div id="right_column" class="{tab == "grocery_list" ? "" : "hidden"} md:flex md:w-1/2 ml-1 mr-2">
                 {#if todays_menu && mode == "menu"}
-                    <GroceryList bind:grocery_list={grocery_list} on:update_grocery_list={update_groceries} bind:status={grocery_list_status}  on:reset_grocery_list={reset_list}/>
+                    {#if grocery_list}
+                        <GroceryList bind:grocery_list={grocery_list} on:update_grocery_list={update_groceries} bind:status={grocery_list_status}  on:reset_grocery_list={reset_list}/>
+                    {:else} 
+                        <div id="menu_loading" class="w-full flex justify-center content-center h-full">
+                            <span class="loading loading-bars loading-lg"></span>
+                        </div>
+                    {/if}
                 {:else}
                     <h2>select recipes to add to your menu</h2>
                 {/if}

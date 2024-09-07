@@ -30,6 +30,8 @@
 
     let alert = {show: false, msg: "", title: "", type: "warning"};
 
+    let loading = false;
+
     onMount(async () => {
         if (!$currentUser) window.location.href = "/login";
         else await pb.collection('users').authRefresh();
@@ -41,7 +43,8 @@
             e.srcElement.value = "";
             return;
         }
-        document.getElementById('loading').classList.remove('hidden');
+        // document.getElementById('loading').classList.remove('hidden');
+        loading = true;
         const data = new FormData(this);
 
         const response = await fetch(this.action, {
@@ -63,7 +66,8 @@
                 show_alert("You have already added this recipe", "warning", "Recipe already exists");
             }
         }
-        document.getElementById('loading').classList.add('hidden');
+        // document.getElementById('loading').classList.add('hidden');
+        loading = false;
     }
 
     function show_alert(msg, type, title){
@@ -86,9 +90,15 @@
             <input placeholder="Link to recipe" name="url" type="text" class="input input-bordered input-xs w-full text-center input-accent"/>
         </form>
     </div>
-    <div class="h-5 flex justify-center">
+    <!-- <div class="h-5 flex justify-center">
         <span id="loading" class="loading loading-dots loading-lg hidden"></span>
-    </div>
+    </div> -->
     <Alerts msg={alert.msg} type={alert.type} bind:show={alert.show} title={alert.title}/>
-    <EditRecipe {recipe} index=0 save={true} show_alert={alert.show}/>
+    <!-- {#if !loading} -->
+        <EditRecipe {recipe} index=0 save={true} show_alert={alert.show} {loading}/>
+    <!-- {:else}
+        <div class="flex h-[calc(100svh-120px)] w-full justify-center items-center">
+            <span id="loading" class="loading loading-bars loading-lg"></span>
+        </div>
+    {/if} -->
 </div>

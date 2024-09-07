@@ -400,7 +400,9 @@
                   </div>
               </div>
           {/each}
-          <span class="{loading ? "" : "hidden"} loading loading-dots loading-md mx-7 self-center"></span>
+          <div class="flex w-full h-full justify-center">
+            <span class="{true ? "" : "hidden"} loading loading-bars loading-lg mx-7 self-center"></span>
+          </div>
           <div class="{no_results ? "" : "hidden"} w-full flex justify-center items-center h-full">
                 no results
             </div>

@@ -1,5 +1,5 @@
 <script>
-    import { beforeUpdate, onMount } from 'svelte';
+    import { afterUpdate, beforeUpdate, onMount } from 'svelte';
     import { currentUser, pb } from '/src/lib/pocketbase.js';
 
     $: results = [];
@@ -7,20 +7,70 @@
     $: failed = 0;
     $: is_auth_user = false;
     $: verify_email = "";
+    $: unset_cat = [];
+    $: categories = [];
+    $: unset_cuis = [];
+    $: cuisines = [];
 
     const tables = ["menus_strict", "grocery_lists", "ingredients_strict", "menu_log_strict", "grocery_items", "recipes_log_strict", "recipes_strict", "sub_recipes"];
 
     onMount(async () => {
         if ($currentUser) await pb.collection('users').authRefresh();
+        if (!$currentUser || $currentUser.id != "67gxu7xk6x46gjy"){
+            window.location.href = "/";
+            return;
+        } else {
+            is_auth_user = true;
+        }
+        unset_cat = await get_unset_category_recipes();
+        categories = await pb.collection('categories').getFullList({sort: `+id`});
+        unset_cuis = await get_unset_cuisines_recipes();
+        cuisines = await pb.collection('cuisines').getFullList({sort: `+id`});
+        console.log({unset_cuis});
+        console.log({cuisines});
     });
+
     beforeUpdate(async () => {
         if (!$currentUser || $currentUser.id != "67gxu7xk6x46gjy"){
             window.location.href = "/";
         } else {
             is_auth_user = true;
         }
-        console.log($currentUser)
     });
+
+    const update_cats = async function(){
+        let perc = 0;
+        for (let i = 0; i < unset_cat.length; i++){
+            const data = { "category": unset_cat[i].category };
+            const updated_record = await pb.collection('recipes').update(unset_cat[i].id, data);
+            perc = (i / unset_cat.length) * 100;
+        }
+        perc = 100;
+    }
+
+    const update_cuis = async function(e){
+        e.srcElement.innerHTML = `0%`;
+        for (let i = 0; i < unset_cuis.length; i++){
+            const data = { "cuisine": unset_cat[i].cuisine };
+            const updated_record = await pb.collection('recipes').update(unset_cuis[i].id, data);
+            e.srcElement.innerHTML = `${(i / unset_cuis.length) * 100}%`;
+        }
+        e.srcElement.innerHTML = `100%`;
+    }
+
+    const get_unset_category_recipes = async function(){
+        let result = await pb.collection('recipes').getList(1, 250, {
+            filter: `category = ""`,
+        });
+        return result.items;
+    }
+
+    const get_unset_cuisines_recipes = async function(){
+        let result = await pb.collection('recipes').getList(1, 250, {
+            filter: `cuisine = ""`,
+        });
+        return result.items;
+    }
         
     const update_recipe_url_ids = async function (){
         return;
@@ -490,6 +540,25 @@
                 <input placeholder="email" name="email" type="text" bind:value={verify_email} class="input input-bordered input-xs w-56 text-center input-accent"/>
                 <button type="submit" class="btn btn-primary">send verification email</button>
             </form>
+        </div>
+        <div class="flex flex-col justify-center items-center space-y-10">
+            <div class="btn btn-primary btn-sm" on:click={update_cuis} on:keydown={update_cuis}>update cuisines</div>
+            {#each unset_cuis as cuis}
+                <div class="flex justify-center items-center space-x-5">
+                    <p>{cuis.title}</p>
+                    <!-- <input placeholder="category" name="category" type="text" bind:value={cuis.category} class="input input-bordered input-xs w-56 text-center input-accent"/> -->
+                    <div class="dropdown w-1/2 flex">
+                        <input type="text" id="cuisine" placeholder="category" tabindex="0" class="input input-bordered input-xs m-1 cursor-text w-full" bind:value={cuis.cuisine}/>
+                        <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box mt-8">
+                            <div class="flex flex-col max-w-52 max-h-[50svh] overflow-y-scroll">
+                                {#each cuisines as cuisine}
+                                    <li class="cursor-pointer" on:click={()=>{cuis.cuisine = cuisine.id; document.activeElement.blur();}}>{cuisine.id}</li>
+                                {/each}
+                            </div>
+                        </ul>
+                    </div>
+                </div>
+            {/each}
         </div>
     {/if}
 </div>
