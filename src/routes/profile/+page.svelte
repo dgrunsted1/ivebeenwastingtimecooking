@@ -26,10 +26,11 @@
     };
 
     onMount(async () => {
-        await pb.collection('users').authRefresh();
         if (!$currentUser){
             window.location.href = "/login";
             return;
+        } else {
+            await pb.collection('users').authRefresh();
         }
         console.log(loading);
 

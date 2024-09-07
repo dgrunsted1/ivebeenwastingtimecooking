@@ -31,8 +31,8 @@
     let alert = {show: false, msg: "", title: "", type: "warning"};
 
     onMount(async () => {
-        await pb.collection('users').authRefresh();
         if (!$currentUser) window.location.href = "/login";
+        else await pb.collection('users').authRefresh();
     });
 
     async function fetch_recipe(e){

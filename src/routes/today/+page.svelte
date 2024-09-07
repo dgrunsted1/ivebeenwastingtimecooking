@@ -24,8 +24,8 @@
 
 
     onMount(async () => {
-        await pb.collection('users').authRefresh();
         if (!$currentUser) window.location.href = "/login";
+        else await pb.collection('users').authRefresh();
         const result_list = await pb.collection('menus').getList(1, 1, {
             filter: `user="${$currentUser.id}" && today=True`,
             expand: `recipes,recipes.notes,recipes.ingr_list, grocery_list, grocery_list.items`

@@ -11,7 +11,7 @@
     const tables = ["menus_strict", "grocery_lists", "ingredients_strict", "menu_log_strict", "grocery_items", "recipes_log_strict", "recipes_strict", "sub_recipes"];
 
     onMount(async () => {
-        await pb.collection('users').authRefresh();
+        if ($currentUser) await pb.collection('users').authRefresh();
     });
     beforeUpdate(async () => {
         if (!$currentUser || $currentUser.id != "67gxu7xk6x46gjy"){

@@ -19,7 +19,7 @@
     }]
 
     onMount(async () => {
-        await pb.collection('users').authRefresh();
+        if ($currentUser) await pb.collection('users').authRefresh();
     })
 </script>
 

@@ -23,7 +23,7 @@
 
 
     onMount(async () => {
-        await pb.collection('users').authRefresh();
+        if ($currentUser) await pb.collection('users').authRefresh();
         if ($currentUser && $currentUser.id == data.post.recipe.user) {
             user_logged_in = true;
 
