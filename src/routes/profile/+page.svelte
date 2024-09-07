@@ -137,63 +137,65 @@
     </div>
     <div class="flex md:space-x-4 flex-col items-center">
         <p class="text-4xl text-primary">What to cook</p>
-        {#if recipe_rec.id}
-            <div id="cook_recipe" class="flex flex-col md:m-2 pb-4 md:pb-10">
-                <div class="img_info_container flex flex-col md:flex-row items-center justify-center">
-                    <div class="img_container w-full md:w-auto flex flex-col">
-                        <img src={recipe_rec.image} alt={recipe_rec.title} class="max-h-52 max-w-52 md:max-w-96 md:max-h-96 rounded-xl m-auto"/>
+        <div class="flex justify-evenly flex-col md:flex-row">
+            {#if recipe_rec.id}
+                <div id="cook_recipe" class="flex flex-col md:m-2 pb-4 md:pb-10 md:w-2/5">
+                    <div class="img_info_container flex flex-col items-center justify-center w-full">
+                        <div class="img_container w-full md:w-auto flex flex-col">
+                            <img src={recipe_rec.image} alt={recipe_rec.title} class="max-h-52 max-w-52 md:max-w-96 md:max-h-96 rounded-xl m-auto"/>
+                        </div>
+                        <div class="info_container w-full flex flex-col m-1 space-y-2 md:space-y-4">
+                            <div class="title_container mx-auto my-2">
+                                <div class="title w-full text-sm md:text-xl">{recipe_rec.title}</div>
+                            </div>
+                            <div class="description_container m-auto w-5/6">
+                                <div class="desc text-xs md:text-sm" >{recipe_rec.description}</div>
+                            </div>
+                            <div class="misc flex justify-evenly">
+                                <div class="author_container text-center w-1/3 text-xs md:text-sm">
+                                    <div class="auth">{recipe_rec.author}</div>
+                                </div>
+                                <div class="time_container text-center w-1/3 text-xs md:text-sm">
+                                    <div class="time">{recipe_rec.time}</div>
+                                </div>
+                                <div class="servings text-center w-1/3 text-xs md:text-sm">
+                                    <div>{recipe_rec.servings} servings</div>
+                                </div>
+                            </div>
+                            <div class="misc flex justify-evenly">
+                                <div class="author_container text-center w-1/3 text-xs md:text-sm">
+                                    <div class="cat">{recipe_rec.category}</div>
+                                </div>
+                                <div class="time_container text-center w-1/3 text-xs md:text-sm">
+                                    <div class="cuisine">{recipe_rec.cuisine}</div>
+                                </div>
+                                <div class="servings text-center w-1/3 text-xs md:text-sm">
+                                    <div class="country">{recipe_rec.country}</div>
+                                </div>
+                            </div>
+                            <div class="flex justify-evenly items-center space-x-2">
+                                {#if recipe_rec.url}
+                                    <div class=" flex justify-center mt-1"><a class="btn btn-primary btn-xs" href={recipe_rec.url} target="_blank">original recipe</a></div>
+                                {/if}    
+                                <div class=" flex justify-center mt-1"><div class="btn btn-primary btn-xs" on:click={window.location = `/cook_recipe/${recipe_rec.url_id}/${recipe_rec.servings}`} on:keydown={window.location = `/cook_recipe/${recipe_rec.url_id}/${recipe_rec.servings}`}>cook</div></div>
+                                <div class=" flex justify-center mt-1"><div class="btn btn-primary btn-xs" on:click={window.location = `/menu/${recipe_rec.id}`} on:keydown={window.location = `/cook_recipe/${recipe_rec.url_id}/${recipe_rec.servings}`}>create menu</div></div>
+                            </div>    
+                        </div>
                     </div>
-                    <div class="info_container w-full md:w-1/2 flex flex-col m-1 space-y-2 md:space-y-4">
-                        <div class="title_container mx-auto my-2">
-                            <div class="title w-full text-sm md:text-xl">{recipe_rec.title}</div>
-                        </div>
-                        <div class="description_container m-auto w-5/6">
-                            <div class="desc text-xs md:text-sm" >{recipe_rec.description}</div>
-                        </div>
-                        <div class="misc flex justify-evenly">
-                            <div class="author_container text-center w-1/3 text-xs md:text-sm">
-                                <div class="auth">{recipe_rec.author}</div>
-                            </div>
-                            <div class="time_container text-center w-1/3 text-xs md:text-sm">
-                                <div class="time">{recipe_rec.time}</div>
-                            </div>
-                            <div class="servings text-center w-1/3 text-xs md:text-sm">
-                                <div>{recipe_rec.servings} servings</div>
-                            </div>
-                        </div>
-                        <div class="misc flex justify-evenly">
-                            <div class="author_container text-center w-1/3 text-xs md:text-sm">
-                                <div class="cat">{recipe_rec.category}</div>
-                            </div>
-                            <div class="time_container text-center w-1/3 text-xs md:text-sm">
-                                <div class="cuisine">{recipe_rec.cuisine}</div>
-                            </div>
-                            <div class="servings text-center w-1/3 text-xs md:text-sm">
-                                <div class="country">{recipe_rec.country}</div>
-                            </div>
-                        </div>
-                        <div class="flex justify-evenly items-center space-x-2">
-                            {#if recipe_rec.url}
-                                <div class=" flex justify-center mt-1"><a class="btn btn-primary btn-xs" href={recipe_rec.url} target="_blank">original recipe</a></div>
-                            {/if}    
-                            <div class=" flex justify-center mt-1"><div class="btn btn-primary btn-xs" on:click={window.location = `/cook_recipe/${recipe_rec.url_id}/${recipe_rec.servings}`} on:keydown={window.location = `/cook_recipe/${recipe_rec.url_id}/${recipe_rec.servings}`}>cook</div></div>
-                            <div class=" flex justify-center mt-1"><div class="btn btn-primary btn-xs" on:click={window.location = `/menu/${recipe_rec.id}`} on:keydown={window.location = `/cook_recipe/${recipe_rec.url_id}/${recipe_rec.servings}`}>create menu</div></div>
-                        </div>    
+                    <div class="notes_container form-control m-2 md:mt-5 md:mx-5 space-y-2 flex items-center">
+                        {#if recipe_rec.expand.notes}
+                            {#each recipe_rec.expand.notes as note, i}
+                                <p class="m-2 text-xs md:text-base">{note.content}</p>
+                            {/each}
+                        {/if}
                     </div>
                 </div>
-                <div class="notes_container form-control m-2 md:mt-5 md:mx-5 space-y-2 flex items-center">
-                    {#if recipe_rec.expand.notes}
-                        {#each recipe_rec.expand.notes as note, i}
-                            <p class="m-2 text-xs md:text-base">{note.content}</p>
-                        {/each}
-                    {/if}
-                </div>
-            </div>
-        {/if}
-        <div class="flex md:w-1/2">
-            {#if menu_rec.length}
-                <Menu title="New Menu" menu={menu_rec} mults={rec_mults} page={page}/>
             {/if}
+            <div class="flex md:w-2/5">
+                {#if menu_rec.length}
+                    <Menu title="New Menu" menu={menu_rec} mults={rec_mults} page={page}/>
+                {/if}
+            </div>
         </div>
     </div>
 </div>
