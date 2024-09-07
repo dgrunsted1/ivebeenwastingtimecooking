@@ -124,16 +124,16 @@
                 {#if status != "none" && $page.url.pathname == "/today"}<div id="update_status" class="text-xs">{status}</div>{/if}
                 <div id="count" class="text-xs">{grocery_list.length} Items</div>
             </div>
-            <button id="copy" class="btn btn-xs md:btn-sm btn-secondary cursor-copy" on:click={copy_to_clipboard}>
+            <button id="copy" class="btn btn-xs btn-primary cursor-copy" on:click={copy_to_clipboard}>
                 {#if just_copied}
                 <CheckMark color=""/>
                 {:else}
                     copy
                 {/if}
             </button>
-            {#if status != "none"}<button id="uncheck" class="btn btn-xs md:btn-sm btn-secondary" on:click={uncheck_list}>uncheck</button>{/if}
-            {#if status != "none"}<button id="reset" class="btn btn-xs md:btn-sm btn-secondary" on:click={reset_list}>reset</button>{/if}
-            {#if status != "none"}<button id="edit" class="btn btn-xs md:btn-sm btn-secondary" on:click={edit_groceries}><EditIcon/></button>{/if}
+            {#if status != "none"}<button id="uncheck" class="btn btn-xs btn-primary" on:click={uncheck_list}>uncheck</button>{/if}
+            {#if status != "none"}<button id="reset" class="btn btn-xs btn-primary" on:click={reset_list}>reset</button>{/if}
+            {#if status != "none"}<button id="edit" class="btn btn-xs btn-primary" on:click={edit_groceries}><EditIcon/></button>{/if}
         {/if}
     </div>
     <div class="md:mx-3">

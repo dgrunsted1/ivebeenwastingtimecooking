@@ -217,7 +217,7 @@
 <div id="recipe" class="flex flex-col">
     {#if $page.url.pathname == "/menu"}<button class="btn btn-xs btn-ghost absolute left-4 top-2" on:click={done_editing}>done</button>{/if}
     <div class="save_btn_container flex flex-col items-center mb-5 mt-1">
-        <button class="save_btn btn btn-secondary btn-xs md:btn-md w-1/3" disabled="true" on:click={save_recipe_v2}>
+        <button class="save_btn btn btn-primary btn-xs md:btn-md w-1/3" disabled="true" on:click={save_recipe_v2}>
             save recipe
         </button>
     </div>
@@ -229,7 +229,7 @@
                         {#if recipe.image}
                             <img src={recipe.image} alt={recipe.title} class="max-h-52 md:max-h-96 rounded-xl m-auto"/>
                             <input type="file" name="photo" id="photo" class="w-8 md:w-10 absolute bottom-5 self-center md:h-10 opacity-0 z-10" on:change={async(e) => {recipe.image = await update_image_upload(e)}}/>
-                            <button class="btn btn-xs md:btn-sm btn-secondary w-8 md:w-10 absolute bottom-5 self-center"><Edit/></button>
+                            <button class="btn btn-xs md:btn-sm btn-primary w-8 md:w-10 absolute bottom-5 self-center"><Edit/></button>
                         {:else}
                             {#if !show_alert}
                                 <input type="file" name="photo" id="photo" class="absolute max-w-[605px] w-23/25 h-[225px] opacity-0" on:change={async(e) => {recipe.image = await update_image_upload(e)}}/>
@@ -355,7 +355,7 @@
                     </div>
                 {/if}
                 <div class="flex justify-center mt-2">
-                    <button class="btn btn-secondary btn-xs" on:click={add_ingr}>add ingredient</button>
+                    <button class="btn btn-primary btn-xs" on:click={add_ingr}>add ingredient</button>
                 </div>
             {:else}
                 <div class="flex h-56 w-4/5 justify-center items-center m-auto">
@@ -387,7 +387,7 @@
                 {/if}
                 
                 <div class="flex justify-center mt-2">
-                    <button id={recipe.directions.length} class="btn btn-secondary btn-xs" on:click={add_dir}>add direction</button>
+                    <button id={recipe.directions.length} class="btn btn-primary btn-xs" on:click={add_dir}>add direction</button>
                 </div>
             {:else}
                 <div class="flex h-56 w-4/5 justify-center items-center m-auto">
@@ -412,7 +412,7 @@
             </div>
         </div>
         <div class="save_btn_container flex flex-col items-center">
-            <button class="save_btn btn btn-secondary btn-xs md:btn-md w-1/3" disabled="true" on:click={save_recipe_v2}>
+            <button class="save_btn btn btn-primary btn-xs md:btn-md w-1/3" disabled="true" on:click={save_recipe_v2}>
                 save recipe
             </button>
         </div>

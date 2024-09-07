@@ -310,16 +310,11 @@
                 </div>
                 <div class="w-full flex space-x-1 text-xs"><div id="user_menus_length">{user_menus.length}</div><div>Menus</div></div>
             </div>
-            
-            <div class="dropdown dropdown-end">
-                <label tabindex="0" class="btn m-1 btn-primary btn-xs md:btn-sm">Sort</label>
+            <div class="dropdown dropdown-top md:dropdown-bottom dropdown-end">
+                <label tabindex="0" class="btn m-1 btn-primary btn-xs md:btn-sm">{sort_val}</label>
                 <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-max bg-primary">
                     {#each sort_opts as opt}
-                        {#if opt == sort_val}
-                        <li class="btn btn-xs btn-secondary"><a>{opt}</a></li>
-                        {:else}
-                        <li class="btn btn-xs btn-primary"><a on:click={(e) => {sort_val = e.currentTarget.innerHTML; sort_menus();}}>{opt}</a></li>
-                        {/if}
+                        <li class="btn btn-xs {opt == sort_val ? 'btn-neutral': 'btn-primary'}"><a on:click={() => {sort_val = opt; document.activeElement.blur(); sort_menus()}}>{opt}</a></li>
                     {/each}
                 </ul>
             </div>

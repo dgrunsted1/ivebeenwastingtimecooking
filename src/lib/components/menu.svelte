@@ -223,7 +223,7 @@
                 </ul>
             </div>
         {:else if $page.url.pathname == "/my_menus"}
-            <button class="btn btn-secondary self-end btn-xs md:btn-sm" id="today_btn" on:click={set_todays_menu}>set today</button>
+            <button class="btn btn-primary self-end btn-xs md:btn-sm" id="today_btn" on:click={set_todays_menu}>set today</button>
         {/if}
     </div>
     <div class="flex content-center">

@@ -216,7 +216,7 @@
                 </div>
                 <div class="flex justify-evenly items-center">
                     {#if data.post.recipe.url}
-                        <div class=" flex justify-center mt-1"><a class="btn btn-secondary btn-xs md:btn-sm" href={data.post.recipe.url} target="_blank">original recipe</a></div>
+                        <div class=" flex justify-center mt-1"><a class="btn btn-primary btn-xs md:btn-sm" href={data.post.recipe.url} target="_blank">original recipe</a></div>
                     {/if}    
                     {#if user_logged_in}
                         {#if recipe_ready}
@@ -230,7 +230,7 @@
                         {/if}
                         <button class="btn btn-xs md:btn-sm p-1 btn-ghost made flex content-center" on:click={()=>{data.post.recipe.made = !data.post.recipe.made; update_fave_made_pre();}}><ThumbUp color={(data.post.recipe.made) ? "fill-primary" : "fill-neutral"}/></button>
                         <button class="btn btn-xs md:btn-sm p-1 btn-ghost favorite flex content-center" on:click={()=>{data.post.recipe.favorite = !data.post.recipe.favorite; update_fave_made_pre();}}><Heart color={(data.post.recipe.favorite) ? "fill-primary" : "fill-neutral"}/></button>
-                        <button class="btn btn-xs md:btn-sm btn-secondary w-8 md:w-10" on:click={() => {my_modal_3.showModal(); document.getElementById('modal_content').classList.remove('hidden');}}><Edit/></button>
+                        <button class="btn btn-xs md:btn-sm btn-primary w-8 md:w-10" on:click={() => {my_modal_3.showModal(); document.getElementById('modal_content').classList.remove('hidden');}}><Edit/></button>
                     {:else if $currentUser}
                         <input type="checkbox" class="checkbox checkbox-primary checkbox-lg p-1" id={data.post.recipe.id} on:click|stopPropagation={log_made(data.post.recipe.id, $currentUser.id)}>
                     {/if}
