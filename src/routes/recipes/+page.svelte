@@ -181,7 +181,8 @@
 	
 	onMount(async ()=> {
 		// load first batch onMount
-        await pb.collection('users').authRefresh();
+        console.log($currentUser)
+        if ($currentUser) await pb.collection('users').authRefresh();
 		await fetchData();
         max_results = total_recipes_num;
         categories = await pb.collection('categories').getFullList({sort: `+id`});
