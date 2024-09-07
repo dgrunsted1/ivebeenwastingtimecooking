@@ -19,6 +19,11 @@
     let edit_billing = false;
     let rec_mults = {};
     let menu_rec = [];
+    $: loading = {
+        user: true,
+        menu: true,
+        recipe: true
+    };
 
     onMount(async () => {
         await pb.collection('users').authRefresh();
@@ -26,18 +31,23 @@
             window.location.href = "/login";
             return;
         }
+        console.log(loading);
+
+        loading.user = false;
         const recipe_result = await pb.collection('recipes').getList(1, 250, {
             fields: `id, category`,
             filter: `user="${$currentUser.id}"`,
         });
+        recipe_rec = await get_random_recipe(recipe_result.items.map(item => item.id));
+        loading.recipe = false;
         main_recipes = recipe_result.items.filter(item => item.category == 'Main').map(item => item.id);
         main_recs = await get_main_recs(main_recipes);
         dessert_rec = await get_random_recipe(recipe_result.items.filter(item => item.category == 'Dessert').map(item => item.id));
         breakfast_rec = await get_random_recipe(recipe_result.items.filter(item => item.category == 'Breakfast').map(item => item.id));
         other_rec = await get_random_recipe(recipe_result.items.filter(item => !['Main', 'Dessert', 'Breakfast'].includes(item.category)).map(item => item.id));
-        recipe_rec = await get_random_recipe(recipe_result.items.map(item => item.id));
         menu_rec = main_recs.concat(dessert_rec).concat(other_rec).concat(breakfast_rec);
         rec_mults = get_mults();
+        loading.menu = false;
     });
 
     function get_mults(){
@@ -90,7 +100,7 @@
     <h1>Profile</h1>
     <div class="flex space-x-4 flex-col items-center md:flex-row">
         {#if !$currentUser}
-            <div class="flex"><span class="loading loading-bars loading-lg"></span></div>
+            <div class="flex h-[215px]"><span class="loading loading-bars loading-lg"></span></div>
         {:else}
             <div class="flex flex-col w-24 md:w-56">
                 {#if $currentUser.avatar != ""}
@@ -109,14 +119,14 @@
                         {#if $currentUser.verified}
                             <div class="text flex space-x-2 items-center"><CheckMark color="fill-primary"/><p>Email Verified</p></div>
                         {:else}
-                            <div class="text flex justify-center w-full"><div class="btn btn-primary btn-xs" on:click={send_verify_email} on:keydown={send_verify_email}>resend verification email</div></div>
+                            <div class="text flex justify-center self-end"><div class="btn btn-primary btn-xs" on:click={send_verify_email} on:keydown={send_verify_email}>resend verification email</div></div>
                         {/if}
-                        <div class="btn btn-primary btn-xs" on:click={() => {edit_profile = true}} on:keydown={() => {edit_profile = true}}>edit profile</div>
+                        <div class="btn btn-primary btn-xs self-end" on:click={() => {edit_profile = true}} on:keydown={() => {edit_profile = true}}>edit profile</div>
                     {:else}
                         <div class="flex space-x-2"><label for="name">name:</label><input type="text" name="name" bind:value={$currentUser.name} class="input input-bordered input-xs w-full"/></div>
                         <div class="flex space-x-2"><label for="email">email:</label><input type="text" name="email" bind:value={$currentUser.email} class="input input-bordered input-xs w-full"/></div>
                         <div class="flex space-x-2"><label for="username">username:</label><input type="text" name="username" bind:value={$currentUser.username} class="input input-bordered input-xs w-full"/></div>
-                        <div class="text flex justify-center w-full"></div><div class="btn btn-primary btn-xs" on:click={save_profile_edits} on:keydown={save_profile_edits}>save</div>
+                        <div class="btn btn-primary btn-xs self-end" on:click={save_profile_edits} on:keydown={save_profile_edits}>save</div>
                     {/if}
                 </div>
                 <div class="flex flex-col space-y-2 my-5 h-full">
@@ -126,19 +136,20 @@
                         <div class="text">credit card: ************0006</div>
                         <div class="btn btn-primary btn-xs self-end" on:click={() => {edit_billing = true}} on:keydown={() => {edit_billing = true}} disabled>edit billing</div>
                     {:else}
-                    <div class="text">next bill: {get_local_time($currentUser.last_bill_date)}</div>
-                    <div class="text">last bill: {get_local_time($currentUser.last_bill_date)}</div>
+                        <div class="text">next bill: {get_local_time($currentUser.last_bill_date)}</div>
+                        <div class="text">last bill: {get_local_time($currentUser.last_bill_date)}</div>
                         <div class="flex space-x-2"><label for="credit_card_num">credit card:</label><input type="text" name="username" value="************0006" class="input input-bordered input-xs"/></div>
-                        <div class="text flex justify-center w-full"></div><div class="btn btn-primary btn-xs" on:click={save_profile_edits} on:keydown={save_profile_edits}>save</div>
                     {/if}
                 </div>
             </div>
         {/if}
     </div>
-    <div class="flex md:space-x-4 flex-col items-center">
+    <div class="flex md:space-x-4 flex-col items-center w-full">
         <p class="text-4xl text-primary">What to cook</p>
-        <div class="flex justify-evenly flex-col md:flex-row">
-            {#if recipe_rec.id}
+        <div class="flex justify-evenly flex-col md:flex-row w-full">
+            {#if loading.recipe}
+                <div class="flex flex-col items-center justify-center md:w-2/5 h-[500px]"><span class="loading loading-bars loading-lg"></span></div>
+            {:else}
                 <div id="cook_recipe" class="flex flex-col md:m-2 pb-4 md:pb-10 md:w-2/5">
                     <div class="img_info_container flex flex-col items-center justify-center w-full">
                         <div class="img_container w-full md:w-auto flex flex-col">
@@ -191,9 +202,13 @@
                     </div>
                 </div>
             {/if}
-            <div class="flex md:w-2/5">
-                {#if menu_rec.length}
-                    <Menu title="New Menu" menu={menu_rec} mults={rec_mults} page={page}/>
+            <div class="flex md:w-2/5 justify-center">
+                {#if loading.menu}
+                    <div class="flex h-[500px] items-center"><span class="loading loading-bars loading-lg"></span></div>
+                {:else}
+                    {#if menu_rec.length}
+                        <Menu title="New Menu" menu={menu_rec} mults={rec_mults} page={page}/>
+                    {/if}
                 {/if}
             </div>
         </div>
