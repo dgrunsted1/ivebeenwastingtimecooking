@@ -180,6 +180,14 @@
 
 </script>
 
+    <svelte:head>
+        <meta property="og:title" content={data.post.recipe.title} />
+        <meta property="og:description" content={data.post.recipe.description} />
+        <meta property="og:image" content={data.post.recipe.image} />
+        <meta property="og:url" content={window.location.href} />
+        <meta property="og:type" content="website" />
+    </svelte:head>
+
     <div id="cook_recipe" class="flex flex-col md:m-2 pb-4 md:pb-10">
         <div class="img_info_container flex flex-col md:flex-row items-center justify-center">
             <div class="img_container w-full md:w-auto flex flex-col">
