@@ -184,7 +184,7 @@
         <meta property="og:title" content={data.post.recipe.title} />
         <meta property="og:description" content={data.post.recipe.description} />
         <meta property="og:image" content={data.post.recipe.image} />
-        <meta property="og:url" content={`/cook_recipe/${data.post.recipe.url_id}/${data.post.recipe.servings}`} />
+        <meta property="og:url" content={`https://www.ivebeenwastingtimecooking.com/cook_recipe/${data.post.recipe.url_id}/${data.post.recipe.servings}`} />
         <meta property="og:type" content="website" />
     </svelte:head>
 

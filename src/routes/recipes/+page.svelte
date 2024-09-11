@@ -308,6 +308,13 @@
         alert.title = title;
     }
 </script>
+<svelte:head>
+    <meta property="og:title" content="Recipes" />
+    <meta property="og:description" content="See What Others are Cooking" />
+    <meta property="og:image" content="static/ChefBookIconV2.png" />
+    <meta property="og:url" content="https://www.ivebeenwastingtimecooking.com/recipes" />
+    <meta property="og:type" content="website" />
+</svelte:head>
 
 <main class="flex flex-col w-full justify-center items-center">
   <h4>See what others are cooking</h4>
