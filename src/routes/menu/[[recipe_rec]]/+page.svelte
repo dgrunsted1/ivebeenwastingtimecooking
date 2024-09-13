@@ -112,6 +112,15 @@
         mults[e.detail.id] = e.detail.mult;
     }
 </script>
+
+<svelte:head>
+    <meta property="og:title" content="Menu" />
+    <meta property="og:description" content="Create a Menu" />
+    <meta property="og:image" content="static/ChefBookIconV2.png" />
+    <meta property="og:url" content="https://www.ivebeenwastingtimecooking.com/menu" />
+    <meta property="og:type" content="website" />
+</svelte:head>
+
 <div id="main" class="p-1 md:p-3">
         {#if (user_recipes && user_recipes.items && user_recipes.items.length > 0) || loading}
             <div id="content" class="flex flex-col md:flex-row   mt-0 md:space-x-3 md:w-full">

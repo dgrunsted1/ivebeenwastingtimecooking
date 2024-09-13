@@ -84,6 +84,15 @@
     }
 
 </script>
+
+<svelte:head>
+    <meta property="og:title" content="Add Recipe" />
+    <meta property="og:description" content="Add Recipe to Your List" />
+    <meta property="og:image" content="static/ChefBookIconV2.png" />
+    <meta property="og:url" content="https://www.ivebeenwastingtimecooking.com/add_recipe" />
+    <meta property="og:type" content="website" />
+</svelte:head>
+
 <div class="flex flex-col max-w-5xl px-1 space-y-5 mb-5 w-full m-auto">
     <div class="link mt-5">
         <form method='POST' on:input|preventDefault={fetch_recipe} class="text-center w-full">

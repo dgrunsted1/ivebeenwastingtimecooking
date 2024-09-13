@@ -294,6 +294,14 @@
     }
 </script>
 
+<svelte:head>
+    <meta property="og:title" content="My Menus" />
+    <meta property="og:description" content="Choose a Menu to Cook" />
+    <meta property="og:image" content="static/ChefBookIconV2.png" />
+    <meta property="og:url" content="https://www.ivebeenwastingtimecooking.com/my_menus" />
+    <meta property="og:type" content="website" />
+</svelte:head>
+
 <div class="flex">
     <div class="flex flex-col w-full md:w-1/2">
         <div class="hidden md:flex justify-between mx-4">

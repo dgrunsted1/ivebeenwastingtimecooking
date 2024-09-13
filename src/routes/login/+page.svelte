@@ -60,7 +60,13 @@
       pb.authStore.clear();
     }
   </script>
-  
+  <svelte:head>
+    <meta property="og:title" content="Login" />
+    <meta property="og:description" content="Login" />
+    <meta property="og:image" content="static/ChefBookIconV2.png" />
+    <meta property="og:url" content="https://www.ivebeenwastingtimecooking.com/login" />
+    <meta property="og:type" content="website" />
+  </svelte:head>
   {#if $currentUser}
     <div class="m-auto mt-32 flex flex-col">
       <p class="m-auto">Signed in as {$currentUser.username}</p> 

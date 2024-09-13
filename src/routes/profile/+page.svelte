@@ -97,6 +97,7 @@
         edit_profile = false;
     }
 </script>
+
 <div class="flex flex-col items-center space-y-6">
     <h1>Profile</h1>
     <div class="flex space-x-4 flex-col items-center md:flex-row">

@@ -21,6 +21,7 @@
 </script>
 
 
+
 <div class="flex flex-col space-y-96 py-32 p-5">
     {#each pages as page}
         <div class="flex flex-col md:flex-row w-full items-center border border-primary bg-primary rounded-lg">

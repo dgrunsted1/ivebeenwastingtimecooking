@@ -161,6 +161,14 @@
     }
 </script>
 
+<svelte:head>
+    <meta property="og:title" content="Today" />
+    <meta property="og:description" content="See What Others are Cooking" />
+    <meta property="og:image" content="static/ChefBookIconV2.png" />
+    <meta property="og:url" content="https://www.ivebeenwastingtimecooking.com/recipes" />
+    <meta property="og:type" content="website" />
+</svelte:head>
+
     <div id="main">
         <div class="flex justify-center pb-1">
             <h1 class="text-xl h-6 text-ellipsis overflow-hidden text-center">{todays_menu.title ? todays_menu.title : ""}</h1>
