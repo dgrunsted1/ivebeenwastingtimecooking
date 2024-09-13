@@ -28,6 +28,7 @@
 	"type": "module",
 	"dependencies": {
 		"pocketbase": "^0.15.1",
-		"puppeteer": "^20.7.1"
+		"puppeteer": "^20.7.1",
+		"stripe": "^16.10.0"
 	}
 }
