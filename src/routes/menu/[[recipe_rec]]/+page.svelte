@@ -156,8 +156,10 @@
                     {#if menu_recipes.length}
                         <Menu title="New Menu" menu={menu_recipes} {mults} {page} on:update_mult={update_mult}/>
                     {:else}
-                        <div class="flex flex-col justify-center items-center space-y-5 mx-2 md:mx-auto p-16 rounded-md shadow-md  md:text-xl max-w-5xl">
-                            <p>select recipes to add to your menu</p>
+                        <div class="flex h-full justify-center w-full items-center">
+                            <div class="flex flex-col justify-center content-center h-fit p-16 rounded-md shadow-md md:text-xl max-w-5xl">
+                                <p>select recipes to add to your menu</p>
+                            </div>
                         </div>
                     {/if}
                 </div>

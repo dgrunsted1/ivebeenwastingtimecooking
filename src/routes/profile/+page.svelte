@@ -111,7 +111,7 @@
                     <img src="https://db.ivebeenwastingtime.com/api/files/716b9n2y44y92zp/w27w7eusm0jjeb4/unknown_3_sc7jpHPrHp.png?token=" alt="avatar" class="profile-avatar border rounded-xl" />
                 {/if}
             </div>
-            <div class="flex md:space-x-4">
+            <div class="flex md:space-x-4 items-center">
                 <div class="flex flex-col space-y-2 my-5">
                     {#if !edit_profile}
                         <div class="text">name: {$currentUser.name}</div>
@@ -131,12 +131,9 @@
                         <div class="btn btn-primary btn-xs self-end" on:click={save_profile_edits} on:keydown={save_profile_edits}>save</div>
                     {/if}
                 </div>
-                <div class="flex flex-col space-y-2 my-5 h-full">
-                    {#if !edit_billing}
-                        <div class="text">next bill: {get_local_time($currentUser.last_bill_date)}</div>
-                        <div class="text">last bill: {get_local_time($currentUser.last_bill_date)}</div>
-                        <div class="text">credit card: ************0006</div>
-                        <div class="btn btn-primary btn-xs self-end" on:click={() => {edit_billing = true}} on:keydown={() => {edit_billing = true}} disabled>edit billing</div>
+                <div class="flex flex-col space-y-2 my-5 h-full min-w-56 items-center justify-center">
+                    {#if !$currentUser.subscribed}
+                            <a href="https://buy.stripe.com/00gdUb2g90fc4Tu4gg" class="btn btn-primary btn-md w-36">Subscribe</a>
                     {:else}
                         <div class="text">next bill: {get_local_time($currentUser.last_bill_date)}</div>
                         <div class="text">last bill: {get_local_time($currentUser.last_bill_date)}</div>
