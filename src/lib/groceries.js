@@ -42,10 +42,10 @@ export const update_grocery_list = async function(grocery_list, id){
             item_filter += (item_filter) ? ` || id = '${grocery_list[i].id}'` : `id = '${grocery_list[i].id}'`;
         } else {
             const data_item = {
-                "qty": grocery_list[i].quantity,
+                "qty": grocery_list[i].qty,
                 "unit": grocery_list[i].unit,
                 "unit_plural": grocery_list[i].unit_plural,
-                "name": grocery_list[i].ingredient,
+                "name": grocery_list[i].name,
                 "checked": grocery_list[i].checked,
                 "ingrs": [
                     grocery_list[i].id
@@ -85,8 +85,8 @@ export const update_grocery_list = async function(grocery_list, id){
                 }
             }
         }
-
     }
+    const menu_upsate_result = await pb.collection('grocery_lists').update(id, {"items+": new_items});
 }
 
 export const update_grocery_item = async function(item){

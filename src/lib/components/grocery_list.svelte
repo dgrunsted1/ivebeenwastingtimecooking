@@ -94,9 +94,10 @@
     }
 
     const new_item = async () => {
-        const new_item = {quantity: 0, unit: "unit", ingredient: "", checked: false, id: generate_id()};
+        const new_item = {qty: 0, unit: "unit", name: "", checked: false};
         grocery_list.push(new_item);
         grocery_list = grocery_list;
+        edit = true;
         await tick();
         new_item.input.focus();
     }
@@ -107,15 +108,6 @@
         if (e.key == "Enter" && items_array[items_array.length-1] == e.srcElement.parentNode){
             await new_item();
         }
-    }
-
-    const generate_id = () => {
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        let id = '';
-        for (let i = 0; i < 15; i++) {
-        id += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        return id;
     }
 
     const edit_groceries = () => {
