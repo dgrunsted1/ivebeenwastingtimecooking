@@ -109,6 +109,11 @@ export const update_grocery_item = async function(item){
     }
 }
 
+export const delete_grocery_item = async function(id){
+    const record = await pb.collection('grocery_items').delete(id);
+    return record;
+}
+
 export const update_made = async function(made, id, user_id){
     const data = {
         "made": made

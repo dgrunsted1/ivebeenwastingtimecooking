@@ -4,6 +4,7 @@
     import { page } from '$app/stores';
     import EditIcon from "/src/lib/icons/EditIcon.svelte";
     import CheckMark from "/src/lib/icons/CheckMark.svelte";
+    import { delete_grocery_item } from '/src/lib/groceries.js'
 
 
 
@@ -22,6 +23,7 @@
             view_size_desktop = `md:max-h-[calc(100svh-120px)]`;
         }
     });
+
     const copy_to_clipboard = () => {
         let copy_text = "";
         let first = true;
@@ -47,20 +49,24 @@
         }, 2000);
     }
 
-    const remove_item = (qty, unit, ingr) => {
-        let delete_item = confirm("Are you sure you want to delete:\n"+qty+" "+unit+" "+ingr+"?");
-        if (delete_item){
-            let temp_arr = [];
-            let found = false;
-            for (let i = 0; i < grocery_list.length; i++){
-                if (grocery_list[i].qty != qty || grocery_list[i].unit != unit || grocery_list[i].name != ingr || found){
-                    temp_arr.push(grocery_list[i]);
-                }else {
-                    found = true;
-                }
+    const remove_item = (id) => {
+        let temp_arr = [];
+        let found = false;
+        let deleted_item = null;
+        for (let i = 0; i < grocery_list.length; i++){
+            if (grocery_list[i].id != id || found){
+                temp_arr.push(grocery_list[i]);
+            }else {
+                deleted_item = grocery_list[i];
+                found = true;
             }
-            grocery_list = temp_arr;
-            edit_item();
+        }
+        if (deleted_item){
+            let delete_item = confirm("Are you sure you want to delete:\n"+deleted_item.qty+" "+deleted_item.unit+" "+deleted_item.name+"?");
+            if (delete_item){
+                grocery_list = temp_arr;
+                delete_grocery_item(id);
+            }
         }
     }
 
@@ -145,7 +151,7 @@
                             <input type="text" class="amount input input-bordered input-xs px-1 mr-1 w-8 text-center h-fit" bind:value={item.qty} on:keyup={edit_item}>
                             <input type="text" class="unit input input-bordered input-xs px-1 mr-1 w-20 text-center h-fit" bind:value={item.unit} on:keyup={edit_item}>
                             <textarea class="name input input-bordered input-xs px-1 mr-1 w-3/4 h-fit" bind:value={item.name} on:keyup={edit_item} on:keypress={enter_new_item} bind:this={item.input}></textarea>
-                            {#if status != "none"}<button class="btn btn-sm p-1 btn-accent" on:click={() => remove_item(item.qty, item.unit, item.name)}><DeleteIcon/></button>{/if}
+                            {#if status != "none"}<button class="btn btn-sm p-1 btn-accent" on:click={() => remove_item(item.id)}><DeleteIcon/></button>{/if}
                         </div>
                     {:else}
                         <div class="grocery_item flex relative my-2 tooltip space-x-3 justify-end md:justify-start items-center">

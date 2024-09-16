@@ -104,7 +104,7 @@
     </div> -->
     <Alerts msg={alert.msg} type={alert.type} bind:show={alert.show} title={alert.title}/>
     <!-- {#if !loading} -->
-        <EditRecipe {recipe} index=0 save={true} show_alert={alert.show} {loading}/>
+        <EditRecipe {recipe} index=0 save={true} show_alert={alert.show} {loading} on:update_recipe={() => {show_alert("Recipe Saved", "success", "Success")}}/>
     <!-- {:else}
         <div class="flex h-[calc(100svh-120px)] w-full justify-center items-center">
             <span id="loading" class="loading loading-bars loading-lg"></span>
