@@ -3,18 +3,20 @@ import { pb } from '/src/lib/pocketbase';
 export const create_grocery_list = async function(grocery_list, menu_id){
     let items = [];
     for (let i = 0; i < grocery_list.length; i++) {
-        const data_item = {
-            "qty": grocery_list[i].qty,
-            "unit": grocery_list[i].unit,
-            "unit_plural": grocery_list[i].unit_plural,
-            "name": grocery_list[i].name,
-            "checked": grocery_list[i].checked,
-            "ingrs": grocery_list[i].ingrs,
-            "active": true
-        };
-    
-        const record_item = await pb.collection('grocery_items').create(data_item);
-        items.push(record_item.id);
+        if (grocery_list[i].name){
+            const data_item = {
+                "qty": grocery_list[i].qty,
+                "unit": grocery_list[i].unit,
+                "unit_plural": grocery_list[i].unit_plural,
+                "name": grocery_list[i].name,
+                "checked": grocery_list[i].checked,
+                "ingrs": grocery_list[i].ingrs,
+                "active": true
+            };
+        
+            const record_item = await pb.collection('grocery_items').create(data_item);
+            items.push(record_item.id);
+        }
     }
     const data_list = {
         "items": items,
@@ -40,7 +42,7 @@ export const update_grocery_list = async function(grocery_list, id){
         if (grocery_list[i].id){
             item_ids.push(grocery_list[i].id);
             item_filter += (item_filter) ? ` || id = '${grocery_list[i].id}'` : `id = '${grocery_list[i].id}'`;
-        } else {
+        } else if (grocery_list[i].name && grocery_list[i].name != "\n"){
             const data_item = {
                 "qty": grocery_list[i].qty,
                 "unit": grocery_list[i].unit,
@@ -54,6 +56,7 @@ export const update_grocery_list = async function(grocery_list, id){
             };
         
             const record_item = await pb.collection('grocery_items').create(data_item);
+            grocery_list[i] = record_item;
             new_items.push(record_item.id);
         }
     }

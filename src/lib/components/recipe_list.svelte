@@ -269,11 +269,6 @@
         return recipes_with_ingr;
     }
 
-    function update_sort(e){
-        sort_val = e.srcElement.innerHTML;
-        document.activeElement.blur();
-    }
-
     function update_fave_made_queue(e){
         update_fave_made_list.push(e.srcElement.id);
         clearTimeout(delay_timer);
@@ -309,7 +304,7 @@
         <div clas="flex flex-row content-center items-center">
             <label class="input input-bordered input-sm input-primary flex items-center gap-2 pr-2">
                 <input type="text" class="input h-full p-0" placeholder="Search" bind:value={search_val}/>
-                <div class="w-5" on:click={()=>{search_val = ""}}>
+                <div class="w-5" on:click={()=>{search_val = ""}} on:keydown={()=>{search_val = ""}}>
                     {#if search_val}
                         <Clear size="w-4 h-4"/>
                     {/if}
@@ -318,19 +313,11 @@
             <span id="menu_loading" class="hidden loading loading-dots loading-lg align-middle"></span>
         </div>
         <p class="mx-5 text-xs md:text-sm">{display_recipes ? display_recipes.length+" Recipes" : ""}</p>
-        <!-- <div class="dropdown dropdown-end">
-            <label tabindex="0" class="btn m-1 btn-primary btn-xs md:btn-sm">Sort</label>
-            <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-max bg-primary">
-                {#each sort_opts as opt}
-                    <li class="btn btn-xs {opt == sort_val ? 'btn-neutral': 'btn-primary'}"><a on:click={update_sort}>{opt}</a></li>
-                {/each}
-            </ul>
-        </div> -->
         <div class="dropdown dropdown-top md:dropdown-bottom dropdown-end">
             <label tabindex="0" class="btn m-1 btn-primary btn-xs md:btn-sm">{sort_val}</label>
             <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-max bg-primary">
                 {#each sort_opts as opt}
-                    <li class="btn btn-xs {opt == sort_val ? 'btn-neutral': 'btn-primary'}"><a on:click={() => {sort_val = opt; document.activeElement.blur(); update_sort()}}>{opt}</a></li>
+                    <li class="btn btn-xs {opt == sort_val ? 'btn-neutral': 'btn-primary'}"><a on:click={() => {sort_val = opt; document.activeElement.blur();}}>{opt}</a></li>
                 {/each}
             </ul>
         </div>
@@ -411,7 +398,7 @@
             <label tabindex="0" class="btn m-1 btn-primary btn-xs md:btn-sm">Sort</label>
             <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-max bg-primary">
                 {#each sort_opts as opt}
-                    <li class="btn btn-xs {opt == sort_val ? 'btn-neutral': 'btn-primary'}"><a on:click={update_sort} on:keydown={update_sort}>{opt}</a></li>
+                    <li class="btn btn-xs {opt == sort_val ? 'btn-neutral': 'btn-primary'}"><a on:click={() => {sort_val = opt; document.activeElement.blur();}}>{opt}</a></li>
                 {/each}
             </ul>
         </div>
