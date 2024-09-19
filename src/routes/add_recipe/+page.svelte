@@ -1,7 +1,7 @@
 <script>
     import EditRecipe from "/src/lib/components/edit_recipe.svelte";
     import { currentUser, pb } from '/src/lib/pocketbase.js';
-    import { process_recipe_old } from '/src/lib/process_recipe.js';
+    import { process_recipe_old, process_directions } from '/src/lib/process_recipe.js';
     import { deserialize } from '$app/forms';
     import { onMount } from "svelte";
     import Alerts from "../../lib/components/alerts.svelte";
@@ -43,7 +43,6 @@
             e.srcElement.value = "";
             return;
         }
-        // document.getElementById('loading').classList.remove('hidden');
         loading = true;
         const data = new FormData(this);
 
@@ -60,13 +59,13 @@
         } else if (result.type === 'success') {
             result.data.expand.ingr_list = process_recipe_old(result.data.expand.ingr_list);
             result.data.url = e.srcElement.value;
+            result.data.directions = process_directions(result.data.directions);
             recipe = result.data;
             const recipe_exist = await check_recipe_exists(recipe.title);
             if (recipe_exist){
                 show_alert("You have already added this recipe", "warning", "Recipe already exists");
             }
         }
-        // document.getElementById('loading').classList.add('hidden');
         loading = false;
     }
 

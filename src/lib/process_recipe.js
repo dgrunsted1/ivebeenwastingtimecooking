@@ -155,3 +155,17 @@ function make_singular(unit) {
     unit = unit.toLowerCase();
     return (unit.substring(unit.length-1) == "s") ? unit.substring(0, unit.length-1) : unit;
 }
+
+export const process_directions = function(in_lines) {
+    let out = [];
+    for (let i = 0; i < in_lines.length; i++){
+        const line_arr = in_lines[i].split('.');
+        for (let j = 0; j < line_arr.length; j++){
+            const sentence = line_arr[j].trim();
+            if (sentence){
+                out.push(sentence);
+            }
+        }
+    } 
+    return out;   
+}
