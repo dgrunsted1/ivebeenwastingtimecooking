@@ -103,106 +103,104 @@ function round_amount(in_amount, mult){
     return Math.round((result + Number.EPSILON) * 100) / 100;
 }
   
-  function removePunctuationSymbolsParentheses(text) {
-    // Remove punctuation
-    text = text.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
-  
-    // Remove symbols
-    const symbols = "!@#$%^&*()_+`-={}|[]\:';\"<>,.?/`";
-    for (let i = 0; i < symbols.length; i++) {
-      text = text.replace(new RegExp("\\" + symbols[i], 'g'), ''); 
+function removePunctuationSymbolsParentheses(text) {
+// Remove punctuation
+text = text.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+
+// Remove symbols
+const symbols = "!@#$%^&*()_+`-={}|[]\:';\"<>,.?/`";
+for (let i = 0; i < symbols.length; i++) {
+    text = text.replace(new RegExp("\\" + symbols[i], 'g'), ''); 
+}
+
+// Remove parentheses and their contents
+text = text.replace(/\([^)]*\)/g, '');
+
+return text;
+}
+
+export const get_grocery_list = function(menu, mults, sub_recipes) {
+
+let grocery_list = [];
+menu = (menu.expand && menu.expand.recipes) ? menu.expand.recipes : menu;
+menu.forEach((recipe, i) => {
+    let mult = 1;
+
+    if (recipe.is_sub_recipe){
+        // get parent servings to use
+        const parent_recipe = get_parent_recipe(recipe.id, menu, sub_recipes);
+        if (menu.servings) mult = parseFloat(menu.servings[parent_recipe.id]) / parseFloat(recipe.servings);
+        else if (mults[parent_recipe.id]) mult = parseFloat(mults[parent_recipe.id]) / parseFloat(recipe.servings);
+    } else {
+        if (menu.servings) mult = parseFloat(menu.servings[recipe.id]) / parseFloat(recipe.servings);
+        else if (mults[recipe.id]) mult = parseFloat(mults[recipe.id]) / parseFloat(recipe.servings);
     }
-  
-    // Remove parentheses and their contents
-    text = text.replace(/\([^)]*\)/g, '');
-  
-    return text;
-  }
-
-  export const get_grocery_list = function(menu, mults, sub_recipes) {
-
-    let grocery_list = [];
-    menu = (menu.expand && menu.expand.recipes) ? menu.expand.recipes : menu;
-    menu.forEach((recipe, i) => {
-        let mult = 1;
-
-        if (recipe.is_sub_recipe){
-            // get parent servings to use
-            const parent_recipe = get_parent_recipe(recipe.id, menu, sub_recipes);
-            if (menu.servings) mult = parseFloat(menu.servings[parent_recipe.id]) / parseFloat(recipe.servings);
-            else if (mults[parent_recipe.id]) mult = parseFloat(mults[parent_recipe.id]) / parseFloat(recipe.servings);
-        } else {
-            if (menu.servings) mult = parseFloat(menu.servings[recipe.id]) / parseFloat(recipe.servings);
-            else if (mults[recipe.id]) mult = parseFloat(mults[recipe.id]) / parseFloat(recipe.servings);
-        }
-        
-        if (recipe.expand.ingr_list) {
-            for (let i = 0; i < recipe.expand.ingr_list.length; i++) {
-                let temp_item = {...recipe.expand.ingr_list[i]};
-                grocery_list.push({
-                    "qty": recipe.expand.ingr_list[i].quantity * mult,
-                    "unit": recipe.expand.ingr_list[i].unit,
-                    "unit_plural": recipe.expand.ingr_list[i].unit_plural,
-                    "name": recipe.expand.ingr_list[i].ingredient,
-                    "checked": false,
-                    "ingrs": [
-                        recipe.expand.ingr_list[i].id
-                    ],
-                    "active": true
-                });
-            }
-        } 
-    });
-    return groupBySimilarity(grocery_list);
-  }
-
-
-
-  export const groupBySimilarity = function(strings) {
-
-    // Split each string into words
-    strings = strings.sort((a, b) => b.length - a.length);
-    let stringWords = strings.map(s => removePunctuationSymbolsParentheses(s.name).split(' '));
     
-    let groups = [];
-    for (let i = 0; i < strings.length; i++) {
-    const str1Words = stringWords[i];
-    //   // Check if this string belongs in an existing group
-      let maxSimilarity = 0;
-      let maxGroup;
-      let maxIndex;
-      for (let j = 0; j < groups.length; j++) {
-            for (let k = 0; k < groups[j].length; k++) {
-                let intersection = 0;
-                const str2Words = removePunctuationSymbolsParentheses(groups[j][k].name).split(' ');
-                str1Words.forEach(word => {
-                if (str2Words.includes(word)) {
-                    intersection++;
-                }
-                });
-                // const min_length = (str1Words.length > str2Words.length) ? str2Words.length : str1Words.length ;
-                const similarity = intersection / str1Words.length;
-                if (similarity > maxSimilarity) {
-                maxSimilarity = similarity;
-                maxGroup = j;
-                maxIndex = k;
-                }
+    if (recipe.expand.ingr_list) {
+        for (let i = 0; i < recipe.expand.ingr_list.length; i++) {
+            let temp_item = {...recipe.expand.ingr_list[i]};
+            grocery_list.push({
+                "qty": recipe.expand.ingr_list[i].quantity * mult,
+                "unit": recipe.expand.ingr_list[i].unit,
+                "unit_plural": recipe.expand.ingr_list[i].unit_plural,
+                "name": recipe.expand.ingr_list[i].ingredient,
+                "checked": false,
+                "ingrs": [
+                    recipe.expand.ingr_list[i].id
+                ],
+                "active": true
+            });
+        }
+    } 
+});
+return groupBySimilarity(grocery_list);
+}
+
+export const groupBySimilarity = function(strings) {
+
+// Split each string into words
+strings = strings.sort((a, b) => b.length - a.length);
+let stringWords = strings.map(s => removePunctuationSymbolsParentheses(s.name).split(' '));
+
+let groups = [];
+for (let i = 0; i < strings.length; i++) {
+const str1Words = stringWords[i];
+//   // Check if this string belongs in an existing group
+    let maxSimilarity = 0;
+    let maxGroup;
+    let maxIndex;
+    for (let j = 0; j < groups.length; j++) {
+        for (let k = 0; k < groups[j].length; k++) {
+            let intersection = 0;
+            const str2Words = removePunctuationSymbolsParentheses(groups[j][k].name).split(' ');
+            str1Words.forEach(word => {
+            if (str2Words.includes(word)) {
+                intersection++;
+            }
+            });
+            // const min_length = (str1Words.length > str2Words.length) ? str2Words.length : str1Words.length ;
+            const similarity = intersection / str1Words.length;
+            if (similarity > maxSimilarity) {
+            maxSimilarity = similarity;
+            maxGroup = j;
+            maxIndex = k;
             }
         }
-      
-        // If no suitable group, create a new one
-        if (maxGroup && maxSimilarity > .25) {
-            groups[maxGroup] = [...groups[maxGroup].slice(0, maxIndex), strings[i], ...groups[maxGroup].slice(maxIndex)];
-        } else {
-            groups.push([strings[i]]);
-        }
     }
+    
+    // If no suitable group, create a new one
+    if (maxGroup && maxSimilarity > .25) {
+        groups[maxGroup] = [...groups[maxGroup].slice(0, maxIndex), strings[i], ...groups[maxGroup].slice(maxIndex)];
+    } else {
+        groups.push([strings[i]]);
+    }
+}
 
 
-    let flattened = [];
-    Array.from(groups.values()).sort((a, b) => b.length - a.length).forEach(subarr => {
-        flattened.push(...subarr);
-    });
+let flattened = [];
+Array.from(groups.values()).sort((a, b) => b.length - a.length).forEach(subarr => {
+    flattened.push(...subarr);
+});
 
-    return flattened;
-  }
+return flattened;
+}
