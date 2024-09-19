@@ -66,7 +66,6 @@
                 }
             }
         }
-        console.log(todays_menu.expand.grocery_list.expand.items[0].expand.ingrs);
         loading = false;
     });
 
