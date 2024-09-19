@@ -115,7 +115,6 @@
     }
 
     const ingrs_to_string = (ingrs) => {
-        console.log(ingrs);
         if (!ingrs) return "none";
         let ingrs_string = "";
         for (let i = 0; i < ingrs.length; i++){
