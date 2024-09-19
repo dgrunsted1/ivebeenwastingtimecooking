@@ -28,7 +28,7 @@
         else await pb.collection('users').authRefresh();
         const result_list = await pb.collection('menus').getList(1, 1, {
             filter: `user="${$currentUser.id}" && today=True`,
-            expand: `recipes,recipes.notes,recipes.ingr_list, grocery_list, grocery_list.items`
+            expand: `recipes,recipes.notes,recipes.ingr_list, grocery_list, grocery_list.items, grocery_list.items.ingrs`
         });
         if (result_list.items[0]){
             todays_menu = result_list.items[0];
@@ -47,7 +47,6 @@
                 grocery_list = groupBySimilarity(todays_menu.expand.grocery_list.expand.items);
                 grocery_list_id = todays_menu.expand.grocery_list.id;
             }
-            console.log({grocery_list})
             let checked = [];
             let unchecked = [];
             for (let i = 0; i < grocery_list.length; i++){
@@ -67,6 +66,7 @@
                 }
             }
         }
+        console.log(todays_menu.expand.grocery_list.expand.items[0].expand.ingrs);
         loading = false;
     });
 
