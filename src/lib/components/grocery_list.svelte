@@ -126,7 +126,7 @@
 </script>
 
 <div id="list" class="flex flex-col w-full">
-    <div id="header" class="flex {($page.url.pathname == "/today") ? `justify-between` : `justify-evenly`} items-center my-2.5 mt-0">
+    <div id="header" class="flex {($page.url.pathname == "/today") ? `justify-between` : `justify-evenly`} items-center mt-0">
         {#if grocery_list.length > 0}
             <div>
                 {#if status != "none" && $page.url.pathname == "/today"}<div id="update_status" class="text-xs">{status}</div>{/if}
@@ -145,7 +145,7 @@
         {/if}
     </div>
     <div class="md:mx-3">
-        <div class="grocery_list {view_size_mobile} {view_size_desktop} overflow-y-auto border border-primary rounded-md md:border-none px-2">
+        <div class="grocery_list {view_size_mobile} {view_size_desktop} overflow-y-auto border border-primary rounded-md md:border-none px-2 pt-7">
             {#if grocery_list.length > 0}
                 {#each grocery_list as item, i}
                     {#if edit}
