@@ -224,8 +224,8 @@ async function get_ba_data(page){
         let body = article.querySelector(".recipe__main-content");
         let description = body.querySelector(".body").textContent;
         let time_servings = body.querySelector("[data-testid='InfoSliceList'] > ul");
-        let servings = time_servings.querySelector("li:nth-child(2) > div > p:nth-child(2)").textContent;
-        let time = time_servings.querySelector("li:nth-child(1) > div > p:nth-child(2)").textContent;
+        let servings = (time_servings.querySelectorAll("li").length > 1) ? time_servings.querySelector("li:nth-child(2) > div > p:nth-child(2)").textContent : time_servings.querySelector("li > div > p:nth-child(2)").textContent;
+        let time = (time_servings.querySelectorAll("li").length > 1) ? time_servings.querySelector("li:nth-child(1) > div > p:nth-child(2)").textContent : null;
         let ingr_list = body.querySelector("[data-testid='IngredientList']");
         let ingredient_list = ingr_list.querySelectorAll("div:nth-child(3) > *");
         if (ingredient_list.length <= 2) ingredient_list = ingr_list.querySelectorAll("div > *");
