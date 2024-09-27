@@ -57,6 +57,7 @@ export async function save_recipe(e, recipe, user, new_note) {
 }
 
 function get_mins(time_in){
+    if (!time_in) return 0;
     let mins = 0;
     let min_result = time_in.match(/(\d+) [mins|minutes]/);
     if (min_result){
