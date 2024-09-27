@@ -1,6 +1,7 @@
 <script>
     import { afterUpdate, beforeUpdate, onMount } from 'svelte';
     import { currentUser, pb } from '/src/lib/pocketbase.js';
+    import { get_grocery_list } from '/src/lib/merge_ingredients.js';
 
     $: results = [];
     $: passed = 0;
@@ -11,6 +12,7 @@
     $: categories = [];
     $: unset_cuis = [];
     $: cuisines = [];
+    $: grocery_list_test = [];
 
     const tables = ["menus_strict", "grocery_lists", "ingredients_strict", "menu_log_strict", "grocery_items", "recipes_log_strict", "recipes_strict", "sub_recipes"];
 
@@ -488,6 +490,11 @@
     const send_verify_email = async function() {
         await pb.collection('users').requestVerification(verify_email);
     }
+
+    const test_merge = async function(id){
+        const menus = await pb.collection('menus').getFullList();
+        grocery_list_test = get_grocery_list(menus.items[id]);
+    } 
 </script>
 
 
@@ -540,25 +547,28 @@
                 <input placeholder="email" name="email" type="text" bind:value={verify_email} class="input input-bordered input-xs w-56 text-center input-accent"/>
                 <button type="submit" class="btn btn-primary">send verification email</button>
             </form>
-        </div>
-        <div class="flex flex-col justify-center items-center space-y-10">
-            <div class="btn btn-primary btn-sm" on:click={update_cuis} on:keydown={update_cuis}>update cuisines</div>
-            {#each unset_cuis as cuis}
-                <div class="flex justify-center items-center space-x-5">
-                    <p>{cuis.title}</p>
-                    <!-- <input placeholder="category" name="category" type="text" bind:value={cuis.category} class="input input-bordered input-xs w-56 text-center input-accent"/> -->
-                    <div class="dropdown w-1/2 flex">
-                        <input type="text" id="cuisine" placeholder="category" tabindex="0" class="input input-bordered input-xs m-1 cursor-text w-full" bind:value={cuis.cuisine}/>
-                        <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box mt-8">
-                            <div class="flex flex-col max-w-52 max-h-[50svh] overflow-y-scroll">
-                                {#each cuisines as cuisine}
-                                    <li class="cursor-pointer" on:click={()=>{cuis.cuisine = cuisine.id; document.activeElement.blur();}}>{cuisine.id}</li>
-                                {/each}
-                            </div>
-                        </ul>
+            <div class="flex flex-col justify-center items-center space-y-10 m-auto">
+                <div class="btn btn-primary btn-sm" on:click={update_cuis} on:keydown={update_cuis}>update cuisines</div>
+                {#each unset_cuis as cuis}
+                    <div class="flex justify-center items-center space-x-5">
+                        <p>{cuis.title}</p>
+                        <!-- <input placeholder="category" name="category" type="text" bind:value={cuis.category} class="input input-bordered input-xs w-56 text-center input-accent"/> -->
+                        <div class="dropdown w-1/2 flex">
+                            <input type="text" id="cuisine" placeholder="cuisine" tabindex="0" class="input input-bordered input-xs m-1 cursor-text w-full" bind:value={cuis.cuisine}/>
+                            <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box mt-8">
+                                <div class="flex flex-col max-w-52 max-h-[50svh] overflow-y-scroll">
+                                    {#each cuisines as cuisine}
+                                        <li class="cursor-pointer" on:click={()=>{cuis.cuisine = cuisine.id; document.activeElement.blur();}}>{cuisine.id}</li>
+                                    {/each}
+                                </div>
+                            </ul>
+                        </div>
                     </div>
-                </div>
-            {/each}
+                {/each}
+            </div>
+        </div>
+        <div>
+            
         </div>
     {/if}
 </div>
