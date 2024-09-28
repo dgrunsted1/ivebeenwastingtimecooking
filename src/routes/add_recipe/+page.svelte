@@ -1,7 +1,7 @@
 <script>
     import EditRecipe from "/src/lib/components/edit_recipe.svelte";
     import { currentUser, pb } from '/src/lib/pocketbase.js';
-    import { process_recipe_old, process_directions } from '/src/lib/process_recipe.js';
+    import { process_ingr, process_directions } from '/src/lib/process_recipe.js';
     import { deserialize } from '$app/forms';
     import { onMount } from "svelte";
     import Alerts from "../../lib/components/alerts.svelte";
@@ -57,7 +57,7 @@
             show_alert(result.data.err.msg, "error", result.data.err.title);
             e.srcElement.value = "";
         } else if (result.type === 'success') {
-            result.data.expand.ingr_list = process_recipe_old(result.data.expand.ingr_list);
+            result.data.expand.ingr_list = process_ingr(result.data.expand.ingr_list);
             result.data.url = e.srcElement.value;
             result.data.directions = process_directions(result.data.directions);
             recipe = result.data;

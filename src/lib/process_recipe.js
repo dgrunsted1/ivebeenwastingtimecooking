@@ -4,6 +4,12 @@ const measurements = [
     "oz", "tsp", "tbsp", "lb", "sprig", "bunch", "quart", "pinch"
 ];
 
+const conv_unit = {
+    "teaspoon": "tsp", "ounce": "oz", "tablespoon": "tbsp", "pound": "lb", "gram": "g",
+    "cup": "c", "pint": "pt", "quart": "qt", "gallon": "gal", "milliliter": "ml",
+    "liter": "l", "kilogram": "kg", "inch": "in", "fluid ounce": "fl oz",
+    "milligram": "mg", "centimeter": "cm", "millimeter": "mm"
+}
 const conv_frac = {
     "¼": .25, "½": .5, "¾": .75, "⅐": .142857, "⅑": .111111, "⅒": .1, "⅓": .333333, "⅔": .666667, "⅕": .2, 
     "⅖": .4, "⅗": .6, "⅘": .8, "⅙": .166667, "⅚": .833333, "⅛": .125, "⅜": .375, "⅝": .625, "⅞": .875
@@ -36,7 +42,7 @@ const reg_exp = {
     ]
 };
 
-export const process_recipe_old = function(in_lines) {
+export const process_ingr = function(in_lines) {
     if (!in_lines || in_lines.length == 0) return [];
     let plus_match = in_lines[0].match(/([^>]+) plus ([^>]+)/);
     if (plus_match){
@@ -113,7 +119,7 @@ export const process_recipe_old = function(in_lines) {
     if (ingr && plus_match && in_lines[1] && in_lines[1].includes("more")){
         in_lines[1] = ingr.ingredient + " " + in_lines[1];
     }
-    if (in_lines.slice(1).length) return [ingr].concat(process_recipe_old(in_lines.slice(1)));
+    if (in_lines.slice(1).length) return [ingr].concat(process_ingr(in_lines.slice(1)));
     else return ingr;
 }
 
@@ -153,7 +159,11 @@ function log_match(match_arr, loop_num){
 
 function make_singular(unit) {
     unit = unit.toLowerCase();
-    return (unit.substring(unit.length-1) == "s") ? unit.substring(0, unit.length-1) : unit;
+    unit = (unit.substring(unit.length-1) == "s") ? unit.substring(0, unit.length-1) : unit;
+    if (conv_unit[unit]){
+        unit = conv_unit[unit];
+    }
+    return unit;
 }
 
 export const process_directions = function(in_lines) {

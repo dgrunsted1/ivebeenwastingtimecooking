@@ -1,5 +1,5 @@
 import { pb } from '/src/lib/pocketbase';
-import { process_recipe_old } from '/src/lib/process_recipe.js'
+import { process_ingr } from '/src/lib/process_recipe.js'
  
 export async function save_recipe(e, recipe, user, new_note) {
     e.srcElement.disabled = true;

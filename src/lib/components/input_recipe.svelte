@@ -5,7 +5,7 @@ import { createEventDispatcher } from 'svelte';
 import { invalidateAll} from '$app/navigation';
 import { deserialize } from '$app/forms';
 import EditRecipe from "/src/lib/components/edit_recipe.svelte";
-import { process_recipe_old } from '/src/lib/process_recipe.js'
+import { process_ingr } from '/src/lib/process_recipe.js'
 
 
 const dispatch = createEventDispatcher();
@@ -14,7 +14,7 @@ let recipe;
 let multiplier = 1;
 
 function forward_input(e) {
-    let items = process_recipe_old(e.srcElement.value.split("\n"));
+    let items = process_ingr(e.srcElement.value.split("\n"));
 	dispatch('recipe_edited', {
         items: items, 
         multiplier: multiplier,
@@ -46,7 +46,7 @@ async function fetch_recipe(e){
         alert(result.data.err);
         e.srcElement.value = "";
     } else if (result.type === 'success') {
-        result.data.expand.ingr_list = process_recipe_old(result.data.expand.ingr_list);
+        result.data.expand.ingr_list = process_ingr(result.data.expand.ingr_list);
         result.data.url = e.srcElement.value;
         recipe = result.data;
         dispatch('recipe_edited', {
