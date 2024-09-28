@@ -2,7 +2,7 @@
     import { deserialize } from '$app/forms';
     import { onMount } from 'svelte';
     import { currentUser, pb } from '/src/lib/pocketbase.js';
-    import { process_recipe_old } from '/src/lib/process_recipe.js';
+    import { process_ingr } from '/src/lib/process_recipe.js';
     import { save_recipe } from '/src/lib/save_recipe.js';
     import { page } from '$app/stores';
 
@@ -109,7 +109,7 @@ async function process_recipe_test(e){
             process_recipe_results  = [get_test_data(result.error.message, recipes[i])].concat(process_recipe_results);
         } else if (result.type === 'success') {
             let scraped_recipe = result.data;
-            scraped_recipe.expand.ingr_list = process_recipe_old(scraped_recipe.expand.ingr_list);
+            scraped_recipe.expand.ingr_list = process_ingr(scraped_recipe.expand.ingr_list);
 
             process_recipe_results  = [test_recipe(scraped_recipe, recipes[i])].concat(process_recipe_results);    
         }

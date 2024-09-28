@@ -3,7 +3,7 @@
     import { createEventDispatcher,afterUpdate, onMount } from 'svelte';
     import { page } from '$app/stores';
     import { save_recipe, update_image_upload } from '/src/lib/save_recipe.js';
-    import { process_recipe_old } from '/src/lib/process_recipe.js';
+    import { process_ingr } from '/src/lib/process_recipe.js';
     import ThumbUp from "/src/lib/icons/ThumbUp.svelte";
     import Heart from "/src/lib/icons/Heart.svelte";
     import Edit from "/src/lib/icons/EditIcon.svelte";
@@ -201,7 +201,7 @@
     }
 
     const parse_ingredients = function(e) {
-        let ingr_list = process_recipe_old(e.data.split("\n"));
+        let ingr_list = process_ingr(e.data.split("\n"));
         recipe.expand.ingr_list = ingr_list;
     }
 
