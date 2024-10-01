@@ -1,7 +1,9 @@
 const measurements = [
     "teaspoon", "cup", "tablespoon", "pound", "gram", "g", "large", 
     "medium", "small", "clove", "whole", "ounce", "pint", "inch", "ear",
-    "oz", "tsp", "tbsp", "lb", "sprig", "bunch", "quart", "pinch"
+    "oz", "tsp", "tbsp", "lb", "sprig", "bunch", "quart", "pinch", "c", "pt",
+    "qt", "gallon", "gal", "milliliter", "ml", "liter", "l", "kilogram", "kg", 
+    "inch", "in", "fluid ounce", "fl oz", "milligram", "mg", "centimeter", "cm", "millimeter", "mm"
 ];
 
 const conv_unit = {
