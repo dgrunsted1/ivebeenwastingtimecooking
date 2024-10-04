@@ -1,7 +1,7 @@
 <script>
     import { afterUpdate, beforeUpdate, onMount } from 'svelte';
     import { currentUser, pb } from '/src/lib/pocketbase.js';
-    import { get_grocery_list } from '/src/lib/merge_ingredients.js';
+    import { merge, trim_verbs, groupBySimilarity } from '/src/lib/merge_ingredients.js';
 
     $: results = [];
     $: passed = 0;
@@ -28,8 +28,6 @@
         categories = await pb.collection('categories').getFullList({sort: `+id`});
         unset_cuis = await get_unset_cuisines_recipes();
         cuisines = await pb.collection('cuisines').getFullList({sort: `+id`});
-        console.log({unset_cuis});
-        console.log({cuisines});
     });
 
     beforeUpdate(async () => {
@@ -492,8 +490,23 @@
     }
 
     const test_merge = async function(id){
-        const menus = await pb.collection('menus').getFullList();
-        grocery_list_test = get_grocery_list(menus.items[id]);
+        const ingrs = await pb.collection('ingredients').getFullList();
+        let list = [];
+        for (let i = 0; i < ingrs.length; i++) {
+            let temp_item = {...ingrs[i]};
+            list.push({
+                "id": ingrs[i].id,
+                "qty": ingrs[i].quantity,
+                "unit": ingrs[i].unit,
+                "unit_plural": ingrs[i].unit_plural,
+                "name": trim_verbs(ingrs[i].ingredient),
+                "checked": false,
+                "ingrs": [ingrs[i].id],
+                "active": true,
+                "matches": [ingrs[i]]
+            });
+        }
+        grocery_list_test = groupBySimilarity(merge(list));
     } 
 </script>
 
@@ -568,7 +581,24 @@
             </div>
         </div>
         <div>
-            
+            <div class="flex m-10 flex-col p-10 border rounded-lg">
+                <div class="btn btn-primary btn-sm" on:click={test_merge} on:keydown={test_merge}>test merge</div>
+                <div class="flex flex-col">
+                    <!-- <div class="text text-sm bg-error text-black px-2 m-2">qty:4 | unit:cup | name:all-purpose flour</div> -->
+                    {#each grocery_list_test as curr}
+                    <div class="flex my-1 rounded-lg justify-center items-center{curr.ingrs.length > 1 ? " bg-info text-black" : ""}">
+                        <div class="text text-sm px-2 m-2{isNaN(curr.qty) ? " bg-error text-black" : ""}">qty:{curr.qty} | unit:{curr.unit} | name:{curr.name}</div>
+                        <div class="flex flex-col">
+                            {#if curr.matches.length > 1}
+                                {#each curr.matches as match}
+                                    <div class="text text-sm px-2 m-2{isNaN(match.quantity) ? " bg-error text-black" : ""}">qty:{match.quantity} | unit:{match.unit} | name:{match.ingredient}</div>
+                                {/each}
+                            {/if}
+                        </div>
+                    </div>
+                    {/each}
+                </div>
+            </div>
         </div>
     {/if}
 </div>

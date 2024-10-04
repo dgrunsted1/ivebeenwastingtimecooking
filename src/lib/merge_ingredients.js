@@ -1,14 +1,22 @@
 import { get_parent_recipe } from '/src/lib/menu_utils.js';
 
-const conversions = {"tablespoon/teaspoon": 1/3, "teaspoon/tablespoon": 3, "tbsp/tsp": 1/3, "tsp/tbsp": 3, "cup/teaspoon": 1/48, "teaspoon/cup": 48, "cup/tsp": 1/48, "tsp/cup": 48, "cup/tablespoon": 1/16, "tablespoon/cup": 16, "cup/tbsp": 1/16, "tbsp/cup": 16};
+const conversions = {"tbsp/tsp": 1/3, "tsp/tbsp": 3, "c/tsp": 1/48, "tsp/c": 48, "c/tsp": 1/48, "c/tbsp": 1/16, "tbsp/c": 16, "medium/large": 1, "large/medium": 1, "sprig/tsp": 5/2, "tsp/sprig": 2/5, "sprig/tbsp": 15/2, "tbsp/sprig": 2/15, "small/medium": 1, "medium/small": 1, "large/small": 1, "small/large": 1};
 
 const weight_volume_conv = {"gram/tablespoon": 14, "tablespoon/gram": 1/14, "gram/tbsp": 14, "tbsp/gram": 1/14, "gram/teaspoon": 14/3, "teaspoon/gram": 3/14, "gram/tsp": 14/3, "tsp/gram": 3/14, "gram/cup": 224/1, "cup/gram": 1/224}
 
+const conv_unit = {
+		"teaspoon": "tsp", "ounce": "oz", "tablespoon": "tbsp", "pound": "lb", "gram": "g",
+		"cup": "c", "pint": "pt", "quart": "qt", "gallon": "gal", "milliliter": "ml",
+		"liter": "l", "kilogram": "kg", "inch": "in", "fluid ounce": "fl oz",
+		"milligram": "mg", "centimeter": "cm", "millimeter": "mm"
+	};
 // remove exact words
-const prepositions = ["of", "and", "with", "to", "in", "on", "at", "for", "by", "from", "into", "over", "under", "through", "around", "beside", "between", "among", "towards"];
+const prepositions = ["of", "with", "to", "in", "on", "at", "for", "by", "from", "into", "over", "under", "through", "around", "beside", "between", "among", "towards", "room", "very", "more for serving", "melon baller", "a"];
 
 const conjunctions = ["and", "or", "nor", "but", "yet", "so"];
+const remove_when_matching = ["(optional)", "for serving"];
 
+let conversions_missing = [];
 // remove words where the string is contained
 const verbs = [
 		"acidulate",
@@ -78,7 +86,6 @@ const verbs = [
 		"drain",
 		"dredge",
 		"drop",
-		"dry",
 		"dust",
 		"dye",
 		"eat",
@@ -294,31 +301,36 @@ export const merge = function(ingrs) {
     let skipped = [];
 	// console.log(ingrs);
 	for(let item of ingrs){
-		if (!item) continue;
+		if (!item.name) continue;
 		let match = false;
-		// console.log({grocery_list});
+		// console.log({item});
 		if (grocery_list) {
 			grocery_list.forEach(element => {
 				// console.log({element, item});
-				if (element.name === item.name || element.name.includes(item.name) || item.name.includes(element.name)){
+				if (((item.unit && item.qty && element.unit && element.qty) || (!item.unit && !item.qty && !element.unit && !element.qty)) && ((strip_parens(element.name) === strip_parens(item.name)) || 
+				   (element.name.includes(item.name) && !element.name.includes("un" + item.name) && !element.name.includes(item.name + "ed") && element.name !== "sugar" && element.name !== "powdered sugar") || 
+				   (item.name.includes(element.name) && !item.name.includes("un" + element.name) && !item.name.includes(element.name + "ed") && item.name !== "sugar" && item.name !== "powdered sugar"))) {
 					match = element;
 					// console.log({match});
 					return;
 				}
 			});
 		}
+		const conv_match = get_conversion_rates(item.unit, match.unit);
 		if (match && !(["small", "medium", "large"].includes(match.unit) ^ ["small", "medium", "large"].includes(item.unit))
-						&& !(match.unit == "clove" ^ item.unit == "clove") && !(match.unit == "whole" ^ item.unit == "whole")) {
+						&& !(match.unit == "clove" ^ item.unit == "clove") && !(match.unit == "whole" ^ item.unit == "whole") &&
+						conv_match) {
 			
-			console.log({match, item});
+			// console.log(match, item);
 			let tmp = { checked: false,
 						qty: 0,
 						unit: 0,
-						name: null
+						name: null,
+						ingrs: match.ingrs.concat(item.ingrs),
+						matches: match.matches.concat(item.matches),
 					};
-			if (match.unit != item.unit) {
-				let qty = round_amount(item.qty);
-				let conv = combine(match, item);
+			if (match.unit != item.unit && conv_unit[match.unit] != item.unit && conv_unit[item.unit] != match.unit) {
+				let conv = combine(match, item, conv_match);
 				tmp.qty = conv.amount;
 				tmp.unit = conv.unit;
 			} else {
@@ -332,13 +344,15 @@ export const merge = function(ingrs) {
 			}
 
 			grocery_list.splice(grocery_list.indexOf(match), 1);
-			console.log({tmp});
+			// console.log(tmp);
 			grocery_list.push(tmp);
 		}else {
-			let tmp = { name: item.name,
+			let tmp = { checked: false,
 						qty: item.qty,
 						unit: item.unit,
-						name: item.name
+						name: item.name,
+						ingrs: item.ingrs,
+						matches: item.matches
 					};
 			tmp.qty = round_amount(item.qty);
 			grocery_list.push(tmp);
@@ -346,33 +360,52 @@ export const merge = function(ingrs) {
 	}
 	if (skipped.length) console.log({skipped});
 	// console.log({grocery_list});
+	console.log(conversions_missing);
     return grocery_list;
 }
 
-const combine = (i, j) => {
-	// console.log({i, j});
-    let conv_index_a = `${j.unit}/${i.unit}`;
-    let conv_index_b = `${i.unit}/${j.unit}`;
-	// console.log(conv_index_a, conv_index_b);
+const get_conversion_rates = (a_unit, b_unit) => {
+	const i_unit = (conv_unit[a_unit]) ? conv_unit[a_unit] : a_unit;
+	const j_unit = (conv_unit[b_unit]) ? conv_unit[b_unit] : b_unit;
+    let conv_index_a = `${j_unit}/${i_unit}`;
+    let conv_index_b = `${i_unit}/${j_unit}`;
+	// console.log("conv_index",conv_index_a, conv_index_b);
     let amount = null;
     let unit = null;
     let conv_a;
     let conv_b;
-    if ((!conversions[conv_index_a] || !conversions[conv_index_a]) && ((j.name.includes('salt') && j.name.includes('salt')) || (i.name.includes('sugar') || i.name.includes('sugar')) || (i.name.includes('oil') || i.name.includes('oil')))){
-        conv_a = weight_volume_conv[conv_index_a];
-        conv_b = weight_volume_conv[conv_index_b];
+    if ((!conversions[conv_index_a] || !conversions[conv_index_a])){
+        conv_a = (weight_volume_conv[conv_index_a]) ? weight_volume_conv[conv_index_a] : conversions[conv_index_a];
+        conv_b = (weight_volume_conv[conv_index_b]) ? weight_volume_conv[conv_index_b] : conversions[conv_index_b];
     } else {
         conv_a = conversions[conv_index_a];
         conv_b = conversions[conv_index_b];
     }
-	// console.log(conv_a, conv_b);
-    if (conv_a < conv_b){
+	if (conv_a || conv_b) {
+		return {a:conv_a, b:conv_b};
+	} else {
+		return false;
+	}
+}
+
+const combine = (i, j, conv) => {
+	// console.log({i, j});
+	const amount_a = conv.a * i.qty + j.qty;
+	const amount_b = conv.b * i.qty + j.qty;
+	let unit;
+	let amount;
+	// console.log("conv", conv_a, conv_b);
+    if (Math.abs(amount_a - 1) < Math.abs(amount_b - 1)) {
         unit = j.unit;
-        amount = conv_a * i.qty + j.qty;
-    }else {
+        amount = amount_a;
+    } else {
         unit = i.unit;
-        amount = conv_b * j.qty + i.qty;
+        amount = amount_b;
     }
+	if (isNaN(amount)) {
+		// console.log(i, j, conv_a, conv_b, conv_index_a, conv_index_b);
+		if (!conversions_missing.includes(conv_index_b) && !conversions_missing.includes(conv_index_a)) conversions_missing.push(conv_index_a);
+	}
 	// console.log({unit: unit, amount: round_amount(amount)});
     return {unit: unit, amount: round_amount(amount)};
 }
@@ -407,38 +440,38 @@ function removePunctuationSymbolsParentheses(text) {
 
 export const get_grocery_list = function(menu, mults, sub_recipes) {
     // console.log("get_grocery_list---------------------------------------");
-let grocery_list = [];
-menu = (menu.expand && menu.expand.recipes) ? menu.expand.recipes : menu;
-menu.forEach((recipe, i) => {
-    let mult = 1;
+	let grocery_list = [];
+	menu = (menu.expand && menu.expand.recipes) ? menu.expand.recipes : menu;
+	menu.forEach((recipe, i) => {
+		let mult = 1;
 
-    if (recipe.is_sub_recipe){
-        // get parent servings to use
-        const parent_recipe = get_parent_recipe(recipe.id, menu, sub_recipes);
-        if (menu.servings) mult = parseFloat(menu.servings[parent_recipe.id]) / parseFloat(recipe.servings);
-        else if (mults[parent_recipe.id]) mult = parseFloat(mults[parent_recipe.id]) / parseFloat(recipe.servings);
-    } else {
-        if (menu.servings) mult = parseFloat(menu.servings[recipe.id]) / parseFloat(recipe.servings);
-        else if (mults[recipe.id]) mult = parseFloat(mults[recipe.id]) / parseFloat(recipe.servings);
-    }
-    
-    if (recipe.expand.ingr_list) {
-        for (let i = 0; i < recipe.expand.ingr_list.length; i++) {
-            let temp_item = {...recipe.expand.ingr_list[i]};
-            grocery_list.push({
-                "qty": recipe.expand.ingr_list[i].quantity * mult,
-                "unit": recipe.expand.ingr_list[i].unit,
-                "unit_plural": recipe.expand.ingr_list[i].unit_plural,
-                "name": trim_verbs(recipe.expand.ingr_list[i].ingredient),
-                "checked": false,
-                "ingrs": [
-                    recipe.expand.ingr_list[i].id
-                ],
-                "active": true
-            });
-        }
-    } 
-});
+		if (recipe.is_sub_recipe){
+			// get parent servings to use
+			const parent_recipe = get_parent_recipe(recipe.id, menu, sub_recipes);
+			if (menu.servings) mult = parseFloat(menu.servings[parent_recipe.id]) / parseFloat(recipe.servings);
+			else if (mults[parent_recipe.id]) mult = parseFloat(mults[parent_recipe.id]) / parseFloat(recipe.servings);
+		} else {
+			if (menu.servings) mult = parseFloat(menu.servings[recipe.id]) / parseFloat(recipe.servings);
+			else if (mults[recipe.id]) mult = parseFloat(mults[recipe.id]) / parseFloat(recipe.servings);
+		}
+		
+		if (recipe.expand.ingr_list) {
+			for (let i = 0; i < recipe.expand.ingr_list.length; i++) {
+				let temp_item = {...recipe.expand.ingr_list[i]};
+				grocery_list.push({
+					"qty": recipe.expand.ingr_list[i].quantity * mult,
+					"unit": recipe.expand.ingr_list[i].unit,
+					"unit_plural": recipe.expand.ingr_list[i].unit_plural,
+					"name": trim_verbs(recipe.expand.ingr_list[i].ingredient),
+					"checked": false,
+					"ingrs": [
+						recipe.expand.ingr_list[i].id
+					],
+					"active": true
+				});
+			}
+		} 
+	});
 	// console.log({grocery_list});
 	// return merge(grocery_list);
 	return groupBySimilarity(merge(grocery_list));
@@ -452,7 +485,7 @@ const trim_punctuation = function(ingr_string) {
 }
 
 
-const trim_verbs = function(ingr_string) {
+export const trim_verbs = function(ingr_string) {
     // console.log("start", ingr_string);
     let out = ingr_string;
     
@@ -552,4 +585,20 @@ Array.from(groups.values()).sort((a, b) => b.length - a.length).forEach(subarr =
 });
 
 return flattened;
+}
+
+
+const strip_parens = function(string) {
+    // console.log({string});
+    let out = string;
+    const regex = /(\([\w+]\))/g;
+    const matches = string.match(regex);
+    // console.log({matches});
+    if (matches) {
+        matches.forEach(match => {
+            out = out.replace(match, '');
+        });
+    }
+    // console.log({out});
+    return out.trim();
 }
