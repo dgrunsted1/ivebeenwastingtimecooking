@@ -506,8 +506,12 @@
                 "matches": [ingrs[i]]
             });
         }
-        grocery_list_test = groupBySimilarity(merge(list));
+        grocery_list_test = groupBySimilarity(merge(list).sort(sort_by_matches)).sort(sort_by_matches);
     } 
+
+    const sort_by_matches = function(a, b){
+        return b.matches.length - a.matches.length;
+    }
 </script>
 
 

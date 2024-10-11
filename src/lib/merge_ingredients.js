@@ -1,8 +1,9 @@
 import { get_parent_recipe } from '/src/lib/menu_utils.js';
 import { get_conversion_rates, conv_unit } from '/src/lib/unit_conversions.js';
+import convert from "convert";
 
 // remove exact words
-const prepositions = ["of", "with", "to", "in", "on", "at", "for", "by", "from", "into", "over", "under", "through", "around", "beside", "between", "among", "towards", "room", "very", "more for serving", "melon baller", "a"];
+const prepositions = ["of", "with", "to", "in", "on", "at", "for", "by", "from", "into", "over", "under", "through", "around", "beside", "between", "among", "towards", "room", "very", "more for serving", "melon baller", "a", "press"];
 
 const conjunctions = ["and", "or", "nor", "but", "yet", "so"];
 const remove_when_matching = ["(optional)", "for serving"];
@@ -52,6 +53,7 @@ const verbs = [
 		"collect",
 		"color",
 		"combine",
+		"complete",
 		"continue",
 		"cook",
 		"cool",
@@ -164,7 +166,6 @@ const verbs = [
 		"pour",
 		"prepare",
 		"preserve",
-		"press",
 		"prick",
 		"pull",
 		"pulverize",
@@ -290,19 +291,15 @@ const verbs = [
 export const merge = function(ingrs) {
     let grocery_list = [];
     let skipped = [];
-	// console.log(ingrs);
 	for(let item of ingrs){
 		if (!item.name) continue;
 		let match = false;
-		// console.log({item});
 		if (grocery_list) {
 			grocery_list.forEach(element => {
-				// console.log({element, item});
 				if (((item.unit && item.qty && element.unit && element.qty) || (!item.unit && !item.qty && !element.unit && !element.qty)) && ((strip_parens(element.name) === strip_parens(item.name)) || 
 				   (element.name.includes(item.name) && !element.name.includes("un" + item.name) && !element.name.includes(item.name + "ed") && element.name !== "sugar" && element.name !== "powdered sugar") || 
 				   (item.name.includes(element.name) && !item.name.includes("un" + element.name) && !item.name.includes(element.name + "ed") && item.name !== "sugar" && item.name !== "powdered sugar"))) {
 					match = element;
-					// console.log({match});
 					return;
 				}
 			});
@@ -312,13 +309,14 @@ export const merge = function(ingrs) {
 						&& !(match.unit == "clove" ^ item.unit == "clove") && !(match.unit == "whole" ^ item.unit == "whole") &&
 						conv_match) {
 			
-			// console.log(match, item);
+			if (!item.ingrs) item.ingrs = [];
+			console.log(match, item);
 			let tmp = { checked: false,
 						qty: 0,
 						unit: 0,
 						name: null,
 						ingrs: match.ingrs.concat(item.ingrs),
-						matches: match.matches.concat(item.matches),
+						matches: match.matches.concat(item),
 					};
 			if (match.unit != item.unit && conv_unit[match.unit] != item.unit && conv_unit[item.unit] != match.unit) {
 				let conv = combine(match, item, conv_match);
@@ -333,54 +331,32 @@ export const merge = function(ingrs) {
 			}else {
 				tmp.name = item.name;
 			}
-
+			console.log(tmp);
 			grocery_list.splice(grocery_list.indexOf(match), 1);
-			// console.log(tmp);
 			grocery_list.push(tmp);
 		}else {
 			let tmp = { checked: false,
 						qty: item.qty,
 						unit: item.unit,
 						name: item.name,
-						ingrs: item.ingrs,
-						matches: item.matches
+						ingrs: (item.ingrs) ?  item.ingrs : [],
+						matches: [item]
 					};
 			tmp.qty = round_amount(item.qty);
 			grocery_list.push(tmp);
 		}
 	}
-	if (skipped.length) console.log({skipped});
-	// console.log({grocery_list});
-	console.log(conversions_missing);
     return grocery_list;
 }
 
 
 
 const combine = (i, j, conv) => {
-	// console.log({i, j});
-	const amount_a = conv.a * i.qty + j.qty;
-	const amount_b = conv.b * i.qty + j.qty;
-	let unit;
-	let amount;
-	// console.log("conv", conv_a, conv_b);
-    if (Math.abs(amount_a - 1) < Math.abs(amount_b - 1)) {
-        unit = j.unit;
-        amount = amount_a;
-    } else {
-        unit = i.unit;
-        amount = amount_b;
-    }
-	if (isNaN(amount)) {
-		// console.log(i, j, conv_a, conv_b, conv_index_a, conv_index_b);
-		if (!conversions_missing.includes(conv_index_b) && !conversions_missing.includes(conv_index_a)) conversions_missing.push(conv_index_a);
-	}
-	// console.log({unit: unit, amount: round_amount(amount)});
-    return {unit: unit, amount: round_amount(amount)};
+	const amount = convert(i.qty + j.qty, conv).to("best");
+    return {unit: amount.unit, amount: round_amount(amount.quantity)};
 }
 
 function round_amount(in_amount, mult){
-	// console.log({in_amount, mult});
     if (!mult) return Math.round((in_amount + Number.EPSILON) * 100) / 100
     let result = 0;
     if (typeof in_amount != "string"){
@@ -393,7 +369,7 @@ function round_amount(in_amount, mult){
   
 function removePunctuationSymbolsParentheses(text) {
 	// Remove punctuation
-	text = text.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+	text = text.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()"']/g,"");
 
 	// Remove symbols
 	const symbols = "!@#$%^&*()_+`-={}|[]\:';\"<>,.?/`";
@@ -408,7 +384,7 @@ function removePunctuationSymbolsParentheses(text) {
 }
 
 export const get_grocery_list = function(menu, mults, sub_recipes) {
-    // console.log("get_grocery_list---------------------------------------");
+
 	let grocery_list = [];
 	menu = (menu.expand && menu.expand.recipes) ? menu.expand.recipes : menu;
 	menu.forEach((recipe, i) => {
@@ -418,10 +394,10 @@ export const get_grocery_list = function(menu, mults, sub_recipes) {
 			// get parent servings to use
 			const parent_recipe = get_parent_recipe(recipe.id, menu, sub_recipes);
 			if (menu.servings) mult = parseFloat(menu.servings[parent_recipe.id]) / parseFloat(recipe.servings);
-			else if (mults[parent_recipe.id]) mult = parseFloat(mults[parent_recipe.id]) / parseFloat(recipe.servings);
+			else if (mults && mults[parent_recipe.id]) mult = parseFloat(mults[parent_recipe.id]) / parseFloat(recipe.servings);
 		} else {
 			if (menu.servings) mult = parseFloat(menu.servings[recipe.id]) / parseFloat(recipe.servings);
-			else if (mults[recipe.id]) mult = parseFloat(mults[recipe.id]) / parseFloat(recipe.servings);
+			else if (mults && mults[recipe.id]) mult = parseFloat(mults[recipe.id]) / parseFloat(recipe.servings);
 		}
 		
 		if (recipe.expand.ingr_list) {
@@ -441,47 +417,35 @@ export const get_grocery_list = function(menu, mults, sub_recipes) {
 			}
 		} 
 	});
-	// console.log({grocery_list});
-	// return merge(grocery_list);
-	return groupBySimilarity(merge(grocery_list));
+	const out = groupBySimilarity(merge(grocery_list));
+	return out;
 }
 
 const trim_punctuation = function(ingr_string) {
-    // console.log(ingr_string.match(/^[\s.,]+|[\s.,]+$/gu, ''));
     const out = ingr_string.replace(/^[\s.,]+|[\s.,]+$/gu, '').trim();
-    // console.log("end", out);
     return out;
 }
 
 
 export const trim_verbs = function(ingr_string) {
-    // console.log("start", ingr_string);
     let out = ingr_string;
     
     verbs.sort((a, b) => b.length - a.length);
-    // console.log({verbs});
     for (let i = 0; i <  verbs.length; i++) {
         const verb = verbs[i];
-        // console.log({verb});
         if (out.toLowerCase().includes(verb)) {
-            // console.log({verb});
             out = out.replace(new RegExp(`\\b\\w*${verb}\\w*\\b`, 'gi'), "").trim();
-            // console.log({out});
         }
     }
-    // console.log("verb", out.trim());
     return trim_prepositions(out.trim());
 }
 
 const trim_prepositions = function(ingr_string) {
-    // console.log({ingr_string});
     let out = ingr_string;
     for (let i = 0; i <  prepositions.length; i++) {
         const preposition = prepositions[i];
         const regex = new RegExp(`\\b${preposition}\\b`, 'gi');
         if (regex.test(out)) {
-            // console.log({preposition});
-            // console.log({regex});
             out = out.replace(regex, "");
         }
     }
@@ -501,12 +465,10 @@ const trim_prepositions = function(ingr_string) {
     out = trimConjunctions(out);
     
     out = trim_punctuation(out);
-    // console.log("prepositions", out);
     return out;
 }
 
 export const groupBySimilarity = function(strings) {
-	// console.log({strings});
     // Split each string into words
     strings = strings.sort((a, b) => b.length - a.length);
     let stringWords = strings.map(s => removePunctuationSymbolsParentheses(s.name).split(' '));
@@ -558,16 +520,14 @@ return flattened;
 
 
 const strip_parens = function(string) {
-    // console.log({string});
+	if (!string) return string;
     let out = string;
     const regex = /(\([\w+]\))/g;
     const matches = string.match(regex);
-    // console.log({matches});
     if (matches) {
         matches.forEach(match => {
             out = out.replace(match, '');
         });
     }
-    // console.log({out});
     return out.trim();
 }

@@ -2,7 +2,7 @@
     import { currentUser, pb } from '/src/lib/pocketbase.js';
     import { afterUpdate, onMount } from 'svelte';
     import Menu from "/src/lib/components/menu.svelte";
-    import { merge } from '/src/lib/merge_ingredients.js';
+    import { get_grocery_list, trim_verbs } from '/src/lib/merge_ingredients.js';
     import DeleteIcon from "/src/lib/icons/DeleteIcon.svelte";
     import Clear from "/src/lib/icons/Clear.svelte";
     import { get_servings } from '/src/lib/recipe_util.js';
@@ -292,6 +292,27 @@
         }
         return 0;
     }
+
+    const get_ingrs_list = function (recipes){
+        let ingrs_list = [];
+        recipes.forEach(recipe => {
+
+            recipe.expand.ingr_list.forEach(ingr => {
+                ingrs_list.push({
+                    "id": ingr.id,
+                    "qty": ingr.quantity,
+                    "unit": ingr.unit,
+                    "unit_plural": ingr.unit_plural,
+                    "name": trim_verbs(ingr.ingredient),
+                    "checked": false,
+                    "ingrs": [ingr.id],
+                    "active": true,
+                    "matches": [ingr]
+                });
+            });
+        });
+        return ingrs_list;
+    }
 </script>
 
 <svelte:head>
@@ -353,7 +374,7 @@
                                 </div>
                                 <div class="flex flex-row justify-evenly w-full">
                                     <p class="text-center text-[10px] xl:text-[12px] border border-primary px-1 text-ellipsis whitespace-nowrap text-nowrap overflow-hidden rounded-tl rounded-bl">{user_menus[i].expand.recipes.length} recipes</p>
-                                    <p class="text-center text-[10px] xl:text-[12px] border border-primary px-1 text-ellipsis whitespace-nowrap text-nowrap overflow-hidden">{merge(user_menus[i].expand.recipes).grocery_list.length} ingredients</p>
+                                    <p class="text-center text-[10px] xl:text-[12px] border border-primary px-1 text-ellipsis whitespace-nowrap text-nowrap overflow-hidden">{get_grocery_list(user_menus[i], user_menus[i].servings, user_menus[i].sub_recipes).length} ingredients</p>
                                     <p class="text-center text-[10px] xl:text-[12px] border border-primary px-1 text-ellipsis whitespace-nowrap text-nowrap overflow-hidden">{get_servings(user_menus[i].expand.recipes, user_menus[i].sub_recipes)} servings</p>
                                     <p class="text-center text-[10px] xl:text-[12px] border border-primary px-1 text-ellipsis whitespace-nowrap text-nowrap overflow-hidden rounded-tr rounded-br">{get_total_time(user_menus[i].expand.recipes).display}</p>
                                 </div>
