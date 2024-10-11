@@ -310,7 +310,6 @@ export const merge = function(ingrs) {
 						conv_match) {
 			
 			if (!item.ingrs) item.ingrs = [];
-			console.log(match, item);
 			let tmp = { checked: false,
 						qty: 0,
 						unit: 0,
@@ -331,7 +330,6 @@ export const merge = function(ingrs) {
 			}else {
 				tmp.name = item.name;
 			}
-			console.log(tmp);
 			grocery_list.splice(grocery_list.indexOf(match), 1);
 			grocery_list.push(tmp);
 		}else {
