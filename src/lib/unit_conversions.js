@@ -21,10 +21,8 @@ const weight_volume_conv = {"gram/tablespoon": 14, "tablespoon/gram": 1/14, "gra
             return false;
         }
         try {
-            console.log(a_unit, b_unit);
             const conv = convert(1, a_unit).to(b_unit);
-            
-            console.log(conv);
+
             if (conv) {
                 return conv;
             } else {
