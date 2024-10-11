@@ -360,7 +360,7 @@
                 <div class="text-center flex flex-col justify-center items-center space-y-5 mx-2 md:mx-auto md:text-4xl h-full w-full"><span class="loading loading-bars loading-lg"></span></div>
             {:else}
                 {#each user_menus as curr, i}
-                    <div id={user_menus[i].id} class="card md:card-side card-bordered bg-base-200 shadow-xl max-h-24 my-1.5 mx-1 cursor-pointer" on:click={show_menu_modal} on:keypress={show_menu_modal}>
+                    <div id={user_menus[i].id} class="card md:card-side card-bordered bg-base-200 shadow-xl h-24 my-1.5 mx-1 cursor-pointer" on:click={show_menu_modal} on:keypress={show_menu_modal}>
                         <figure class="md:w-2/3">
                             {#each user_menus[i].expand.recipes as recipe, j}
                                     <img class="w-16 md:w-20" src={user_menus[i].expand.recipes[j].image} alt={user_menus[i].expand.recipes[j].title}/>
