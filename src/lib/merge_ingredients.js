@@ -3,7 +3,7 @@ import { get_conversion_rates, conv_unit } from '/src/lib/unit_conversions.js';
 import convert from "convert";
 
 // remove exact words
-const prepositions = ["of", "with", "to", "in", "on", "at", "for", "by", "from", "into", "over", "under", "through", "around", "beside", "between", "among", "towards", "room", "very", "more for serving", "melon baller", "a", "press"];
+const prepositions = ["of", "with", "to", "in", "on", "at", "for", "by", "from", "into", "over", "under", "through", "around", "beside", "between", "among", "towards", "room", "very", "more for serving", "melon baller", "a", "press", "freshly ground"];
 
 const conjunctions = ["and", "or", "nor", "but", "yet", "so"];
 const remove_when_matching = ["(optional)", "for serving"];
@@ -333,14 +333,36 @@ export const merge = function(ingrs) {
 			grocery_list.splice(grocery_list.indexOf(match), 1);
 			grocery_list.push(tmp);
 		}else {
-			let tmp = { checked: false,
-						qty: item.qty,
+			let tmp = {};
+				try{
+					if (item.qty && item.unit){
+						const best_unit = convert(item.qty, item.unit).to("best", "imperial");
+						tmp = { checked: false,
+							qty: round_amount(best_unit.quantity),
+							unit: best_unit.unit,
+							name: item.name,
+							ingrs: (item.ingrs) ?  item.ingrs : [],
+							expand: { ingrs: [item]}
+						};
+					} else {
+						tmp = { checked: false,
+							qty: round_amount(item.qty),
+							unit: item.unit,
+							name: item.name,
+							ingrs: (item.ingrs) ?  item.ingrs : [],
+							expand: { ingrs: [item]}
+						};
+					}
+				} catch (err) {
+					tmp = { checked: false,
+						qty: round_amount(item.qty),
 						unit: item.unit,
 						name: item.name,
 						ingrs: (item.ingrs) ?  item.ingrs : [],
 						expand: { ingrs: [item]}
 					};
-			tmp.qty = round_amount(item.qty);
+				}
+
 			grocery_list.push(tmp);
 		}
 	}
@@ -350,8 +372,10 @@ export const merge = function(ingrs) {
 
 
 const combine = (i, j, conv) => {
-	const amount = convert(convert(i.qty, i.unit).to(j.unit), j.unit).to("best");
-    return {unit: amount.unit, amount: round_amount(amount.quantity)};
+	const tmp = convert(i.qty, i.unit).to(j.unit);
+	const amount = convert(tmp+j.qty, j.unit).to("best", "imperial");
+	let out = {unit: amount.unit, amount: round_amount(amount.quantity)}
+    return out;
 }
 
 function round_amount(in_amount, mult){
