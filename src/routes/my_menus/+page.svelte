@@ -292,27 +292,6 @@
         }
         return 0;
     }
-
-    const get_ingrs_list = function (recipes){
-        let ingrs_list = [];
-        recipes.forEach(recipe => {
-
-            recipe.expand.ingr_list.forEach(ingr => {
-                ingrs_list.push({
-                    "id": ingr.id,
-                    "qty": ingr.quantity,
-                    "unit": ingr.unit,
-                    "unit_plural": ingr.unit_plural,
-                    "name": trim_verbs(ingr.ingredient),
-                    "checked": false,
-                    "ingrs": [ingr.id],
-                    "active": true,
-                    "matches": [ingr]
-                });
-            });
-        });
-        return ingrs_list;
-    }
 </script>
 
 <svelte:head>

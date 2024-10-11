@@ -316,7 +316,7 @@ export const merge = function(ingrs) {
 						unit: 0,
 						name: null,
 						ingrs: match.ingrs.concat(item.ingrs),
-						matches: match.matches.concat(item),
+						expand: { ingrs: match.expand.ingrs.concat(item)}
 					};
 			if (match.unit != item.unit && conv_unit[match.unit] != item.unit && conv_unit[item.unit] != match.unit) {
 				let conv = combine(match, item, conv_match);
@@ -340,7 +340,7 @@ export const merge = function(ingrs) {
 						unit: item.unit,
 						name: item.name,
 						ingrs: (item.ingrs) ?  item.ingrs : [],
-						matches: [item]
+						expand: { ingrs: [item]}
 					};
 			tmp.qty = round_amount(item.qty);
 			grocery_list.push(tmp);
@@ -352,7 +352,7 @@ export const merge = function(ingrs) {
 
 
 const combine = (i, j, conv) => {
-	const amount = convert(i.qty + j.qty, conv).to("best");
+	const amount = convert(convert(i.qty, i.unit).to(j.unit), j.unit).to("best");
     return {unit: amount.unit, amount: round_amount(amount.quantity)};
 }
 
@@ -442,6 +442,7 @@ export const trim_verbs = function(ingr_string) {
 
 const trim_prepositions = function(ingr_string) {
     let out = ingr_string;
+	prepositions.sort((a,b) => b.length - a.length);
     for (let i = 0; i <  prepositions.length; i++) {
         const preposition = prepositions[i];
         const regex = new RegExp(`\\b${preposition}\\b`, 'gi');
