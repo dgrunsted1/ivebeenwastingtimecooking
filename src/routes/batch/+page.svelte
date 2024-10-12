@@ -510,7 +510,7 @@
     } 
 
     const sort_by_matches = function(a, b){
-        return b.matches.length - a.matches.length;
+        return b.ingrs.length - a.ingrs.length;
     }
 </script>
 
@@ -593,9 +593,9 @@
                     <div class="flex my-1 rounded-lg justify-center items-center{curr.ingrs.length > 1 ? " bg-info text-black" : ""}">
                         <div class="text text-sm px-2 m-2{isNaN(curr.qty) ? " bg-error text-black" : ""}">qty:{curr.qty} | unit:{curr.unit} | name:{curr.name}</div>
                         <div class="flex flex-col">
-                            {#if curr.matches.length > 1}
-                                {#each curr.matches as match}
-                                    <div class="text text-sm px-2 m-2{isNaN(match.quantity) ? " bg-error text-black" : ""}">qty:{match.quantity} | unit:{match.unit} | name:{match.ingredient}</div>
+                            {#if curr.ingrs.length > 1}
+                                {#each curr.expand.ingrs as match}
+                                    <div class="text text-sm px-2 m-2{isNaN(match.qty) ? " bg-error text-black" : ""}">qty:{match.qty} | unit:{match.unit} | name:{match.name}</div>
                                 {/each}
                             {/if}
                         </div>
