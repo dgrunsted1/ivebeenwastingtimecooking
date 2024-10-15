@@ -315,7 +315,7 @@ export const merge = function(ingrs) {
 						unit: 0,
 						name: null,
 						ingrs: match.ingrs.concat(item.ingrs),
-						expand: { ingrs: match.expand.ingrs.concat(item)}
+						expand: { ingrs: match.expand.ingrs.concat(item.expand.ingrs)}
 					};
 			if (match.unit != item.unit && conv_unit[match.unit] != item.unit && conv_unit[item.unit] != match.unit) {
 				let conv = combine(match, item, conv_match);
@@ -342,7 +342,7 @@ export const merge = function(ingrs) {
 							unit: best_unit.unit,
 							name: item.name,
 							ingrs: (item.ingrs) ?  item.ingrs : [],
-							expand: { ingrs: [item]}
+							expand: { ingrs: item.expand.ingrs}
 						};
 					} else {
 						tmp = { checked: false,
@@ -350,7 +350,7 @@ export const merge = function(ingrs) {
 							unit: item.unit,
 							name: item.name,
 							ingrs: (item.ingrs) ?  item.ingrs : [],
-							expand: { ingrs: [item]}
+							expand: { ingrs: item.expand.ingrs}
 						};
 					}
 				} catch (err) {
@@ -359,7 +359,7 @@ export const merge = function(ingrs) {
 						unit: item.unit,
 						name: item.name,
 						ingrs: (item.ingrs) ?  item.ingrs : [],
-						expand: { ingrs: [item]}
+						expand: { ingrs: item.expand.ingrs}
 					};
 				}
 
@@ -434,6 +434,11 @@ export const get_grocery_list = function(menu, mults, sub_recipes) {
 					"ingrs": [
 						recipe.expand.ingr_list[i].id
 					],
+					"expand": {
+						"ingrs": [
+							recipe.expand.ingr_list[i]
+						]
+					},
 					"active": true
 				});
 			}
