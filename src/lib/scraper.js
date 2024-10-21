@@ -235,7 +235,7 @@ async function get_ba_data(page){
                 ingredient_list[i].querySelectorAll("*").length == 0) {
                 if (ingredients[ingredients.length - 1] && !ingredients[ingredients.length - 1].includes(" ") && !/[a-z]/i.test(ingredients[ingredients.length - 1])){
                     ingredients[ingredients.length - 1] = ingredients[ingredients.length - 1] + " " + ingredient_list[i].textContent;
-                }else ingredients.push(ingredient_list[i].textContent);
+                }else if (ingredient_list[i].textContent) ingredients.push(ingredient_list[i].textContent);
             }
         }
         let dir_list = body.querySelectorAll("[data-testid='InstructionsWrapper'] > ol > *");
@@ -389,6 +389,7 @@ export const scrape = async function(url) {
                 compare_time: `${((set_view_time-go_to_time)+(end-set_view_time)+(go_to_time-selector_time)+(selector_time-await_data)+(await_data-init_time)+(init_time-start))/1000}s`
             };
             await validate_recipe_data(results, url);
+            console.log(results.expand.ingr_list)
             return results;
         }catch (e){
             await browser.close();

@@ -340,14 +340,12 @@
             {#if !loading}
                 {#if recipe.expand.ingr_list.length}
                     {#each recipe.expand.ingr_list as ingr, i}
-                        {#if ingr}
                             <div class="ingr_row flex flex-row justify-center items-center mt-1 " class:removed={ingr.removed}>
                                 <input type="text" class="ingr_amount input input-bordered input-xs px-1 mr-1 w-10 text-center h-fit" bind:value={recipe.expand.ingr_list[i].quantity}>
                                 <input type="text" class="ingr_unit input input-bordered input-xs px-1 mr-1 w-16 text-center h-fit" id="{recipe.expand.ingr_list[i].id}" bind:value={recipe.expand.ingr_list[i].unit}>
                                 <input type="text" class="ingr_name input input-bordered input-xs px-1 mr-1 w-80 h-fit" bind:value={recipe.expand.ingr_list[i].ingredient}>
                                 <input on:click={check_item} id={recipe.expand.ingr_list[i].ingredient} type="checkbox" class="checkbox checkbox-accent checkbox-sm"/>
                             </div>
-                        {/if}
                     {/each}
                 {:else}
                     <div class="flex justify-center w-4/5 m-auto h-52">
