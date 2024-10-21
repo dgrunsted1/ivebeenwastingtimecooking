@@ -118,8 +118,15 @@
         if (!ingrs) return "none";
         let ingrs_string = "";
         for (let i = 0; i < ingrs.length; i++){
-            if (i > 0) ingrs_string += "\n";
-            ingrs_string += ingrs[i].quantity+" "+ingrs[i].unit+" "+ingrs[i].ingredient;
+            if (!ingrs[i]) continue;
+            if (i > 0) ingrs_string += " + ";
+            if (ingrs[i].quantity) {
+                ingrs_string += ingrs[i].quantity;
+            }else if (ingrs[i].qty){
+                ingrs_string += ingrs[i].qty;
+            }
+            ingrs_string += (ingrs[i].unit) ? " "+ingrs[i].unit+" " : " ";
+            ingrs_string += (ingrs[i].name) ? ingrs[i].name : ingrs[i].ingredient;
         }
         return ingrs_string;
     }
@@ -145,20 +152,20 @@
         {/if}
     </div>
     <div class="md:mx-3">
-        <div class="grocery_list {view_size_mobile} {view_size_desktop} overflow-y-auto border border-primary rounded-md md:border-none px-2 pt-7">
+        <div class="grocery_list {view_size_mobile} {view_size_desktop} overflow-y-auto border border-primary rounded-md md:border-none px-2">
             {#if grocery_list.length > 0}
                 {#each grocery_list as item, i}
                     {#if edit}
-                        <div class="grocery_item flex relative my-1 {($page.url.pathname == "/today") ? "tooltip" : ""} space-x-2 justify-center items-center z-10" data-tip={($page.url.pathname == "/today") ? ingrs_to_string(item.expand.ingrs) : ""}>
+                        <div class="grocery_item flex relative my-1 tooltip {(i > 2) ? "tooltip-top": "tooltip-bottom"} space-x-2 justify-center items-center z-10" data-tip={ingrs_to_string(item.expand.ingrs)}>
                             <input type="text" class="amount input input-bordered input-xs px-1 mr-1 w-8 text-center h-fit" bind:value={item.qty} on:keyup={edit_item}>
                             <input type="text" class="unit input input-bordered input-xs px-1 mr-1 w-20 text-center h-fit" bind:value={item.unit} on:keyup={edit_item}>
                             <textarea class="name input input-bordered input-xs px-1 mr-1 w-3/4 h-fit" bind:value={item.name} on:keyup={edit_item} on:keypress={enter_new_item} bind:this={item.input}></textarea>
                             {#if status != "none"}<button class="btn btn-sm p-1 btn-accent" on:click={() => remove_item(item.id)}><DeleteIcon/></button>{/if}
                         </div>
                     {:else}
-                        <div class="grocery_item flex relative my-2 {($page.url.pathname == "/today") ? "tooltip" : ""} space-x-3 justify-end md:justify-start items-center z-100" data-tip={($page.url.pathname == "/today") ? ingrs_to_string(item.expand.ingrs) : ""}>
+                        <div class="grocery_item flex relative my-2 tooltip {(i > 2) ? "tooltip-top": "tooltip-bottom"} space-x-3 justify-end md:justify-start items-center z-100" data-tip={ingrs_to_string(item.expand.ingrs)}>
                             {#if status != "none"}<input type="checkbox" class="hidden md:flex checkbox checkbox-primary checkbox-lg p-1" id="{item.name}" bind:checked={item.checked} on:change={edit_item}>{/if}
-                            <p class="text-xs md:text-left -indent-5 pl-5">{item.qty == 0 ? "" : item.qty} {item.unit} {item.name}</p>
+                            <p class="text-xs md:text-left -indent-5 pl-5">{ingrs_to_string([item])}</p>
                             {#if status != "none"}<input type="checkbox" class="md:hidden checkbox checkbox-primary checkbox-lg p-1" id="{item.name}" bind:checked={item.checked} on:change={edit_item}>{/if}
                         </div>
                     {/if}

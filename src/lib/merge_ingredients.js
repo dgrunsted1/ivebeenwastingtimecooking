@@ -1,95 +1,384 @@
 import { get_parent_recipe } from '/src/lib/menu_utils.js';
+import { get_conversion_rates, conv_unit } from '/src/lib/unit_conversions.js';
+import convert from "convert";
 
-const conversions = {"tablespoon/teaspoon": 1/3, "teaspoon/tablespoon": 3, "cup/teaspoon": 1/48, "teaspoon/cup": 48, "cup/tablespoon": 1/16, "tablespoon/cup": 16};
+// remove exact words
+const prepositions = ["of", "with", "to", "in", "on", "at", "for", "by", "from", "into", "over", "under", "through", "around", "beside", "between", "among", "towards", "room", "very", "more for serving", "for serving", "melon baller", "a", "press", "freshly ground", "seeded"];
 
-const weight_volume_conv = {"gram/tablespoon": 14, "tablespoon/gram": 1/14, "gram/teaspoon": 14/3, "teaspoon/gram": 3/14, "gram/cup": 224/1, "cup/gram": 1/224}
+const conjunctions = ["and", "or", "nor", "but", "yet", "so"];
+const remove_when_matching = ["(optional)"];
 
-export const merge = function(recipes) {
+let conversions_missing = [];
+// remove words where the string is contained
+const verbs = [
+		"acidulate",
+		"add",
+		"allow",
+		"alternate",
+		"arrange",
+		"bake",
+		"barrel",
+		"baste",
+		"beat",
+		"bind",
+		"blanch",
+		"blend",
+		"blister",
+		"blow",
+		"boil",
+		"bone",
+		"bottle",
+		"braid",
+		"braise",
+		"break",
+		"brine",
+		"broil",
+		"brown",
+		"bruise",
+		"brush",
+		"caramelize",
+		"carry",
+		"carve",
+		"chafe",
+		"chill",
+		"chop",
+		"churn",
+		"circle",
+		"clarify",
+		"clean",
+		"coat",
+		"coddle",
+		"coil",
+		"collar",
+		"collect",
+		"color",
+		"combine",
+		"complete",
+		"continue",
+		"cook",
+		"cool",
+		"core",
+		"count",
+        "coarsely",
+		"cover",
+		"crack",
+		"crease",
+		"crisscross",
+		"cross",
+		"crush",
+		"cut",
+		"decorate",
+		"deglaze",
+		"dice",
+		"dilute",
+		"discard",
+		"dish",
+		"dissolve",
+		"distill",
+		"dot",
+		"drain",
+		"dredge",
+		"drop",
+		"dust",
+		"dye",
+		"eat",
+		"empty",
+		"emulsify",
+		"eviscerate",
+		"fasten",
+		"feathers",
+		"filet",
+		"fill",
+		"fire",
+		"fit",
+		"flake",
+		"flame",
+		"flatten",
+		"flavor",
+		"flay",
+		"flip",
+		"fold",
+		"force",
+		"form",
+		"freeze",
+		"frost",
+		"froth",
+		"fry",
+		"garnish",
+		"gas",
+		"gash",
+		"gild",
+		"glaze",
+		"grate",
+		"grease",
+		"grill",
+		"grind",
+		"hack",
+        "halved",
+		"hands",
+		"hang",
+		"hard-boil",
+		"heat",
+		"hold",
+		"hollow",
+		"hull",
+		"husk",
+		"indent",
+		"insert",
+		"julienne",
+		"keep",
+		"knead",
+		"lard",
+		"lay",
+		"layer",
+		"leaven",
+		"light",
+		"line",
+		"make",
+		"marinate",
+		"mash",
+		"mask",
+		"measure",
+		"melt",
+		"mince",
+		"mix",
+		"moisten",
+		"mold",
+		"ornament",
+		"oven",
+		"pack",
+		"parboil",
+		"pare",
+		"pat",
+		"peeled",
+		"pick",
+		"pickle",
+		"pierce",
+		"pile",
+		"pinch",
+		"pipe",
+		"pit",
+		"place",
+		"plank",
+		"plunge",
+		"poach",
+		"pound",
+		"pour",
+		"prepare",
+		"preserve",
+		"prick",
+		"pull",
+		"pulverize",
+		"purée",
+		"push",
+		"put",
+        "quartered",
+		"reduce",
+		"reheat",
+		"remove",
+		"rinse",
+		"rise",
+		"roast",
+		"rub",
+		"rusty",
+		"sauté",
+		"saw",
+		"scald",
+		"scale",
+		"schedule",
+		"scoop",
+		"scotch",
+		"scour",
+		"scrape",
+		"seal",
+		"sear",
+		"season",
+		"seasonal",
+		"separate",
+		"serve",
+		"set",
+		"sew",
+		"shake",
+		"shape",
+		"shave",
+		"shell",
+		"shovel",
+		"shred",
+		"sift",
+		"simmer",
+		"singe",
+		"skewer",
+		"skim",
+		"skin",
+		"slash",
+		"slice",
+		"slit",
+		"sliver",
+		"smoke",
+		"smooth",
+		"snip",
+		"soak",
+		"souse",
+		"sow",
+		"spit",
+		"splat",
+		"split",
+		"spread",
+		"sprinkle",
+		"squeeze",
+		"stack",
+		"stamp",
+		"stand",
+		"steam",
+		"steep",
+        "stemmed",
+		"stew",
+		"stick",
+		"stir",
+		"store",
+		"strain",
+		"strew",
+		"strip",
+		"stuff",
+		"substitute",
+		"surround",
+		"sweeten",
+		"swing",
+		"syringe",
+		"take",
+		"taste",
+		"temperature",
+		"thicken",
+		"thin",
+		"throw",
+		"tie",
+		"toast",
+		"top",
+		"toss",
+		"trail",
+		"trim",
+		"truss",
+		"try",
+		"turn",
+		"unmold",
+		"use",
+		"variation",
+		"warm",
+		"wash",
+		"weigh",
+		"weight",
+		"whip",
+		"whisk",
+		"wipe",
+		"work",
+		"wrap",
+		"wring",
+        "finely",
+        "rings",
+        "deveined",
+        "tails removed",
+        "diagonal",
+        "the",
+        "wedge",
+        "morton",
+        "kosher",
+        "store-bought",
+        "homemade"
+	];
+
+export const merge = function(ingrs) {
     let grocery_list = [];
     let skipped = [];
-    for(let recipe of recipes){
-        let ingrs = (recipe.ingredients) ? recipe.ingredients : recipe.expand.ingr_list;
-        for(let item of ingrs){
-            if (!item) continue;
-            let match = false;
-            if (grocery_list) {
-                grocery_list.forEach(element => {
-                    if (element.ingredient === item.ingredient || element.ingredient.includes(item.ingredient) || item.ingredient.includes(element.ingredient)){
-                        match = element;
-                        return;
-                    }
-                });
-            }
-            if (match && !(["small", "medium", "large"].includes(match.unit) ^ ["small", "medium", "large"].includes(item.unit))
-                            && !(match.unit == "clove" ^ item.unit == "clove") && !(match.unit == "whole" ^ item.unit == "whole")) {
-                
-                
-                let tmp = { ingredient: "",
-                            maxQty: 0,
-                            minQty: 0,
-                            quantity: 0,
-                            symbol: null,
-                            unit: null,
-                            unitPlural: null
-                        };
-                if (match.unit != item.unit) {
-                    let qty = round_amount(item.quantity, recipe.multiplier);
-                    let conv = combine(match, item);
-                    tmp.quantity = conv.amount;
-                    tmp.unit = conv.unit;
-                } else {
-                    tmp.quantity = match.quantity + round_amount(item.quantity, recipe.multiplier);
-                    tmp.unit = match.unit;
-                }
-                if (match.ingredient != item.ingredient){
-                    tmp.ingredient = match.ingredient+" and/or "+item.ingredient;
-                }else {
-                    tmp.ingredient = match.ingredient;
-                }
-                grocery_list.splice(grocery_list.indexOf(match), 1);
-                grocery_list.push(tmp);
-            }else {
-                let tmp = { ingredient: item.ingredient,
-                            maxQty: item.maxQty,
-                            minQty: item.minQty,
-                            quantity: item.quantity,
-                            symbol: item.symbol,
-                            unit: item.unit,
-                            unitPlural: item.unitPlural
-                        };
-                tmp.quantity = round_amount(item.quantity, recipe.multiplier);
-                grocery_list.push(tmp);
-            }
-        }
-    }
-    return {
-        grocery_list: grocery_list,
-        skipped: skipped
-    }
+	for(let item of ingrs){
+		if (!item.name) continue;
+		let match = false;
+		let conv_match = false;
+		if (grocery_list) {
+			for (let i = 0; i < grocery_list.length; i++) {
+				if (((item.unit && item.qty && grocery_list[i].unit && grocery_list[i].qty) || (!item.unit && !item.qty && !grocery_list[i].unit && !grocery_list[i].qty)) && ((strip_parens(grocery_list[i].name) === strip_parens(item.name)) || 
+				   (grocery_list[i].name.includes(item.name) && !grocery_list[i].name.includes("un" + item.name) && !grocery_list[i].name.includes(item.name + "ed") && grocery_list[i].name !== "sugar" && grocery_list[i].name !== "powdered sugar") || 
+				   (item.name.includes(grocery_list[i].name) && !item.name.includes("un" + grocery_list[i].name) && !item.name.includes(grocery_list[i].name + "ed") && item.name !== "sugar" && item.name !== "powdered sugar"))) {
+					conv_match = get_conversion_rates(item.unit, grocery_list[i].unit);
+					if (conv_match) {
+						match = grocery_list[i];
+						break;
+					}
+				}
+			}
+				
+		}
+		
+
+		if (match && !(["small", "medium", "large"].includes(match.unit) ^ ["small", "medium", "large"].includes(item.unit))
+						&& !(match.unit == "clove" ^ item.unit == "clove") && !(match.unit == "whole" ^ item.unit == "whole") &&
+						conv_match) {
+			if (!item.ingrs) item.ingrs = [];
+			let tmp = { checked: false,
+						qty: 0,
+						unit: 0,
+						name: null,
+						ingrs: match.ingrs.concat(item.ingrs),
+						expand: { ingrs: match.expand.ingrs.concat(item.expand.ingrs)}
+					};
+			if (match.unit != item.unit && conv_unit[match.unit] != item.unit && conv_unit[item.unit] != match.unit) {
+				let conv = combine(match, item, conv_match);
+				tmp.qty = conv.amount;
+				tmp.unit = conv.unit;
+			} else {
+				tmp.qty = match.qty + round_amount(item.qty);
+				tmp.unit = match.unit;
+			}
+			if (match.name.length >= item.name.length){
+				tmp.name = match.name;
+			}else {
+				tmp.name = item.name;
+			}
+			grocery_list.splice(grocery_list.indexOf(match), 1);
+			grocery_list.push(tmp);
+		}else {
+			let tmp = {};
+				try{
+					if (item.qty && item.unit){
+						const best_unit = convert(item.qty, item.unit).to("best", "imperial");
+						tmp = { checked: false,
+							qty: round_amount(best_unit.quantity),
+							unit: best_unit.unit,
+							name: item.name,
+							ingrs: (item.ingrs) ?  item.ingrs : [],
+							expand: { ingrs: item.expand.ingrs}
+						};
+					} else {
+						tmp = { checked: false,
+							qty: round_amount(item.qty),
+							unit: item.unit,
+							name: item.name,
+							ingrs: (item.ingrs) ?  item.ingrs : [],
+							expand: { ingrs: item.expand.ingrs}
+						};
+					}
+				} catch (err) {
+					tmp = { checked: false,
+						qty: round_amount(item.qty),
+						unit: item.unit,
+						name: item.name,
+						ingrs: (item.ingrs) ?  item.ingrs : [],
+						expand: { ingrs: item.expand.ingrs}
+					};
+				}
+
+			grocery_list.push(tmp);
+		}
+	}
+    return grocery_list;
 }
 
-const combine = (i, j) => {
-    let conv_index_a = `${j.unit}/${i.unit}`;
-    let conv_index_b = `${i.unit}/${j.unit}`;
-    let amount = null;
-    let unit = null;
-    let conv_a;
-    let conv_b;
-    if ((!conversions[conv_index_a] || !conversions[conv_index_a]) && ((j.ingredient.includes('salt') && j.ingredient.includes('salt')) || (i.ingredient.includes('sugar') || i.ingredient.includes('sugar')) || (i.ingredient.includes('oil') || i.ingredient.includes('oil')))){
-        conv_a = weight_volume_conv[conv_index_a];
-        conv_b = weight_volume_conv[conv_index_b];
-    } else {
-        conv_a = conversions[conv_index_a];
-        conv_b = conversions[conv_index_b];
-    }
-    if (conv_a < conv_b){
-        unit = j.unit;
-        amount = conv_a * i.quantity + j.quantity;
-    }else {
-        unit = i.unit;
-        amount = conv_b * j.quantity + i.quantity;
-    }
-    return {unit: unit, amount: amount};
+
+
+const combine = (i, j, conv) => {
+	const tmp = convert(i.qty, i.unit).to(j.unit);
+	const amount = convert(tmp+j.qty, j.unit).to("best", "imperial");
+	let out = {unit: amount.unit, amount: round_amount(amount.quantity)}
+    return out;
 }
 
 function round_amount(in_amount, mult){
@@ -103,75 +392,126 @@ function round_amount(in_amount, mult){
     return Math.round((result + Number.EPSILON) * 100) / 100;
 }
   
-  function removePunctuationSymbolsParentheses(text) {
-    // Remove punctuation
-    text = text.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
-  
-    // Remove symbols
-    const symbols = "!@#$%^&*()_+`-={}|[]\:';\"<>,.?/`";
-    for (let i = 0; i < symbols.length; i++) {
-      text = text.replace(new RegExp("\\" + symbols[i], 'g'), ''); 
-    }
-  
-    // Remove parentheses and their contents
-    text = text.replace(/\([^)]*\)/g, '');
-  
-    return text;
-  }
+function removePunctuationSymbolsParentheses(text) {
+	// Remove punctuation
+	text = text.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()"']/g,"");
 
-  export const get_grocery_list = function(menu, mults, sub_recipes) {
+	// Remove symbols
+	const symbols = "!@#$%^&*()_+`-={}|[]\:';\"<>,.?/`";
+	for (let i = 0; i < symbols.length; i++) {
+		text = text.replace(new RegExp("\\" + symbols[i], 'g'), ''); 
+	}
 
-    let grocery_list = [];
-    menu = (menu.expand && menu.expand.recipes) ? menu.expand.recipes : menu;
-    menu.forEach((recipe, i) => {
-        let mult = 1;
+	// Remove parentheses and their contents
+	text = text.replace(/\([^)]*\)/g, '');
 
-        if (recipe.is_sub_recipe){
-            // get parent servings to use
-            const parent_recipe = get_parent_recipe(recipe.id, menu, sub_recipes);
-            if (menu.servings) mult = parseFloat(menu.servings[parent_recipe.id]) / parseFloat(recipe.servings);
-            else if (mults[parent_recipe.id]) mult = parseFloat(mults[parent_recipe.id]) / parseFloat(recipe.servings);
-        } else {
-            if (menu.servings) mult = parseFloat(menu.servings[recipe.id]) / parseFloat(recipe.servings);
-            else if (mults[recipe.id]) mult = parseFloat(mults[recipe.id]) / parseFloat(recipe.servings);
+	return text;
+}
+
+export const get_grocery_list = function(menu, mults, sub_recipes) {
+
+	let grocery_list = [];
+	menu = (menu.expand && menu.expand.recipes) ? menu.expand.recipes : menu;
+	menu.forEach((recipe, i) => {
+		let mult = 1;
+
+		if (recipe.is_sub_recipe){
+			// get parent servings to use
+			const parent_recipe = get_parent_recipe(recipe.id, menu, sub_recipes);
+			if (menu.servings) mult = parseFloat(menu.servings[parent_recipe.id]) / parseFloat(recipe.servings);
+			else if (mults && mults[parent_recipe.id]) mult = parseFloat(mults[parent_recipe.id]) / parseFloat(recipe.servings);
+		} else {
+			if (menu.servings) mult = parseFloat(menu.servings[recipe.id]) / parseFloat(recipe.servings);
+			else if (mults && mults[recipe.id]) mult = parseFloat(mults[recipe.id]) / parseFloat(recipe.servings);
+		}
+		
+		if (recipe.expand.ingr_list) {
+			for (let i = 0; i < recipe.expand.ingr_list.length; i++) {
+				let temp_item = {...recipe.expand.ingr_list[i]};
+				grocery_list.push({
+					"qty": recipe.expand.ingr_list[i].quantity * mult,
+					"unit": recipe.expand.ingr_list[i].unit,
+					"unit_plural": recipe.expand.ingr_list[i].unit_plural,
+					"name": trim_verbs(recipe.expand.ingr_list[i].ingredient),
+					"checked": false,
+					"ingrs": [
+						recipe.expand.ingr_list[i].id
+					],
+					"expand": {
+						"ingrs": [
+							recipe.expand.ingr_list[i]
+						]
+					},
+					"active": true
+				});
+			}
+		} 
+	});
+	const out = groupBySimilarity(merge(grocery_list));
+	return out;
+}
+
+const trim_punctuation = function(ingr_string) {
+    const out = ingr_string.replace(/^[\s.,]+|[\s.,]+$/gu, '').trim();
+    return out;
+}
+
+
+export const trim_verbs = function(ingr_string) {
+    let out = ingr_string;
+    
+    verbs.sort((a, b) => b.length - a.length);
+    for (let i = 0; i <  verbs.length; i++) {
+        const verb = verbs[i];
+        if (out.toLowerCase().includes(verb)) {
+            out = out.replace(new RegExp(`\\b\\w*${verb}\\w*\\b`, 'gi'), "").trim();
         }
+    }
+    return trim_prepositions(out.trim());
+}
+
+const trim_prepositions = function(ingr_string) {
+    let out = ingr_string;
+	prepositions.sort((a,b) => b.length - a.length);
+    for (let i = 0; i <  prepositions.length; i++) {
+        const preposition = prepositions[i];
+        const regex = new RegExp(`\\b${preposition}\\b`, 'gi');
+        if (regex.test(out)) {
+            out = out.replace(regex, "");
+        }
+    }
+    
         
-        if (recipe.expand.ingr_list) {
-            for (let i = 0; i < recipe.expand.ingr_list.length; i++) {
-                let temp_item = {...recipe.expand.ingr_list[i]};
-                grocery_list.push({
-                    "qty": recipe.expand.ingr_list[i].quantity * mult,
-                    "unit": recipe.expand.ingr_list[i].unit,
-                    "unit_plural": recipe.expand.ingr_list[i].unit_plural,
-                    "name": recipe.expand.ingr_list[i].ingredient,
-                    "checked": false,
-                    "ingrs": [
-                        recipe.expand.ingr_list[i].id
-                    ],
-                    "active": true
-                });
-            }
-        } 
-    });
-    return groupBySimilarity(grocery_list);
-  }
+    // Trim conjunctions from the beginning and end
+    const trimConjunctions = (str) => {
+        let trimmed = str;
+        for (const conjunction of conjunctions) {
+            const startRegex = new RegExp(`^${conjunction}\\s+`, 'i');
+            const endRegex = new RegExp(`\\s+${conjunction}$`, 'i');
+            trimmed = trimmed.replace(startRegex, '').replace(endRegex, '');
+        }
+        return trimmed.trim();
+    };
+    
+    out = trimConjunctions(out);
+    
+    out = trim_punctuation(out);
+    return out;
+}
 
-
-
-  export const groupBySimilarity = function(strings) {
-
+export const groupBySimilarity = function(strings) {
     // Split each string into words
     strings = strings.sort((a, b) => b.length - a.length);
     let stringWords = strings.map(s => removePunctuationSymbolsParentheses(s.name).split(' '));
-    
+
     let groups = [];
     for (let i = 0; i < strings.length; i++) {
-    const str1Words = stringWords[i];
+        const str1Words = stringWords[i];
     //   // Check if this string belongs in an existing group
-      let maxSimilarity = 0;
-      let maxGroup;
-      let maxIndex;
-      for (let j = 0; j < groups.length; j++) {
+        let maxSimilarity = 0;
+        let maxGroup;
+        let maxIndex;
+        for (let j = 0; j < groups.length; j++) {
             for (let k = 0; k < groups[j].length; k++) {
                 let intersection = 0;
                 const str2Words = removePunctuationSymbolsParentheses(groups[j][k].name).split(' ');
@@ -189,20 +529,36 @@ function round_amount(in_amount, mult){
                 }
             }
         }
-      
+        
         // If no suitable group, create a new one
         if (maxGroup && maxSimilarity > .25) {
             groups[maxGroup] = [...groups[maxGroup].slice(0, maxIndex), strings[i], ...groups[maxGroup].slice(maxIndex)];
         } else {
             groups.push([strings[i]]);
         }
+}
+
+
+
+
+let flattened = [];
+Array.from(groups.values()).sort((a, b) => b.length - a.length).forEach(subarr => {
+    flattened.push(...subarr);
+});
+
+return flattened;
+}
+
+
+const strip_parens = function(string) {
+	if (!string) return string;
+    let out = string;
+    const regex = /(\([\w+]\))/g;
+    const matches = string.match(regex);
+    if (matches) {
+        matches.forEach(match => {
+            out = out.replace(match, '');
+        });
     }
-
-
-    let flattened = [];
-    Array.from(groups.values()).sort((a, b) => b.length - a.length).forEach(subarr => {
-        flattened.push(...subarr);
-    });
-
-    return flattened;
-  }
+    return out.trim();
+}

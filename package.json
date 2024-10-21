@@ -27,6 +27,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"convert": "^5.4.1",
 		"pocketbase": "^0.15.1",
 		"puppeteer": "^20.7.1"
 	}

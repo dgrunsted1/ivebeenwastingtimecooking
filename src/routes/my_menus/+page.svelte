@@ -2,7 +2,7 @@
     import { currentUser, pb } from '/src/lib/pocketbase.js';
     import { afterUpdate, onMount } from 'svelte';
     import Menu from "/src/lib/components/menu.svelte";
-    import { merge } from '/src/lib/merge_ingredients.js';
+    import { get_grocery_list, trim_verbs } from '/src/lib/merge_ingredients.js';
     import DeleteIcon from "/src/lib/icons/DeleteIcon.svelte";
     import Clear from "/src/lib/icons/Clear.svelte";
     import { get_servings } from '/src/lib/recipe_util.js';
@@ -214,20 +214,20 @@
     }
 
     function compare_ingr_amounts_asc(a, b){
-        if ( merge(a.expand.recipes).grocery_list.length < merge(b.expand.recipes).grocery_list.length ){
+        if ( get_grocery_list(a.expand.recipes, a.servings, a.sub_recipes).length < get_grocery_list(b.expand.recipes, b.servings, b.sub_recipes).length ){
             return -1;
         }
-        if ( merge(a.expand.recipes).grocery_list.length > merge(b.expand.recipes).grocery_list.length ){
+        if ( get_grocery_list(a.expand.recipes, a.servings, a.sub_recipes).length > get_grocery_list(b.expand.recipes, b.servings, b.sub_recipes).length ){
             return 1;
         }
         return 0;
     }
 
     function compare_ingr_amounts_dsc(a, b){
-        if ( merge(a.expand.recipes).grocery_list.length > merge(b.expand.recipes).grocery_list.length ){
+        if ( get_grocery_list(a.expand.recipes, a.servings, a.sub_recipes).length > get_grocery_list(b.expand.recipes, b.servings, b.sub_recipes).length ){
             return -1;
         }
-        if ( merge(a.expand.recipes).grocery_list.length < merge(b.expand.recipes).grocery_list.length ){
+        if ( get_grocery_list(a.expand.recipes, a.servings, a.sub_recipes).length < get_grocery_list(b.expand.recipes, b.servings, b.sub_recipes).length ){
             return 1;
         }
         return 0;
@@ -339,7 +339,7 @@
                 <div class="text-center flex flex-col justify-center items-center space-y-5 mx-2 md:mx-auto md:text-4xl h-full w-full"><span class="loading loading-bars loading-lg"></span></div>
             {:else}
                 {#each user_menus as curr, i}
-                    <div id={user_menus[i].id} class="card md:card-side card-bordered bg-base-200 shadow-xl max-h-24 my-1.5 mx-1 cursor-pointer" on:click={show_menu_modal} on:keypress={show_menu_modal}>
+                    <div id={user_menus[i].id} class="card md:card-side card-bordered bg-base-200 shadow-xl h-24 my-1.5 mx-1 cursor-pointer" on:click={show_menu_modal} on:keypress={show_menu_modal}>
                         <figure class="md:w-2/3">
                             {#each user_menus[i].expand.recipes as recipe, j}
                                     <img class="w-16 md:w-20" src={user_menus[i].expand.recipes[j].image} alt={user_menus[i].expand.recipes[j].title}/>
@@ -353,7 +353,7 @@
                                 </div>
                                 <div class="flex flex-row justify-evenly w-full">
                                     <p class="text-center text-[10px] xl:text-[12px] border border-primary px-1 text-ellipsis whitespace-nowrap text-nowrap overflow-hidden rounded-tl rounded-bl">{user_menus[i].expand.recipes.length} recipes</p>
-                                    <p class="text-center text-[10px] xl:text-[12px] border border-primary px-1 text-ellipsis whitespace-nowrap text-nowrap overflow-hidden">{merge(user_menus[i].expand.recipes).grocery_list.length} ingredients</p>
+                                    <p class="text-center text-[10px] xl:text-[12px] border border-primary px-1 text-ellipsis whitespace-nowrap text-nowrap overflow-hidden">{get_grocery_list(user_menus[i], user_menus[i].servings, user_menus[i].sub_recipes).length} ingredients</p>
                                     <p class="text-center text-[10px] xl:text-[12px] border border-primary px-1 text-ellipsis whitespace-nowrap text-nowrap overflow-hidden">{get_servings(user_menus[i].expand.recipes, user_menus[i].sub_recipes)} servings</p>
                                     <p class="text-center text-[10px] xl:text-[12px] border border-primary px-1 text-ellipsis whitespace-nowrap text-nowrap overflow-hidden rounded-tr rounded-br">{get_total_time(user_menus[i].expand.recipes).display}</p>
                                 </div>
