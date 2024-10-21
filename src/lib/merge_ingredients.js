@@ -3,10 +3,10 @@ import { get_conversion_rates, conv_unit } from '/src/lib/unit_conversions.js';
 import convert from "convert";
 
 // remove exact words
-const prepositions = ["of", "with", "to", "in", "on", "at", "for", "by", "from", "into", "over", "under", "through", "around", "beside", "between", "among", "towards", "room", "very", "more for serving", "melon baller", "a", "press", "freshly ground"];
+const prepositions = ["of", "with", "to", "in", "on", "at", "for", "by", "from", "into", "over", "under", "through", "around", "beside", "between", "among", "towards", "room", "very", "more for serving", "for serving", "melon baller", "a", "press", "freshly ground", "seeded"];
 
 const conjunctions = ["and", "or", "nor", "but", "yet", "so"];
-const remove_when_matching = ["(optional)", "for serving"];
+const remove_when_matching = ["(optional)"];
 
 let conversions_missing = [];
 // remove words where the string is contained
@@ -179,7 +179,6 @@ const verbs = [
 		"rinse",
 		"rise",
 		"roast",
-		"roll",
 		"rub",
 		"rusty",
 		"sauté",
@@ -195,7 +194,6 @@ const verbs = [
 		"sear",
 		"season",
 		"seasonal",
-		"seed",
 		"separate",
 		"serve",
 		"set",
@@ -294,21 +292,26 @@ export const merge = function(ingrs) {
 	for(let item of ingrs){
 		if (!item.name) continue;
 		let match = false;
+		let conv_match = false;
 		if (grocery_list) {
-			grocery_list.forEach(element => {
-				if (((item.unit && item.qty && element.unit && element.qty) || (!item.unit && !item.qty && !element.unit && !element.qty)) && ((strip_parens(element.name) === strip_parens(item.name)) || 
-				   (element.name.includes(item.name) && !element.name.includes("un" + item.name) && !element.name.includes(item.name + "ed") && element.name !== "sugar" && element.name !== "powdered sugar") || 
-				   (item.name.includes(element.name) && !item.name.includes("un" + element.name) && !item.name.includes(element.name + "ed") && item.name !== "sugar" && item.name !== "powdered sugar"))) {
-					match = element;
-					return;
+			for (let i = 0; i < grocery_list.length; i++) {
+				if (((item.unit && item.qty && grocery_list[i].unit && grocery_list[i].qty) || (!item.unit && !item.qty && !grocery_list[i].unit && !grocery_list[i].qty)) && ((strip_parens(grocery_list[i].name) === strip_parens(item.name)) || 
+				   (grocery_list[i].name.includes(item.name) && !grocery_list[i].name.includes("un" + item.name) && !grocery_list[i].name.includes(item.name + "ed") && grocery_list[i].name !== "sugar" && grocery_list[i].name !== "powdered sugar") || 
+				   (item.name.includes(grocery_list[i].name) && !item.name.includes("un" + grocery_list[i].name) && !item.name.includes(grocery_list[i].name + "ed") && item.name !== "sugar" && item.name !== "powdered sugar"))) {
+					conv_match = get_conversion_rates(item.unit, grocery_list[i].unit);
+					if (conv_match) {
+						match = grocery_list[i];
+						break;
+					}
 				}
-			});
+			}
+				
 		}
-		const conv_match = get_conversion_rates(item.unit, match.unit);
+		
+
 		if (match && !(["small", "medium", "large"].includes(match.unit) ^ ["small", "medium", "large"].includes(item.unit))
 						&& !(match.unit == "clove" ^ item.unit == "clove") && !(match.unit == "whole" ^ item.unit == "whole") &&
 						conv_match) {
-			
 			if (!item.ingrs) item.ingrs = [];
 			let tmp = { checked: false,
 						qty: 0,
@@ -325,7 +328,7 @@ export const merge = function(ingrs) {
 				tmp.qty = match.qty + round_amount(item.qty);
 				tmp.unit = match.unit;
 			}
-			if (match.name.length <= item.name.length){
+			if (match.name.length >= item.name.length){
 				tmp.name = match.name;
 			}else {
 				tmp.name = item.name;
