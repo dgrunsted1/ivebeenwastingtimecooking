@@ -170,7 +170,7 @@ function make_singular(unit) {
 
 export const process_directions = function(in_lines) {
     let out = [];
-    const conv_unit_string = ` (${Object.values(conv_unit).join('|')})$`;
+    const conv_unit_string = `[ |\d+-](${Object.values(conv_unit).join('|')})$`;
     console.log(conv_unit_string);
     for (let i = 0; i < in_lines.length; i++){
         const line_arr = in_lines[i].split('.');

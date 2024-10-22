@@ -22,7 +22,7 @@
         if (!$currentUser) window.location.href = "/login";
         else await pb.collection('users').authRefresh();
         const result_list = await pb.collection('menus').getList(1, 250, {
-            filter: `user="${$currentUser.id}"`,
+            filter: `user="${$currentUser.id}" && recipes:length > 0`,
             expand: `recipes,recipes.ingr_list`,
             sort: `-created`
         });
