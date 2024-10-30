@@ -9,21 +9,21 @@
     let dessert_recipes = [];
     let breakfast_recipes = [];
     let other_recipes = [];
-    let recipe_rec = {};
+    let recipe_rec = $state({});
     let main_recs = [];
     let dessert_rec = {};
     let breakfast_rec = {};
     let other_rec = {};
     let menus = [];
-    let edit_profile = false;
+    let edit_profile = $state(false);
     let edit_billing = false;
-    let rec_mults = {};
-    let menu_rec = [];
-    $: loading = {
+    let rec_mults = $state({});
+    let menu_rec = $state([]);
+    let loading = $state({
         user: true,
         menu: true,
         recipe: true
-    };
+    });
 
     onMount(async () => {
         if (!$currentUser){
@@ -32,7 +32,6 @@
         } else {
             await pb.collection('users').authRefresh();
         }
-        console.log(loading);
 
         loading.user = false;
         const recipe_result = await pb.collection('recipes').getList(1, 250, {
@@ -121,14 +120,14 @@
                         {#if $currentUser.verified}
                             <div class="text flex space-x-2 items-center"><CheckMark color="fill-primary"/><p>Email Verified</p></div>
                         {:else}
-                            <div class="text flex justify-center self-end"><div class="btn btn-primary btn-xs" on:click={send_verify_email} on:keydown={send_verify_email}>resend verification email</div></div>
+                            <div class="text flex justify-center self-end"><button class="btn btn-primary btn-xs" onclick={send_verify_email} onkeydown={send_verify_email}>resend verification email</button></div>
                         {/if}
-                        <div class="btn btn-primary btn-xs self-end" on:click={() => {edit_profile = true}} on:keydown={() => {edit_profile = true}}>edit profile</div>
+                        <button class="btn btn-primary btn-xs self-end" onclick={() => {edit_profile = true}} onkeydown={() => {edit_profile = true}}>edit profile</button>
                     {:else}
                         <div class="flex space-x-2"><label for="name">name:</label><input type="text" name="name" bind:value={$currentUser.name} class="input input-bordered input-xs w-full"/></div>
                         <div class="flex space-x-2"><label for="email">email:</label><input type="text" name="email" bind:value={$currentUser.email} class="input input-bordered input-xs w-full"/></div>
                         <div class="flex space-x-2"><label for="username">username:</label><input type="text" name="username" bind:value={$currentUser.username} class="input input-bordered input-xs w-full"/></div>
-                        <div class="btn btn-primary btn-xs self-end" on:click={save_profile_edits} on:keydown={save_profile_edits}>save</div>
+                        <button class="btn btn-primary btn-xs self-end" onclick={save_profile_edits} onkeydown={save_profile_edits}>save</button>
                     {/if}
                 </div>
                 <div class="flex flex-col space-y-2 my-5 h-full min-w-56 items-center justify-center">
@@ -187,8 +186,8 @@
                                 {#if recipe_rec.url}
                                     <div class=" flex justify-center mt-1"><a class="btn btn-primary btn-xs" href={recipe_rec.url} target="_blank">original recipe</a></div>
                                 {/if}    
-                                <div class=" flex justify-center mt-1"><div class="btn btn-primary btn-xs" on:click={window.location = `/cook_recipe/${recipe_rec.url_id}/${recipe_rec.servings}`} on:keydown={window.location = `/cook_recipe/${recipe_rec.url_id}/${recipe_rec.servings}`}>cook</div></div>
-                                <div class=" flex justify-center mt-1"><div class="btn btn-primary btn-xs" on:click={window.location = `/menu/${recipe_rec.id}`} on:keydown={window.location = `/cook_recipe/${recipe_rec.url_id}/${recipe_rec.servings}`}>create menu</div></div>
+                                <div class=" flex justify-center mt-1"><button class="btn btn-primary btn-xs" onclick={window.location = `/cook_recipe/${recipe_rec.url_id}/${recipe_rec.servings}`} onkeydown={window.location = `/cook_recipe/${recipe_rec.url_id}/${recipe_rec.servings}`}>cook</button></div>
+                                <div class=" flex justify-center mt-1"><button class="btn btn-primary btn-xs" onclick={window.location = `/menu/${recipe_rec.id}`} onkeydown={window.location = `/cook_recipe/${recipe_rec.url_id}/${recipe_rec.servings}`}>create menu</button></div>
                             </div>    
                         </div>
                     </div>

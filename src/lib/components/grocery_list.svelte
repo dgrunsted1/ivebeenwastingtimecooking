@@ -8,14 +8,15 @@
 
 
 
-    export let grocery_list = [];
-    export let status;
-    $: edit = false;
+    let { grocery_list = $bindable([]), status = $bindable() } = $props();
+    let edit = $state(false);
+    
     let dispatch = createEventDispatcher();
     let delay_timer;
-    let view_size_mobile = `max-h-[calc(55svh)]`;
-    let view_size_desktop = `md:max-h-[calc(100svh-200px)]`;
-    $: just_copied = false;
+    let view_size_mobile = $state(`max-h-[calc(55svh)]`);
+    let view_size_desktop = $state(`md:max-h-[calc(100svh-200px)]`);
+    let just_copied = $state(false);
+    
 
     onMount(async () => {
         if ($page.url.pathname == "/today"){
@@ -139,16 +140,16 @@
                 {#if status != "none" && $page.url.pathname == "/today"}<div id="update_status" class="text-xs">{status}</div>{/if}
                 <div id="count" class="text-xs">{grocery_list.length} Items</div>
             </div>
-            <button id="copy" class="btn btn-xs btn-primary cursor-copy" on:click={copy_to_clipboard}>
+            <button id="copy" class="btn btn-xs btn-primary cursor-copy" onclick={copy_to_clipboard}>
                 {#if just_copied}
                 <CheckMark color=""/>
                 {:else}
                     copy
                 {/if}
             </button>
-            {#if status != "none"}<button id="uncheck" class="btn btn-xs btn-primary" on:click={uncheck_list}>uncheck</button>{/if}
-            {#if status != "none"}<button id="reset" class="btn btn-xs btn-primary" on:click={reset_list}>reset</button>{/if}
-            {#if status != "none"}<button id="edit" class="btn btn-xs btn-primary" on:click={edit_groceries}><EditIcon/></button>{/if}
+            {#if status != "none"}<button id="uncheck" class="btn btn-xs btn-primary" onclick={uncheck_list}>uncheck</button>{/if}
+            {#if status != "none"}<button id="reset" class="btn btn-xs btn-primary" onclick={reset_list}>reset</button>{/if}
+            {#if status != "none"}<button id="edit" class="btn btn-xs btn-primary" onclick={edit_groceries}><EditIcon/></button>{/if}
         {/if}
     </div>
     <div class="md:mx-3">
@@ -157,22 +158,22 @@
                 {#each grocery_list as item, i}
                     {#if edit}
                         <div class="grocery_item flex relative my-1 tooltip {(i > 2) ? "tooltip-top": "tooltip-bottom"} space-x-2 justify-center items-center z-10" data-tip={ingrs_to_string(item.expand.ingrs)}>
-                            <input type="text" class="amount input input-bordered input-xs px-1 mr-1 w-8 text-center h-fit" bind:value={item.qty} on:keyup={edit_item}>
-                            <input type="text" class="unit input input-bordered input-xs px-1 mr-1 w-20 text-center h-fit" bind:value={item.unit} on:keyup={edit_item}>
-                            <textarea class="name input input-bordered input-xs px-1 mr-1 w-3/4 h-fit" bind:value={item.name} on:keyup={edit_item} on:keypress={enter_new_item} bind:this={item.input}></textarea>
-                            {#if status != "none"}<button class="btn btn-sm p-1 btn-accent" on:click={() => remove_item(item.id)}><DeleteIcon/></button>{/if}
+                            <input type="text" class="amount input input-bordered input-xs px-1 mr-1 w-8 text-center h-fit" bind:value={item.qty} onkeyup={edit_item}>
+                            <input type="text" class="unit input input-bordered input-xs px-1 mr-1 w-20 text-center h-fit" bind:value={item.unit} onkeyup={edit_item}>
+                            <textarea class="name input input-bordered input-xs px-1 mr-1 w-3/4 h-fit" bind:value={item.name} onkeyup={edit_item} onkeypress={enter_new_item} bind:this={item.input}></textarea>
+                            {#if status != "none"}<button class="btn btn-sm p-1 btn-accent" onclick={() => remove_item(item.id)}><DeleteIcon/></button>{/if}
                         </div>
                     {:else}
                         <div class="grocery_item flex relative my-2 tooltip {(i > 2) ? "tooltip-top": "tooltip-bottom"} space-x-3 justify-end md:justify-start items-center z-100" data-tip={ingrs_to_string(item.expand.ingrs)}>
-                            {#if status != "none"}<input type="checkbox" class="hidden md:flex checkbox checkbox-primary checkbox-lg p-1" id="{item.name}" bind:checked={item.checked} on:change={edit_item}>{/if}
+                            {#if status != "none"}<input type="checkbox" class="hidden md:flex checkbox checkbox-primary checkbox-lg p-1" id="{item.name}" bind:checked={item.checked} onchange={edit_item}>{/if}
                             <p class="text-xs md:text-left -indent-5 pl-5">{ingrs_to_string([item])}</p>
-                            {#if status != "none"}<input type="checkbox" class="md:hidden checkbox checkbox-primary checkbox-lg p-1" id="{item.name}" bind:checked={item.checked} on:change={edit_item}>{/if}
+                            {#if status != "none"}<input type="checkbox" class="md:hidden checkbox checkbox-primary checkbox-lg p-1" id="{item.name}" bind:checked={item.checked} onchange={edit_item}>{/if}
                         </div>
                     {/if}
                 {/each} 
                 {#if status != "none"}
                     <div class="flex relative my-1 space-x-2 justify-center items-center">
-                        <button class="btn btn-xs btn-primary" on:click={new_item}>new item</button>
+                        <button class="btn btn-xs btn-primary" onclick={new_item}>new item</button>
                     </div>
                 {/if}
             {/if}

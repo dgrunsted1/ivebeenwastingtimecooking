@@ -1,12 +1,15 @@
 <script>
+  import { createBubbler, preventDefault } from 'svelte/legacy';
+
+  const bubble = createBubbler();
     import { currentUser, pb } from '/src/lib/pocketbase.js';
     import { page } from '$app/stores';
     import { onMount } from 'svelte';
 
-    let username;
-    let password;
-    let name;
-    let email;
+    let username = $state();
+    let password = $state();
+    let name = $state();
+    let email = $state();
 
     onMount(async () => {
       if ($currentUser) await pb.collection('users').authRefresh();
@@ -37,7 +40,7 @@
         };
       try {
         const createdUser = await pb.collection('users').create(data);
-        console.log("sign up", createdUser.email);
+        
         await pb.collection('users').requestVerification(createdUser.email);
         await login();
       } catch (err) {
@@ -70,10 +73,10 @@
   {#if $currentUser}
     <div class="m-auto mt-32 flex flex-col">
       <p class="m-auto">Signed in as {$currentUser.username}</p> 
-      <button on:click={signOut}>Sign Out</button>
+      <button onclick={signOut}>Sign Out</button>
     </div>
   {:else}
-    <form on:submit|preventDefault class="m-auto mt-32 flex flex-col w-72">
+    <form onsubmit={preventDefault(bubble('submit'))} class="m-auto mt-32 flex flex-col w-72">
       <input
         placeholder="Username"
         type="text"
@@ -102,7 +105,7 @@
         bind:value={name} 
       />
 
-      <button class="btn btn-primary m-2.5 w-fit my-1 mx-auto" on:click={login}>Login</button>
-      <button class="btn btn-accent m-2.5 w-fit my-1 mx-auto" on:click={signUp}>Sign Up</button>
+      <button class="btn btn-primary m-2.5 w-fit my-1 mx-auto" onclick={login}>Login</button>
+      <button class="btn btn-accent m-2.5 w-fit my-1 mx-auto" onclick={signUp}>Sign Up</button>
     </form>
   {/if}

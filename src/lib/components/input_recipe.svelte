@@ -1,15 +1,16 @@
 <script>
-export let name;
-export let index;
+    import { preventDefault } from 'svelte/legacy';
+
 import { createEventDispatcher } from 'svelte';
 import { invalidateAll} from '$app/navigation';
 import { deserialize } from '$app/forms';
 import EditRecipe from "/src/lib/components/edit_recipe.svelte";
 import { process_ingr } from '/src/lib/process_recipe.js'
+    let { name, index } = $props();
 
 
 const dispatch = createEventDispatcher();
-let recipe;
+let recipe = $state();
 
 let multiplier = 1;
 
@@ -69,13 +70,13 @@ async function fetch_recipe(e){
         <EditRecipe {recipe} {index} on:update_recipe={update_recipe}/>
     {:else}
         <div class="link">
-            <form method='POST' on:input|preventDefault={fetch_recipe}>
+            <form method='POST' oninput={preventDefault(fetch_recipe)}>
                 <input placeholder="Link to recipe" name="url" type="text" class="input input-bordered input-xs w-full text-center input-accent"/>
             </form>
         </div>
         <div class="divider">OR</div>
         <div class="flex justify-center">
-            <textarea id="ingr_list_input" cols="60" rows="10" class="textarea textarea-primary" placeholder="Paste ingredient list here" on:input|preventDefault={forward_input} on:delete|preventDefault={forward_input}></textarea>
+            <textarea id="ingr_list_input" cols="60" rows="10" class="textarea textarea-primary" placeholder="Paste ingredient list here" oninput={preventDefault(forward_input)} ondelete={preventDefault(forward_input)}></textarea>
         </div>
     {/if}
 </div>

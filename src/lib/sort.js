@@ -1,4 +1,6 @@
 export const sort_recipes = function(sort_val, display_recipes){
+    
+    
     switch (sort_val) {
         case "Least Ingredients":
             return display_recipes.sort(compare_ingr_amounts_asc);

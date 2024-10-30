@@ -2,7 +2,14 @@
 		import { page } from '$app/stores';  
 		import { currentUser, pb, signOut } from '/src/lib/pocketbase.js';
 		import "../input.css";
-		$: is_homepage = ($page.url.pathname == "/") ? true : false; 
+	/**
+	 * @typedef {Object} Props
+	 * @property {import('svelte').Snippet} [children]
+	 */
+
+	/** @type {Props} */
+	let { children } = $props();
+		let is_homepage = $derived(($page.url.pathname == "/") ? true : false); 
 
     	let page_links = ($currentUser) ? [
 			{href:"/today", display: "Today"},
@@ -39,7 +46,7 @@
 							{#if !$currentUser && $page.url.pathname != "/login"}
 								<li><a href="login" class="btn btn-xs btn-primary flex content-center">login</a></li>
 							{:else if $currentUser && $page.url.pathname != "/login" && $page.url.pathname != "/gallery"}
-								<li><div on:click={signOut} class="btn btn-xs btn-primary flex content-center" on:keypress={signOut}>logout</div></li>
+								<li><div onclick={signOut} class="btn btn-xs btn-primary flex content-center" onkeypress={signOut}>logout</div></li>
 							{/if}
 							</ul>
 						</div>
@@ -51,5 +58,5 @@
 			{#if !is_homepage}
 				<div class="h-6 md:h-9"></div>
 			{/if}
-			<slot></slot>
+			{@render children?.()}
 		</div>

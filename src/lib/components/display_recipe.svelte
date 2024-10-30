@@ -1,11 +1,11 @@
 <script>
     import EditIcon from "/src/lib/icons/EditIcon.svelte";
-    import { createEventDispatcher,afterUpdate, onMount } from 'svelte';
+    import { createEventDispatcher,onMount } from 'svelte';
     import ThumbUp from "/src/lib/icons/ThumbUp.svelte";
     import Heart from "/src/lib/icons/Heart.svelte";
 
 
-    export let recipe;
+    let { recipe = $bindable() } = $props();
     let dispatch = createEventDispatcher();
 
 
@@ -80,9 +80,9 @@
                 {#if recipe.url}
                     <a class="btn btn-primary btn-xs" href={recipe.url} target="_blank">original recipe</a>
                 {/if}
-                <button class="btn btn-xs md:btn-sm p-1 btn-ghost flex content-center" on:click={()=>{recipe.made = !recipe.made}}><ThumbUp color={(recipe.made) ? "fill-primary" : "fill-neutral"}/></button>
-                <button class="btn btn-xs md:btn-sm p-1 btn-ghost flex content-center" on:click={()=>{recipe.favorite = !recipe.favorite}}><Heart color={(recipe.favorite) ? "fill-primary" : "fill-neutral"}/></button>
-                <button class="btn btn-xs md:btn-sm btn-primary" on:click={edit_groceries}><EditIcon/></button>
+                <button class="btn btn-xs md:btn-sm p-1 btn-ghost flex content-center" onclick={()=>{recipe.made = !recipe.made}}><ThumbUp color={(recipe.made) ? "fill-primary" : "fill-neutral"}/></button>
+                <button class="btn btn-xs md:btn-sm p-1 btn-ghost flex content-center" onclick={()=>{recipe.favorite = !recipe.favorite}}><Heart color={(recipe.favorite) ? "fill-primary" : "fill-neutral"}/></button>
+                <button class="btn btn-xs md:btn-sm btn-primary" onclick={edit_groceries}><EditIcon/></button>
             </div>
         </div>
     </div>

@@ -1,9 +1,13 @@
 <script>
-    import { afterUpdate } from "svelte";
-    export let title;
-    export let msg;
-    export let type;
-    export let show;
+    import { stopPropagation } from 'svelte/legacy';
+    import { tick } from 'svelte';
+    
+    let {
+        title,
+        msg,
+        type,
+        show = $bindable()
+    } = $props();
     let delay_timer;
     const alert_types = {   success: "alert-success", 
                             info:"alert-info", 
@@ -11,7 +15,7 @@
                             error:"alert-error"
     };
 
-    afterUpdate(() => {
+    tick(() => {
         if (show && type != "error") {
             clearTimeout(delay_timer);
             delay_timer = setTimeout(() => {
@@ -38,6 +42,6 @@
         <div class="text-xs">{msg}</div>
     </div>
     <div>
-        <button on:click|stopPropagation={()=>{show = false}} class="btn btn-xs">close</button>
+        <button onclick={stopPropagation(()=>{show = false})} class="btn btn-xs">close</button>
     </div>
 </div>

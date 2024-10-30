@@ -8,14 +8,18 @@
     import Menu from "/src/lib/components/menu.svelte";
     import { page } from '$app/stores';
 
-    $: user_recipes = {};
-    let menu_recipes = [];
-    let mults = {};
+    let user_recipes = $state([]);
+    
+    let menu_recipes = $derived(user_recipes.filter(r => r.checked));
+    let mults = $state({});
     let mode = "menu";
     let view_recipe;
-    let edit_recipe;
-    let edit_modal_recipe = false;
-    $: loading = true;
+    let edit_recipe = $state();
+    let edit_modal_recipe = $state(false);
+    let loading = $state(true);
+    let total_servings = $derived(get_servings(menu_recipes, mults));
+    let menu_title = $state("New Menu");
+    
 
 
     onMount(async () => {
@@ -26,12 +30,13 @@
             expand: `notes, ingr_list`,
             sort: `-created`
         });
-        user_recipes = result_list;
+        user_recipes = result_list.items;
+        
         if ($page.params.recipe_rec != ""){
-            for (let i = 0; i < user_recipes.items.length; i++){
-                if (user_recipes.items[i].id == $page.params.recipe_rec){
-                    menu_recipes.push(user_recipes.items[i]);
-                    mults[user_recipes.items[i].id] = user_recipes.items[i].servings;
+            for (let i = 0; i < user_recipes.length; i++){
+                if (user_recipes[i].id == $page.params.recipe_rec){
+                    user_recipes[i].checked = true;
+                    mults[user_recipes[i].id] = user_recipes[i].servings;
                 }
             }
         }
@@ -41,7 +46,7 @@
     function update_edit(e){
         view_recipe = null;
         if (e.detail.index != -1) {
-            for (let curr of user_recipes.items){
+            for (let curr of user_recipes){
                 if (curr.id == e.detail.index){
                     edit_recipe = curr;
                     continue;
@@ -58,7 +63,7 @@
     function update_view(e){
         edit_recipe = null;
         if (e.detail.index != -1){
-            for (let curr of user_recipes.items){
+            for (let curr of user_recipes){
                 if (curr.id == e.detail.index){
                     view_recipe = curr;
                     continue;
@@ -71,37 +76,6 @@
         }
     }
 
-    function remove_from_menu(e){
-        let remove = -1;
-        let cnt = 0;
-        for (let recipe of menu_recipes){
-            if (recipe.id == e.detail.index){
-                remove = cnt;
-            }
-            cnt++;
-        }
-        if (remove > -1){
-            let tmp_mults = {};
-            for (let key of Object.keys(mults)){
-                if (key != e.detail.index) tmp_mults[key] = mults[key];
-            }
-            mults = tmp_mults;
-            menu_recipes.splice(remove, 1);
-            menu_recipes = menu_recipes;
-        }
-    }
-
-    function add_to_menu(e){
-        for (let recipe of user_recipes.items){
-            if (recipe.id == e.detail.index){
-                recipe.checked = true;
-                menu_recipes.push(recipe);
-                mults[recipe.id] = recipe.servings;
-            }
-        }
-        menu_recipes = menu_recipes;
-    }
-
     function reset_mode(){
         mode = "menu";
         view_recipe = null;
@@ -110,6 +84,21 @@
 
     function update_mult(e){
         mults[e.detail.id] = e.detail.mult;
+    }
+
+    
+
+    function check_item(e){
+        for (let recipe of user_recipes){
+            if (recipe.id == e.detail.index){
+                recipe.checked = !recipe.checked;
+                mults[recipe.id] = recipe.servings;
+            }
+        }
+    }
+
+    function update_title(e){
+        menu_title = e.detail.title;
     }
 </script>
 
@@ -122,20 +111,18 @@
 </svelte:head>
 
 <div id="main" class="p-1 md:p-3">
-        {#if (user_recipes && user_recipes.items && user_recipes.items.length > 0) || loading}
+        {#if (user_recipes && user_recipes.length > 0) || loading}
             <div id="content" class="flex flex-col md:flex-row   mt-0 md:space-x-3 md:w-full">
                 <div id="left_column" class="md:w-1/2">
-                    <RecipeList recipes={user_recipes.items} 
-                        on:update_view={update_view} on:update_edit={update_edit}
-                        on:remove_from_menu={remove_from_menu}
-                        on:add_to_menu={add_to_menu} on:reset_mode={reset_mode}/>
+                    <RecipeList recipes={user_recipes} 
+                        on:update_view={update_view} on:update_edit={update_edit} on:reset_mode={reset_mode} on:check_item={check_item}/>
                 </div>
-                <details class="md:hidden collapse bg-base-200 md:bg-base-100 collapse-arrow mt-1 w-full md:w-1/2" on:click={() => {window.scrollBy({ top: 700, left: 0, behavior: "smooth"});}}>
+                <details class="md:hidden collapse bg-base-200 md:bg-base-100 collapse-arrow mt-1 w-full md:w-1/2" onclick={() => {window.scrollBy({ top: 700, left: 0, behavior: "smooth"});}}>
                     <summary class="collapse-title text-xl font-medium">
                         {#if menu_recipes.length > 0}
                             <div class="flex justify-around m-1 items-center">
                                 <p class="text-xs">{menu_recipes.length} recipes</p>
-                                <p class="text-xs">{get_servings(menu_recipes, mults)} servings</p>
+                                <p class="text-xs">{total_servings} servings</p>
                                 <p class="text-xs">{get_total_time(menu_recipes)}</p>
                             </div>
                         {:else}
@@ -144,7 +131,7 @@
                     </summary>
                     <div id="right_column" class="collapse-content w-full">
                         {#if menu_recipes.length}
-                            <Menu title="New Menu" menu={menu_recipes} {mults} {page} on:update_mult={update_mult}/>
+                            <Menu title="New Menu" menu={menu_recipes} {mults} {page} on:update_mult={update_mult} on:update_title={update_title} {menu_title}/>
                         {:else}
                             <div class="flex flex-col justify-center items-center space-y-5 mx-2 md:mx-auto p-5 rounded-md shadow-md  md:text-xl max-w-5xl">
                                 <p>select recipes to add to your menu</p>
@@ -154,7 +141,7 @@
                 </details>
                 <div id="right_column" class="hidden md:flex md:w-1/2">
                     {#if menu_recipes.length}
-                        <Menu title="New Menu" menu={menu_recipes} {mults} {page} on:update_mult={update_mult}/>
+                        <Menu title="New Menu" menu={menu_recipes} {mults} {page} on:update_mult={update_mult} {menu_title}/>
                     {:else}
                         <div class="flex h-full justify-center w-full items-center">
                             <div class="flex flex-col justify-center content-center h-fit p-16 rounded-md shadow-md md:text-xl max-w-5xl">
@@ -166,7 +153,7 @@
                 <dialog id="my_modal_3" class="modal">
                         <div class="modal-box max-w-full md:w-2/3 p-1 h-[90svh]">
                             <form method="dialog">
-                                <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" on:click={()=>{edit_recipe = null}}>✕</button>
+                                <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" onclick={()=>{edit_recipe = null}}>✕</button>
                             </form>
                             {#if edit_recipe}
                                 {#if edit_modal_recipe}

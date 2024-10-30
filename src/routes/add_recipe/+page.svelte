@@ -1,4 +1,6 @@
 <script>
+    import { preventDefault } from 'svelte/legacy';
+
     import EditRecipe from "/src/lib/components/edit_recipe.svelte";
     import { currentUser, pb } from '/src/lib/pocketbase.js';
     import { process_ingr, process_directions } from '/src/lib/process_recipe.js';
@@ -6,7 +8,7 @@
     import { onMount } from "svelte";
     import Alerts from "../../lib/components/alerts.svelte";
 
-    let recipe = {
+    let recipe = $state({
         author: "",
         category: "",
         collectionId: "",
@@ -26,11 +28,11 @@
         updated: "",
         url: "",
         user: ""
-    };
+    });
 
-    let alert = {show: false, msg: "", title: "", type: "warning"};
+    let alert = $state({show: false, msg: "", title: "", type: "warning"});
 
-    let loading = false;
+    let loading = $state(false);
 
     onMount(async () => {
         if (!$currentUser) window.location.href = "/login";
@@ -94,7 +96,7 @@
 
 <div class="flex flex-col max-w-5xl px-1 space-y-5 mb-5 w-full m-auto">
     <div class="link mt-5">
-        <form method='POST' on:input|preventDefault={fetch_recipe} class="text-center w-full">
+        <form method='POST' oninput={preventDefault(fetch_recipe)} class="text-center w-full">
             <input placeholder="Link to recipe" name="url" type="text" class="input input-bordered input-xs w-full text-center input-accent"/>
         </form>
     </div>

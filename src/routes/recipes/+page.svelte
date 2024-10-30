@@ -1,5 +1,7 @@
 <script>
-	import {afterUpdate, onMount} from "svelte";
+  import { run, stopPropagation } from 'svelte/legacy';
+
+	import {onMount} from "svelte";
     import { pb, currentUser } from '/src/lib/pocketbase.js';
     import InfiniteScroll from "/src/lib/components/infinite_scroll.svelte";
     import Clear from "/src/lib/icons/Clear.svelte";
@@ -17,36 +19,49 @@
 
     let page_size = 30
 	// store all the data here.
-	let data = [];
-	// store the new batch of data here.
-	let newBatch = [];
-    let categories = [];
-    let countries = [];
-    let cuisines = [];
-    let authors = [];
+    // store the new batch of data here.
+	let newBatch = $state([]);
+    let sort_val = $state("Most Recent");
+	let data = $state([]);
+	
+    let categories = $state([]);
+    let countries = $state([]);
+    let cuisines = $state([]);
+    let authors = $state([]);
     let sort_opts = ["Least Ingredients", "Most Ingredients", "Least Servings", "Most Servings", "Least Time", "Most Time", "Most Recent", "Least Recent"];
     let web_sites = [];
     let delay_timer;
 
 
-    $: selected_category = null;
-    $: selected_country = null;
-    $: selected_cuisine = null;
-    $: selected_author = null;
+    let selected_category = $state(null);
+  
+    let selected_country = $state(null);
+  
+    let selected_cuisine = $state(null);
+  
+    let selected_author = $state(null);
+  
 
-    $: loading = true;
-    $: recipes_have_more = true;
-    $: ingr_has_more = true;
-    $: has_more = recipes_have_more || ingr_has_more;
-    $: no_results = false;
-    $: sort_val = "Most Recent";
-    $: search_val = "";
-    $: max_results = 0;
-    $: just_copied = false;
-    let alert = {show: false, msg: "", title: "", type: "warning"};
+    let loading = $state(true);
+  
+    let recipes_have_more = $state(true);
+  
+    let ingr_has_more = $state(true);
+  
+    let has_more = $derived(recipes_have_more || ingr_has_more);
+    let no_results = $state(false);
+  
+  
+    let search_val = $state("");
+  
+    let max_results = $state(0);
+  
+    let just_copied = $state(false);
+  
+    let alert = $state({show: false, msg: "", title: "", type: "warning"});
     
-    let total_recipes_num = 0;
-	
+    let total_recipes_num = $state(0);
+
 	async function fetchData() {
         
         if (search_val){
@@ -85,6 +100,7 @@
             total_recipes_num = ingr_recipes.totalItems ? ingr_recipes.totalItems : recipes.totalItems;
             if (final_recipes.length > total_recipes_num) total_recipes_num = final_recipes.length;
             newBatch = final_recipes;
+            data = [...data, ...newBatch];
         } else {
             ingr_has_more = false;
             const recipes = await pb.collection('recipes').getList(page, page_size, {
@@ -97,10 +113,11 @@
             
             total_recipes_num = recipes.totalItems;
             newBatch = recipes.items;
+            data = [...data, ...newBatch];1
         }
 	};
 
-    async function get_ingr_recipes(){
+    async function get_ingr_recipes(){ 
         const ingredients = await pb.collection('ingredients').getList(page, page_size, {
             expand: `recipe, recipe.ingr_list`,
             filter: `ingredient~"${search_val}" && recipe:length > 0`,
@@ -181,7 +198,6 @@
 	
 	onMount(async ()=> {
 		// load first batch onMount
-        console.log($currentUser)
         if ($currentUser) await pb.collection('users').authRefresh();
 		await fetchData();
         max_results = total_recipes_num;
@@ -191,11 +207,6 @@
         authors = await pb.collection('authors').getFullList({sort: `+id`});
         loading = false;
 	});
-
-  $: data = sort_recipes(sort_val, [
-		...data,
-    ...newBatch
-  ]);
 
   async function select_cat(e){
     loading = true;
@@ -214,8 +225,9 @@
     }
     if (e.currentTarget.value == "null") e.currentTarget.value = null;
     page = 1; 
-    data = []; 
+    
     newBatch = [];
+    data = [];
     await fetchData();
     loading = false;
     if (!newBatch.length){
@@ -226,7 +238,6 @@
   }
 
   async function load_more(){
-    
     loading = true;
     page++;
     await fetchData();
@@ -238,8 +249,9 @@
         sort_val = e.srcElement.innerHTML;
         newBatch = [];
         page = 1; 
-        data = []; 
+        
         newBatch = [];
+        data = [];
         await fetchData();
         loading = false;
         document.activeElement.blur();
@@ -248,10 +260,12 @@
     async function update_search(e){
         clearTimeout(delay_timer);
         delay_timer = setTimeout(async () => {
+            console.log({search_val});
             loading = true;
             page = 1; 
-            data = []; 
+            
             newBatch = [];
+            data = [];
             await fetchData();
             loading = false;
             document.activeElement.blur();
@@ -259,6 +273,7 @@
     }
 
     async function add_recipe(e){
+        
         if (!$currentUser){
             if (window.confirm("you must login to add this recipe to your list. Do you want to sign in?")) {
                 window.open(`/login`, "Thanks for Visiting!");
@@ -268,7 +283,7 @@
             return;
         } else {
             const recipe_to_add = data.filter((curr) => curr.id == e.currentTarget.id)[0];
-            console.log({recipe_to_add});
+            
             const recipe_in = {
                 "title": recipe_to_add.title,
                 "description": recipe_to_add.description,
@@ -290,9 +305,9 @@
                 "time_new": recipe_to_add.time_new,
                 "ingr_num": recipe_to_add.ingr_num
             };
-            console.log({recipe_in});
+            
             let recipe_result = await pb.collection('recipes').create(recipe_in);
-            console.log({recipe_result});
+            
             just_copied = recipe_to_add.id;
             clearTimeout(delay_timer);
             delay_timer = setTimeout(function() {
@@ -302,6 +317,7 @@
     }
 
     function show_alert(msg, type, title){
+        
         alert.show = true;
         alert.msg = msg;
         alert.type = type;
@@ -320,25 +336,25 @@
   <h4>See what others are cooking</h4>
   <div class="flex w-full justify-center flex-col md:flex-row md:mt-2 space-y-1 md:space-y-2">
     <div class="hidden md:flex flex-row md:flex-col mx-1 space-x-1 md:space-x-0 md:space-y-2">
-        <select bind:value={selected_category} on:change={select_cat} class="select select-sm select-bordered border-primary w-full max-w-xs pl-1">
+        <select bind:value={selected_category} onchange={select_cat} class="select select-sm select-bordered border-primary w-full max-w-xs pl-1">
             <option value={null}>category</option>
             {#each categories as curr}
                 <option>{curr.id}</option>
             {/each}
         </select>
-        <select bind:value={selected_country} on:change={select_cat} class="select select-sm select-bordered border-primary w-full max-w-xs pl-1">
+        <select bind:value={selected_country} onchange={select_cat} class="select select-sm select-bordered border-primary w-full max-w-xs pl-1">
             <option value={null}>country</option>
             {#each countries as curr}
                 <option>{curr.id}</option>
             {/each}
         </select>
-        <select bind:value={selected_cuisine} on:change={select_cat} class="select select-sm select-bordered border-primary w-full max-w-xs pl-1">
+        <select bind:value={selected_cuisine} onchange={select_cat} class="select select-sm select-bordered border-primary w-full max-w-xs pl-1">
             <option value={null}>cuisine</option>
             {#each cuisines as curr}
                 <option>{curr.id}</option>
             {/each}
         </select>
-        <select bind:value={selected_author} on:change={select_cat} class="select select-sm select-bordered border-primary w-full max-w-xs pl-1">
+        <select bind:value={selected_author} onchange={select_cat} class="select select-sm select-bordered border-primary w-full max-w-xs pl-1">
             <option value={null}>author</option>
             {#each authors as curr}
                 <option>{curr.id}</option>
@@ -350,27 +366,27 @@
         <div class="hidden md:flex justify-between items-center mx-1">
             <div class="form-control md:w-auto md:max-w-xs">
                 <label class="input input-bordered input-sm input-primary flex items-center gap-2 pr-0">
-                    <input type="text" class="input h-full p-0 w-28" placeholder="Search" on:keyup={update_search} bind:value={search_val}/>
-                    <div class="w-5" on:click={()=>{search_val = ""; update_search();}} on:keydown={()=>{search_val = ""; update_search();}}>
+                    <input type="text" class="input h-full p-0 w-28" placeholder="Search" onkeyup={update_search} bind:value={search_val}/>
+                    <button class="w-5" onclick={()=>{search_val = ""; update_search();}} onkeydown={()=>{search_val = ""; update_search();}}>
                         {#if search_val}
                             <Clear size="w-3 h-3"/>
                         {/if}
-                    </div>
+                    </button>
                 </label>
             </div>
             <div class="mx-1 text-xs md:text-base">{(total_recipes_num > max_results) ? max_results : total_recipes_num} recipes</div>
             <div class="dropdown dropdown-top md:dropdown-bottom dropdown-end">
-                  <label tabindex="0" class="btn m-1 btn-primary btn-xs md:btn-sm">{sort_val}</label>
-                  <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-max bg-primary">
+                  <label tabindex="-1" for="sort" class="btn m-1 btn-primary btn-xs md:btn-sm">{sort_val}</label>
+                  <ul tabindex="-1" name="sort" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-max bg-primary">
                       {#each sort_opts as opt}
-                          <li class="btn btn-xs {opt == sort_val ? 'btn-neutral': 'btn-primary'}"><a on:click={update_sort}>{opt}</a></li>
+                          <li class="btn btn-xs {opt == sort_val ? 'btn-neutral': 'btn-primary'}"><button onclick={update_sort} onkeydown={update_sort}>{opt}</button></li>
                       {/each}
                   </ul>
               </div>
             </div>
         <ul class="flex flex-col w-full max-w-3xl space-y-2 md:space-y-4 h-[calc(100svh-135px)] md:h-[calc(100svh-125px)] overflow-y-auto">
           {#each data as item}
-              <div class="card card-side bg-base-200 shadow-xl h-24 card-bordered border-primary cursor-pointer mx-1" on:keydown={window.location = `/cook_recipe/${item.url_id}/${item.servings}`} on:click={window.location = `/cook_recipe/${item.url_id}/${item.servings}`}>
+              <div class="card card-side bg-base-200 shadow-xl h-24 card-bordered border-primary cursor-pointer mx-1" onkeydown={window.location = `/cook_recipe/${item.url_id}/${item.servings}`} onclick={window.location = `/cook_recipe/${item.url_id}/${item.servings}`}>
                   <figure class="w-1/4 bg-cover bg-no-repeat bg-center" style="background-image: url('{item.image}')"></figure>
                   <div class="card-body h-full flex flex-row p-1 w-3/4 justify-between">
                       <div class="flex flex-col justify-between p-1 md:p-3 w-full">
@@ -394,13 +410,13 @@
                                   {item.expand.ingr_list.length} ingredients
                               </div>
                               {#if !$currentUser || $currentUser.id != item.user}
-                                <div id={item.id} class="btn btn-primary btn-xs w-6 ml-2 p-0" on:click|stopPropagation={add_recipe} on:keydown|stopPropagation={add_recipe}>
+                                <button id={item.id} class="btn btn-primary btn-xs w-6 ml-2 p-0" onclick={stopPropagation(add_recipe)} onkeydown={stopPropagation(add_recipe)}>
                                     {#if just_copied == item.id}
                                         <CheckMark color=""/>
                                     {:else}
                                         <Plus/>
                                     {/if}
-                                </div>
+                                </button>
                               {/if}
                           </div>
                       </div>
@@ -408,7 +424,7 @@
               </div>
           {/each}
           <div class="flex w-full h-full justify-center">
-            <span class="{true ? "" : "hidden"} loading loading-bars loading-lg mx-7 self-center"></span>
+            <span class="{has_more ? "" : "hidden"} loading loading-bars loading-lg mx-7 self-center"></span>
           </div>
           <div class="{no_results ? "" : "hidden"} w-full flex justify-center items-center h-full">
                 no results
@@ -421,45 +437,45 @@
       <div class="flex justify-between items-center mx-1 md:hidden">
         <div class="form-control md:w-auto md:max-w-xs">
             <label class="input input-bordered input-sm input-primary flex items-center gap-2 pr-0">
-                <input type="text" class="input h-full p-0 w-28" placeholder="Search" on:keyup={update_search} bind:value={search_val}/>
-                <div class="w-5" on:click={()=>{search_val = ""; update_search();}} on:keydown={()=>{search_val = ""; update_search();}}>
+                <input type="text" class="input h-full p-0 w-28" placeholder="Search" onkeyup={update_search} bind:value={search_val}/>
+                <button class="w-5" onclick={()=>{search_val = ""; update_search();}} onkeydown={()=>{search_val = ""; update_search();}}>
                     {#if search_val}
                         <Clear size="w-3 h-3"/>
                     {/if}
-                </div>
+                </button>
             </label>
         </div>
         <div class="mx-1 text-xs md:text-base">{(total_recipes_num > max_results) ? max_results : total_recipes_num} recipes</div>
         <div class="dropdown dropdown-top md:dropdown-bottom dropdown-end">
-              <label tabindex="0" class="btn m-1 btn-primary btn-xs md:btn-sm">{sort_val}</label>
-              <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-max bg-primary">
+              <label tabindex="-1" for="sort_mobile" class="btn m-1 btn-primary btn-xs md:btn-sm">{sort_val}</label>
+              <ul tabindex="-1" name="sort_mobile" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-max bg-primary">
                   {#each sort_opts as opt}
-                      <li class="btn btn-xs {opt == sort_val ? 'btn-neutral': 'btn-primary'}"><a on:click={update_sort}>{opt}</a></li>
+                      <li class="btn btn-xs {opt == sort_val ? 'btn-neutral': 'btn-primary'}"><button onclick={update_sort}>{opt}</button></li>
                   {/each}
               </ul>
           </div>
         </div>
     </div>
     <div class="flex md:hidden flex-row md:flex-col mx-1 space-x-1 md:space-x-0 md:space-y-2">
-        <select bind:value={selected_category} on:change={select_cat} class="select select-sm select-bordered border-primary w-full max-w-xs pl-1">
+        <select bind:value={selected_category} onchange={select_cat} class="select select-sm select-bordered border-primary w-full max-w-xs pl-1">
             <option value={null}>category</option>
             {#each categories as curr}
                 <option>{curr.id}</option>
             {/each}
         </select>
-        <select bind:value={selected_country} on:change={select_cat} class="select select-sm select-bordered border-primary w-full max-w-xs pl-1">
+        <select bind:value={selected_country} onchange={select_cat} class="select select-sm select-bordered border-primary w-full max-w-xs pl-1">
             <option value={null}>country</option>
             {#each countries as curr}
                 <option>{curr.id}</option>
             {/each}
         </select>
-        <select bind:value={selected_cuisine} on:change={select_cat} class="select select-sm select-bordered border-primary w-full max-w-xs pl-1">
+        <select bind:value={selected_cuisine} onchange={select_cat} class="select select-sm select-bordered border-primary w-full max-w-xs pl-1">
             <option value={null}>cuisine</option>
             {#each cuisines as curr}
                 <option>{curr.id}</option>
             {/each}
         </select>
-        <select bind:value={selected_author} on:change={select_cat} class="select select-sm select-bordered border-primary w-full max-w-xs pl-1">
+        <select bind:value={selected_author} onchange={select_cat} class="select select-sm select-bordered border-primary w-full max-w-xs pl-1">
             <option value={null}>author</option>
             {#each authors as curr}
                 <option>{curr.id}</option>

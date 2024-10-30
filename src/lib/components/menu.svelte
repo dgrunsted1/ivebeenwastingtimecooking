@@ -1,5 +1,5 @@
 <script>
-    import { afterUpdate, onMount } from 'svelte';
+    import { onMount, tick } from 'svelte';
     import GroceryList from "/src/lib/components/grocery_list.svelte";
     import { currentUser, pb } from '/src/lib/pocketbase';
     import { page } from '$app/stores';
@@ -10,90 +10,110 @@
 
 
 
-    export let menu;
-    export let id = null;
-    export let mults;
-    export let sub_recipes;
-    let tab = "recipe_list";
-    let grocery_list = [];
-    let num_servings = 0;
-    let total_time = 0;
+    /**
+     * @typedef {Object} Props
+     * @property {any} menu
+     * @property {any} [id]
+     * @property {any} mults
+     * @property {any} sub_recipes
+     */
+
+    /** @type {Props} */
+    let {
+        menu = $bindable(),
+        id = $bindable(null),
+        mults = $bindable(),
+        sub_recipes = $bindable(),
+        menu_title = $bindable()
+    } = $props();
+    let tab = $state("recipe_list");
+    let grocery_list = $derived(get_grocery_list(menu, mults, sub_recipes));
+    let num_servings = $derived(get_servings(menu, sub_recipes, mults));
+    let total_time = $derived(get_total_time(menu));
     const dispatch = createEventDispatcher();
     let overflow_len = ``;
     let basic_words = ['and', 'the', 'of', 'with', 'recipe'];
     let delay_timer;
+    let title_lock = $state(false);
 
     onMount(async () => {
         overflow_len = ($page.url.pathname == "/menu") ? `max-h-[60vh]` : `max-h-[60vh]`;
     });
 
-    afterUpdate(() => {
-        clearTimeout(delay_timer);
-        grocery_list = [];
+    // const update = () => {
+    //     clearTimeout(delay_timer);
+    //     grocery_list = [];
 
-        if (!menu.length){
-            if (document.getElementById('save_btn')) document.getElementById('save_btn').disabled = true;
-            return;
-        } else {
-            if (document.getElementById('save_btn')) document.getElementById('save_btn').disabled = false;
-        }
-        grocery_list = get_grocery_list(menu, mults, sub_recipes);
+    //     if (!menu.length){
+    //         if (document.getElementById('save_btn')) document.getElementById('save_btn').disabled = true;
+    //         return;
+    //     } else {
+    //         if (document.getElementById('save_btn')) document.getElementById('save_btn').disabled = false;
+    //     }
+    //     grocery_list = get_grocery_list(menu, mults, sub_recipes);
 
-        total_time = get_total_time(menu);
+    //     total_time = get_total_time(menu);
 
-        update_sub_recipes();
+    //     update_sub_recipes();
 
-        num_servings = get_servings(menu, sub_recipes, mults);
+    //     num_servings = get_servings(menu, sub_recipes, mults);
 
-        if (!menu.title || menu.title == "New Menu"){
-            menu.title = "New Menu";
-            if (menu.length > 1) menu.title = generate_menu_title();
+    //     if (!menu.title || menu.title == "New Menu"){
+    //         menu.title = "New Menu";
+    //         if (menu.length > 1) menu.title = generate_menu_title();
+    //     }
+    // }
+    $effect(() => {
+        if (!menu_title || menu_title == "New Menu" || !title_lock){
+            let title = (menu.length < 2) ? "New Menu" : generate_menu_title();
+            dispatch("update_title", {title: title});
         }
     });
 
     function update_sub_recipes(){
-        if (!sub_recipes){
-            //create sub_recipes object
-            sub_recipes = {};
+        let out = {};
+        if (!out){
+            //create out object
+            out = {};
             for (let i = 0; i < menu.length; i++){
-                if (!sub_recipes[menu[i].id]){
-                    sub_recipes[menu[i].id] = [];
-                    sub_recipes[menu[i].id].push({ingr_id: null, recipe_id: null});
+                if (!out[menu[i].id]){
+                    out[menu[i].id] = [];
+                    out[menu[i].id].push({ingr_id: null, recipe_id: null});
                 }
             }
         } else {
             // add new sub_recipe instance if needed
-            for (let key in sub_recipes){
+            for (let key in out){
                 let found_unset_sub_recipe = false;
-                for (let j = 0; j < sub_recipes[key].length; j++){
-                    if (sub_recipes[key][j].ingr_id === null || sub_recipes[key][j].recipe_id === null){
+                for (let j = 0; j < out[key].length; j++){
+                    if (out[key][j].ingr_id === null || out[key][j].recipe_id === null){
                         found_unset_sub_recipe = true;
                         break;
                     }
                 }
-                if (!found_unset_sub_recipe && Object.keys(sub_recipes).length - 1 > sub_recipes[key].length) {
-                    sub_recipes[key].push({ingr_id: null, recipe_id: null});
+                if (!found_unset_sub_recipe && Object.keys(out).length - 1 > out[key].length) {
+                    out[key].push({ingr_id: null, recipe_id: null});
                 }
             }
         }
 
         // add new instance for each recipe added to a menu
         for (let i = 0; i < menu.length; i++){
-            if (!(menu[i].id in sub_recipes)){
-                sub_recipes[menu[i].id] = [];
-                sub_recipes[menu[i].id].push({ingr_id: null, recipe_id: null});
+            if (!(menu[i].id in out)){
+                out[menu[i].id] = [];
+                out[menu[i].id].push({ingr_id: null, recipe_id: null});
             }
         }
 
-        // set sub_recipe values in each recipe object, data for sub_recipes, is_sub_recipe flag
+        // set sub_recipe values in each recipe object, data for out, is_sub_recipe flag
         for (let i = 0; i < menu.length; i++){
-            for (let k in sub_recipes){
-                for (let j = 0; j < sub_recipes[k].length; j++){
+            for (let k in out){
+                for (let j = 0; j < out[k].length; j++){
                     // add recipe data to parent recipe object
-                    if (k == menu[i].id && sub_recipes[k][j].recipe_id && sub_recipes[k][j].ingr_id){
+                    if (k == menu[i].id && out[k][j].recipe_id && out[k][j].ingr_id){
                         if (!menu[i].sub_recipe_data) menu[i].sub_recipe_data = [];
                         for (let l = 0; l < menu.length; l++){
-                            if (menu[l].id == sub_recipes[k][j].recipe_id){
+                            if (menu[l].id == out[k][j].recipe_id){
                                 if (!menu[i].sub_recipe_data.includes(menu[l])){
                                     menu[i].sub_recipe_data.push(menu[l]);
                                 }
@@ -101,8 +121,8 @@
                         }
                     }
                     //set an is_sub_recipe flag for each recipe
-                    for (let l = 0; l < sub_recipes[k].length; l++){
-                        if (sub_recipes[k][l].recipe_id == menu[i].id){
+                    for (let l = 0; l < out[k].length; l++){
+                        if (out[k][l].recipe_id == menu[i].id){
                             menu[i].is_sub_recipe = true;
                         }
                     }
@@ -163,7 +183,7 @@
             "recipes": recipe_ids,
             "user": $currentUser.id,
             "today": false,
-            "title": menu.title,
+            "title": menu_title,
             "servings": mults,
             "made": made,
             "sub_recipes": sub_recipes
@@ -213,23 +233,23 @@
 
 <div id="menu" class="h-3/4 md:h-full w-full cursor-default">
     <div class="flex items-center p-3 justify-between">
-        <input type="text" class="input input-bordered border-primary input-xs w-2/3" bind:value={menu.title}/>
+        <input type="text" class="input input-bordered border-primary input-xs w-2/3" value={menu_title} oninput={() => {title_lock = true}}/>
         {#if $page.url.pathname == "/menu" || $page.url.pathname == "/profile"}
             <div class="dropdown dropdown-end">
-                <label tabindex="0" class="btn m-1 btn-primary btn-xs md:btn-sm">save menu</label>
-                <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-max bg-primary">
-                    <li class="btn btn-xs btn-primary p-0"><a class="p-0" on:click={save_menu}>save menu</a></li>
-                    <li class="btn btn-xs btn-primary p-0"><a class="p-0" on:click={save_and_set_today}>save and set today</a></li>
+                <label tabindex="-1" for="save_menu" class="btn m-1 btn-primary btn-xs md:btn-sm">save menu</label>
+                <ul tabindex="-1" name="save_menu" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-max bg-primary">
+                    <li class="btn btn-xs btn-primary p-0"><button class="p-0" onclick={save_menu}>save menu</button></li>
+                    <li class="btn btn-xs btn-primary p-0"><button class="p-0" onclick={save_and_set_today}>save and set today</button></li>
                 </ul>
             </div>
         {:else if $page.url.pathname == "/my_menus"}
-            <button class="btn btn-primary self-end btn-xs md:btn-sm" id="today_btn" on:click={set_todays_menu}>set today</button>
+            <button class="btn btn-primary self-end btn-xs md:btn-sm" id="today_btn" onclick={set_todays_menu}>set today</button>
         {/if}
     </div>
     <div class="flex content-center">
         <div class="tabs tabs-boxed w-fit mx-auto flex items-center bg-base-300 md:bg-base-200">
-            <a id="recipe_list" class="tab tab-active tab-xs" on:click={switch_tab}>Recipes</a> 
-            <a id="grocery_list" class="tab tab-xs" on:click={switch_tab}>Grocery List</a>
+            <button id="recipe_list" class="tab tab-active tab-xs" onclick={switch_tab}>Recipes</button> 
+            <button id="grocery_list" class="tab tab-xs" onclick={switch_tab}>Grocery List</button>
         </div>
     </div>
     <div class="flex justify-around m-1 items-center">
@@ -252,16 +272,16 @@
                                 <p class="time text-xs">{recipe.time}</p>
                                 <div class="servings_container text-xs">
                                     servings:<input type="text" class="servings input input-bordered input-xs px-1 mr-1 w-8" 
-                                                id={recipe.id} bind:value={mults[recipe.id]} 
-                                                on:input={update_mult}>
+                                                id={recipe.id} value={mults[recipe.id]} 
+                                                oninput={update_mult}>
                                 </div>
                                 <!-- <p class="description text-xs">{recipe.description}</p> -->
                                 {#if sub_recipes && sub_recipes[recipe.id] && $page.url.pathname == "/menu"}
                                     <div class="flex flex-col space-y-2">
                                         {#each sub_recipes[recipe.id] as curr}
-                                            <div class="btn btn-xs btn-primary px-0 w-6 h-fit" on:click={show_subrecipe_selector}><Plus/></div>
+                                            <button class="btn btn-xs btn-primary px-0 w-6 h-fit" onclick={show_subrecipe_selector}><Plus/></button>
                                             <div class="hidden flex flex-row items-center space-x-1 w-full">
-                                                <select bind:value={curr.ingr_id} class="flex select select-xs w-20">
+                                                <select value={curr.ingr_id} class="flex select select-xs w-20">
                                                     <option value={null}>ingredient</option>
                                                     {#each recipe.expand.ingr_list as item}
                                                         
@@ -269,7 +289,7 @@
                                                     {/each}
                                                 </select>
                                                 <div class="text-xs">to swap for a</div>
-                                                <select bind:value={curr.recipe_id} class="flex select select-xs w-20">
+                                                <select value={curr.recipe_id} class="flex select select-xs w-20">
                                                     <option value={null}>recipe</option>
                                                     {#each menu as recipe_swap}
                                                         {#if recipe.id != recipe_swap.id}

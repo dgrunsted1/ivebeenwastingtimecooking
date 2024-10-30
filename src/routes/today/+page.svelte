@@ -1,5 +1,7 @@
 <script>
-    import { onMount, afterUpdate } from 'svelte';
+    import { stopPropagation } from 'svelte/legacy';
+
+    import { onMount,tick } from 'svelte';
     import { currentUser, pb } from '/src/lib/pocketbase.js';
     import GroceryList from "/src/lib/components/grocery_list.svelte";
     import { page } from '$app/stores';
@@ -10,17 +12,19 @@
     import { update_fave } from '/src/lib/save_recipe.js';
 
 
-    let todays_menu = {};
-    let grocery_list = [];
+    let todays_menu = $state({});
+    let grocery_list = $state([]);
     let grocery_list_id = "";
-    let grocery_list_status = "saved";
+    let grocery_list_status = $state("saved");
     let mode = "menu";
-    $: loading = true;
+    let loading = $state(true);
+    
     let delay_timer;
     let update_fave_list = [];
-    let tab = "recipe_list";
-    let sub_recipe_ids = [];
-    $: recipes_ready = [];
+    let tab = $state("recipe_list");
+    let sub_recipe_ids = $state([]);
+    let recipes_ready = $state([]);
+    
 
 
     onMount(async () => {
@@ -69,7 +73,7 @@
         loading = false;
     });
 
-    afterUpdate(() => {
+    tick(() => {
         if (todays_menu.expand) update_recipes_ready();
     });
 
@@ -184,13 +188,13 @@
                                             {#if curr_sub_recipe.id === sub_recipe.recipe_id}
                                                 <div class="flex justify-around items-center w-full">
                                                     <SubTask/>
-                                                    <div class="card card-bordered sm:card-side {(todays_menu.made && todays_menu.made[curr_sub_recipe.id]) ? "bg-base-300" : "bg-base-200"} shadow-xl max-h-24 my-1.5 mx-1 w-4/5" on:click={window.location = `/cook_recipe/${curr_sub_recipe.url_id}/${todays_menu.servings[curr_sub_recipe.id]}`} on:keydown={window.location = `/cook_recipe/${curr_sub_recipe.url_id}/${todays_menu.servings[curr_sub_recipe.id]}`}>
+                                                    <div class="card card-bordered sm:card-side {(todays_menu.made && todays_menu.made[curr_sub_recipe.id]) ? "bg-base-300" : "bg-base-200"} shadow-xl max-h-24 my-1.5 mx-1 w-4/5" onclick={window.location = `/cook_recipe/${curr_sub_recipe.url_id}/${todays_menu.servings[curr_sub_recipe.id]}`} onkeydown={window.location = `/cook_recipe/${curr_sub_recipe.url_id}/${todays_menu.servings[curr_sub_recipe.id]}`}>
                                                         <figure class="md:w-3/5 {(todays_menu.made && todays_menu.made[curr_sub_recipe.id]) ? "blur-sm" : ""}"><img src={curr_sub_recipe.image} alt={curr_sub_recipe.title}/></figure>
                                                         <div class="card-body max-h-full flex flex-row p-2 items-center w-full">
                                                             <p id={i} class="w-1/2 text-xs">{curr_sub_recipe.title}</p>
                                                             <div class="card-actions flex flex-row justify-evenly items-center">
-                                                                <input type="checkbox" class="checkbox checkbox-primary checkbox-lg p-1" id={curr_sub_recipe.id} bind:checked={todays_menu.made[curr_sub_recipe.id]} on:click|stopPropagation={toggle_made}>
-                                                                <button id={curr_sub_recipe.id} class="btn btn-xs md:btn-sm p-1 favorite" on:click|stopPropagation={(e)=>{curr_sub_recipe.favorite = !curr_sub_recipe.favorite; update_fave_queue(e);}}><Heart color={(curr_sub_recipe.favorite) ? "fill-primary" : "fill-neutral"}/></button>
+                                                                <input type="checkbox" class="checkbox checkbox-primary checkbox-lg p-1" id={curr_sub_recipe.id} bind:checked={todays_menu.made[curr_sub_recipe.id]} onclick={stopPropagation(toggle_made)}>
+                                                                <button id={curr_sub_recipe.id} class="btn btn-xs md:btn-sm p-1 favorite" onclick={stopPropagation((e)=>{curr_sub_recipe.favorite = !curr_sub_recipe.favorite; update_fave_queue(e);})}><Heart color={(curr_sub_recipe.favorite) ? "fill-primary" : "fill-neutral"}/></button>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -199,17 +203,17 @@
                                         {/each}
                                     {/each}
                                 {/if}
-                                <div class="card card-bordered sm:card-side bg-base-200 shadow-xl max-h-24 my-1.5 mx-1 cursor-pointer" on:click={ recipes_ready.includes(curr.id) ? window.location = `/cook_recipe/${curr.url_id}/${todays_menu.servings[curr.id]}` : ""} on:keydown={window.location = `/cook_recipe/${curr.url_id}/${todays_menu.servings[curr.id]}`}>
+                                <div class="card card-bordered sm:card-side bg-base-200 shadow-xl max-h-24 my-1.5 mx-1 cursor-pointer" onclick={recipes_ready.includes(curr.id) ? window.location = `/cook_recipe/${curr.url_id}/${todays_menu.servings[curr.id]}` : ""} onkeydown={window.location = `/cook_recipe/${curr.url_id}/${todays_menu.servings[curr.id]}`}>
                                     <figure class="md:w-3/5 "><img src={curr.image} alt={curr.title}/></figure>
                                     <div class="card-body max-h-full flex flex-row p-2 items-center w-full">
                                         <p id={i} class="w-1/2 text-xs">{curr.title}</p>
                                         <div class="card-actions flex flex-row justify-evenly items-center">
                                                 {#if recipes_ready.includes(curr.id)}
-                                                    <input type="checkbox" class="checkbox checkbox-primary checkbox-lg p-1" id={curr.id} bind:checked={todays_menu.made[curr.id]} on:click|stopPropagation={toggle_made}>
+                                                    <input type="checkbox" class="checkbox checkbox-primary checkbox-lg p-1" id={curr.id} bind:checked={todays_menu.made[curr.id]} onclick={stopPropagation(toggle_made)}>
                                                 {:else}
                                                     not ready
                                                 {/if}
-                                            <button id={curr.id} class="btn btn-xs p-1 favorite flex content-center" on:click|stopPropagation={(e)=>{curr.favorite = !curr.favorite; update_fave_queue(e);}}><Heart color={(curr.favorite) ? "fill-primary" : "fill-neutral"}/></button>
+                                            <button id={curr.id} class="btn btn-xs p-1 favorite flex content-center" onclick={stopPropagation((e)=>{curr.favorite = !curr.favorite; update_fave_queue(e);})}><Heart color={(curr.favorite) ? "fill-primary" : "fill-neutral"}/></button>
                                         </div>
                                     </div>
                                 </div>
@@ -237,7 +241,7 @@
             </div>
         </div>
         <div class="tabs tabs-boxed w-fit mx-auto flex items-center bg-base-300 md:bg-base-200 md:hidden my-1">
-            <a id="recipe_list" class="tab tab-active tab-xs" on:click={switch_tab}>Recipes</a> 
-            <a id="grocery_list" class="tab tab-xs" on:click={switch_tab}>Grocery List</a>
+            <button id="recipe_list" class="tab tab-active tab-xs" onclick={switch_tab}>Recipes</button> 
+            <button id="grocery_list" class="tab tab-xs" onclick={switch_tab}>Grocery List</button>
         </div>
     </div>

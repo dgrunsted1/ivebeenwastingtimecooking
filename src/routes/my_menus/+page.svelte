@@ -1,6 +1,8 @@
 <script>
+    import { stopPropagation } from 'svelte/legacy';
+
     import { currentUser, pb } from '/src/lib/pocketbase.js';
-    import { afterUpdate, onMount } from 'svelte';
+    import { onMount } from 'svelte';
     import Menu from "/src/lib/components/menu.svelte";
     import { get_grocery_list, trim_verbs } from '/src/lib/merge_ingredients.js';
     import DeleteIcon from "/src/lib/icons/DeleteIcon.svelte";
@@ -9,14 +11,20 @@
 
 
     
-    $: user_menus = [];
-    $: modal_menu = [];
-    $: loading = true;
-    $: sort_val = "Most Recent";
+    let user_menus = $state([]);
+    
+    let modal_menu = $state([]);
+    
+    let loading = $state(true);
+    
+    let sort_val = $state("Most Recent");
+    
     let delay_timer;
     let sort_opts = ["Least Recipes", "Most Recipes", "Least Ingredients", "Most Ingredients", "Least Servings", "Most Servings", "Least Time", "Most Time", "Most Recent", "Least Recent"];
-    $: search_val = "";
-    $: no_results_found = false;
+    let search_val = $state("");
+    
+    let no_results_found = $state(false);
+    
 
     onMount(async () => {
         if (!$currentUser) window.location.href = "/login";
@@ -308,21 +316,21 @@
             <div class="flex w-fit space-x-6 items-center">
                 <div class="form-control w-full max-w-xs">
                     <label class="input input-bordered input-sm input-primary flex items-center gap-2 pr-2">
-                        <input type="text" class="input h-full p-0" placeholder="Search" on:keyup={search} bind:value={search_val}/>
-                        <div class="w-5" on:click={()=>{search_val = ""; search();}}>
+                        <input type="text" class="input h-full p-0" placeholder="Search" onkeyup={search} bind:value={search_val}/>
+                        <button class="w-5" onclick={()=>{search_val = ""; search();}} onkeydown={()=>{search_val = ""; search();}}>
                             {#if search_val}
                                 <Clear size="w-4 h-4"/>
                             {/if}
-                        </div>
+                        </button>
                     </label>
                 </div>
                 <div class="w-full flex space-x-1 text-xs"><div id="user_menus_length">{user_menus.length}</div><div>Menus</div></div>
             </div>
             <div class="dropdown dropdown-top md:dropdown-bottom dropdown-end">
-                <label tabindex="0" class="btn m-1 btn-primary btn-xs md:btn-sm">{sort_val}</label>
-                <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-max bg-primary">
+                <label tabindex="-1" for="sort" class="btn m-1 btn-primary btn-xs md:btn-sm">{sort_val}</label>
+                <ul tabindex="-1" name="sort" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-max bg-primary">
                     {#each sort_opts as opt}
-                        <li class="btn btn-xs {opt == sort_val ? 'btn-neutral': 'btn-primary'}"><a on:click={() => {sort_val = opt; document.activeElement.blur(); sort_menus()}}>{opt}</a></li>
+                        <li class="btn btn-xs {opt == sort_val ? 'btn-neutral': 'btn-primary'}"><button onclick={() => {sort_val = opt; document.activeElement.blur(); sort_menus()}}>{opt}</button></li>
                     {/each}
                 </ul>
             </div>
@@ -339,7 +347,7 @@
                 <div class="text-center flex flex-col justify-center items-center space-y-5 mx-2 md:mx-auto md:text-4xl h-full w-full"><span class="loading loading-bars loading-lg"></span></div>
             {:else}
                 {#each user_menus as curr, i}
-                    <div id={user_menus[i].id} class="card md:card-side card-bordered bg-base-200 shadow-xl h-24 my-1.5 mx-1 cursor-pointer" on:click={show_menu_modal} on:keypress={show_menu_modal}>
+                    <div id={user_menus[i].id} class="card md:card-side card-bordered bg-base-200 shadow-xl h-24 my-1.5 mx-1 cursor-pointer" onclick={show_menu_modal} onkeypress={show_menu_modal}>
                         <figure class="md:w-2/3">
                             {#each user_menus[i].expand.recipes as recipe, j}
                                     <img class="w-16 md:w-20" src={user_menus[i].expand.recipes[j].image} alt={user_menus[i].expand.recipes[j].title}/>
@@ -359,7 +367,7 @@
                                 </div>
                             </div>
                             <div class="flex conten-center items-center">
-                                <button id={user_menus[i].id} class="btn btn-sm p-1 btn-accent"  on:click|stopPropagation={delete_menu}><DeleteIcon/></button>
+                                <button id={user_menus[i].id} class="btn btn-sm p-1 btn-accent"  onclick={stopPropagation(delete_menu)}><DeleteIcon/></button>
                             </div>
                         </div>
                     </div>
@@ -370,8 +378,8 @@
             <div class="flex w-fit space-x-6 items-center">
                 <div class="form-control w-full max-w-xs">
                     <label class="input input-bordered input-xs input-primary flex items-center gap-2 pr-0">
-                        <input type="text" class="input h-full p-0" placeholder="Search" on:keyup={search} bind:value={search_val}/>
-                        <div class="w-5" on:click={()=>{search_val = ""; search();}}>
+                        <input type="text" class="input h-full p-0" placeholder="Search" onkeyup={search} bind:value={search_val}/>
+                        <div class="w-5" onclick={()=>{search_val = ""; search();}}>
                             {#if search_val}
                                 <Clear size="w-3 h-3"/>
                             {/if}
@@ -388,7 +396,7 @@
                         {#if opt == sort_val}
                         <li class="btn btn-xs btn-secondary"><a>{opt}</a></li>
                         {:else}
-                        <li class="btn btn-xs btn-primary"><a on:click={(e) => {sort_val = e.currentTarget.innerHTML; sort_menus();}}>{opt}</a></li>
+                        <li class="btn btn-xs btn-primary"><a onclick={(e) => {sort_val = e.currentTarget.innerHTML; sort_menus();}}>{opt}</a></li>
                         {/if}
                     {/each}
                 </ul>
@@ -416,7 +424,7 @@
     </div>
     <div id="desktop_menu" class="hidden md:flex w-1/2">
         {#if modal_menu.id}
-            <Menu title={modal_menu.title} menu={modal_menu.expand.recipes} mults={modal_menu.servings} sub_recipes={modal_menu.sub_recipes} id={modal_menu.id}/>
+            <Menu title={modal_menu.title} menu={modal_menu.expand.recipes} mults={modal_menu.servings} menu_title={modal_menu.title} sub_recipes={modal_menu.sub_recipes} id={modal_menu.id}/>
         {/if}
     </div>
 </div>
