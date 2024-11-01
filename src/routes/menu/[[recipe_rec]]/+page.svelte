@@ -83,6 +83,7 @@
     }
 
     function update_mult(e){
+        console.log("update_mult", mults[e.detail.id], e.detail.mult);
         mults[e.detail.id] = e.detail.mult;
     }
 
@@ -117,12 +118,15 @@
                     <RecipeList recipes={user_recipes} 
                         on:update_view={update_view} on:update_edit={update_edit} on:reset_mode={reset_mode} on:check_item={check_item}/>
                 </div>
+                <!-- --------------
+                MOBILE ONLY SECTION
+                -------------- -->
                 <details class="md:hidden collapse bg-base-200 md:bg-base-100 collapse-arrow mt-1 w-full md:w-1/2" onclick={() => {window.scrollBy({ top: 700, left: 0, behavior: "smooth"});}}>
                     <summary class="collapse-title text-xl font-medium">
                         {#if menu_recipes.length > 0}
                             <div class="flex justify-around m-1 items-center">
                                 <p class="text-xs">{menu_recipes.length} recipes</p>
-                                <p class="text-xs">{total_servings} servings</p>
+                                <p class="text-xs">{total_servings} servings </p>
                                 <p class="text-xs">{get_total_time(menu_recipes)}</p>
                             </div>
                         {:else}
@@ -131,7 +135,7 @@
                     </summary>
                     <div id="right_column" class="collapse-content w-full">
                         {#if menu_recipes.length}
-                            <Menu title="New Menu" menu={menu_recipes} {mults} {page} on:update_mult={update_mult} on:update_title={update_title} {menu_title}/>
+                            <Menu title="New Menu" menu={menu_recipes} {mults} {page} on:update_mult={update_mult} on:update_title={update_title} {menu_title} {total_servings}/>
                         {:else}
                             <div class="flex flex-col justify-center items-center space-y-5 mx-2 md:mx-auto p-5 rounded-md shadow-md  md:text-xl max-w-5xl">
                                 <p>select recipes to add to your menu</p>
@@ -139,9 +143,12 @@
                         {/if}
                     </div>
                 </details>
+                 <!-- --------------
+                END MOBILE ONLY SECTION
+                -------------- -->
                 <div id="right_column" class="hidden md:flex md:w-1/2">
                     {#if menu_recipes.length}
-                        <Menu title="New Menu" menu={menu_recipes} {mults} {page} on:update_mult={update_mult} {menu_title}/>
+                        <Menu title="New Menu" menu={menu_recipes} {mults} {page} on:update_mult={update_mult} {menu_title} {total_servings}/>
                     {:else}
                         <div class="flex h-full justify-center w-full items-center">
                             <div class="flex flex-col justify-center content-center h-fit p-16 rounded-md shadow-md md:text-xl max-w-5xl">

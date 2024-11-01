@@ -24,11 +24,12 @@
         id = $bindable(null),
         mults = $bindable(),
         sub_recipes = $bindable(),
-        menu_title = $bindable()
+        menu_title = $bindable(),
+        total_servings = $bindable()
     } = $props();
     let tab = $state("recipe_list");
     let grocery_list = $derived(get_grocery_list(menu, mults, sub_recipes));
-    let num_servings = $derived(get_servings(menu, sub_recipes, mults));
+    // let num_servings = $derived(get_servings(menu, sub_recipes, mults));
     let total_time = $derived(get_total_time(menu));
     const dispatch = createEventDispatcher();
     let overflow_len = ``;
@@ -221,6 +222,7 @@
     }
 
     function update_mult(e){
+        console.log("update_mult", {id: e.srcElement.id, mult: e.srcElement.value});
         dispatch('update_mult', {id: e.srcElement.id, mult: e.srcElement.value});
     }
 
@@ -254,7 +256,7 @@
     </div>
     <div class="flex justify-around m-1 items-center">
         <p class="text-xs">{menu.length} recipes</p>
-        <p class="text-xs">{num_servings} servings</p>
+        <p class="text-xs">{total_servings} servings menu</p>
         <p class="text-xs">{total_time}</p>
     </div>
     
