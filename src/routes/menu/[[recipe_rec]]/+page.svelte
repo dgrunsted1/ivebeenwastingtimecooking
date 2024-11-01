@@ -17,7 +17,7 @@
     let edit_recipe = $state();
     let edit_modal_recipe = $state(false);
     let loading = $state(true);
-    let total_servings = $derived(get_servings(menu_recipes, mults));
+    let total_servings = $derived(get_servings(menu_recipes, {}, mults));
     let menu_title = $state("New Menu");
     
 
@@ -164,9 +164,9 @@
                             </form>
                             {#if edit_recipe}
                                 {#if edit_modal_recipe}
-                                    <EditRecipe recipe={edit_recipe} on:update_edit={update_edit} on:done_editing={() => edit_modal_recipe = false}/>
+                                    <!-- <EditRecipe recipe={edit_recipe} on:update_edit={update_edit} on:done_editing={() => edit_modal_recipe = false}/> -->
                                 {:else}
-                                    <DisplayRecipe recipe={edit_recipe} on:edit_recipe={()=>{edit_modal_recipe = true}}/>
+                                    <!-- <DisplayRecipe recipe={edit_recipe} on:edit_recipe={()=>{edit_modal_recipe = true}}/> -->
                                 {/if}
                             {/if}
                         </div>
