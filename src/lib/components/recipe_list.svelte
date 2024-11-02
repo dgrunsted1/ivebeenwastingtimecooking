@@ -40,10 +40,7 @@
             let index = e.currentTarget.getElementsByTagName("h2")[0].id;
             for (let i = 0; i < display_recipes.length; i++){
                 if (display_recipes[i].id == index){
-                    display_recipes[i].mode = `edit`;
                     dispatch(`update_edit`, {index: index});
-                } else {
-                    display_recipes[i].mode = null;
                 }
             }
         }
