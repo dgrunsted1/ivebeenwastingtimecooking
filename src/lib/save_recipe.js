@@ -39,8 +39,9 @@ export async function save_recipe(e, recipe, user, new_note) {
         "favorite": recipe.favorite
     };
     if (note_ids.length) data.notes = note_ids;
+    let recipe_result;
     if (recipe.id){
-        recipe = await pb.collection('recipes').update(recipe.id, data, {expand: "notes,ingr_list"});
+        recipe_result = await pb.collection('recipes').update(recipe.id, data, {expand: "notes,ingr_list"});
     }else {
         data.user = user.id;
         data.url = recipe.url;
@@ -53,7 +54,7 @@ export async function save_recipe(e, recipe, user, new_note) {
     
     
     e.srcElement.innerHTML = "saved";
-    return recipe;
+    return recipe_result;
 }
 
 function get_mins(time_in){

@@ -101,6 +101,18 @@
     function update_title(e){
         menu_title = e.detail.title;
     }
+
+    function update_recipe(e){
+        for (let i = 0; i < user_recipes.length; i++){
+            if (user_recipes[i].id == e.detail.recipe.id){
+                // $state.snapshot(user_recipes[i])
+                console.log("e.detail.recipe", e.detail.recipe)
+                // $state.snapshot(edit_recipe)
+                user_recipes[i] = e.detail.recipe;
+                edit_recipe = e.detail.recipe.id;
+            }
+        }
+    }
 </script>
 
 <svelte:head>
@@ -164,9 +176,9 @@
                             </form>
                             {#if edit_recipe}
                                 {#if edit_modal_recipe}
-                                    <EditRecipe recipe={edit_recipe} on:update_edit={update_edit} on:done_editing={() => edit_modal_recipe = false}/>
+                                    <EditRecipe recipe={edit_recipe} on:update_edit={update_edit} on:update_recipe={update_recipe} on:done_editing={() => edit_modal_recipe = false}/>
                                 {:else}
-                                    <DisplayRecipe recipe={edit_recipe} on:edit_recipe={()=>{edit_modal_recipe = true}}/>
+                                    <DisplayRecipe bind:recipe={edit_recipe} on:edit_recipe={()=>{edit_modal_recipe = true}}/>
                                 {/if}
                             {/if}
                         </div>

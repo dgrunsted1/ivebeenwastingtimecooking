@@ -90,19 +90,20 @@
         <div>
             <div class="text-sm">Ingredients</div>
             <div id="ingredient_list" class="flex flex-col m-2 border rounded-md w-fit m-auto py-1">
-                
-                {#each recipe.expand.ingr_list as ingr, i}
-                    {#if ingr}
-                        <div class="ingr_row flex w-full space-x-1 items-center px-5">
-                            <div class="ingr_amount text-xs md:text-sm my-1 text-center md:w-9">{ingr.quantity ? ingr.quantity : ""}</div>
-                            <div class="ingr_unit md:w-24 text-center text-xs md:text-sm my-1">{ingr.unit ? ingr.unit : ""}</div>
-                            <div class="ingr_name md:w-7/10 text-xs md:text-sm">{ingr.ingredient ? ingr.ingredient : ""}</div>
-                        </div>
-                    {/if}
-                    {#if i < recipe.expand.ingr_list.length - 1}
-                        <hr class="mx-3"/>
-                    {/if}
-                {/each}
+                {#if recipe.expand && recipe.expand.ingr_list}
+                    {#each recipe.expand.ingr_list as ingr, i}
+                        {#if ingr}
+                            <div class="ingr_row flex w-full space-x-1 items-center px-5">
+                                <div class="ingr_amount text-xs md:text-sm my-1 text-center md:w-9">{ingr.quantity ? ingr.quantity : ""}</div>
+                                <div class="ingr_unit md:w-24 text-center text-xs md:text-sm my-1">{ingr.unit ? ingr.unit : ""}</div>
+                                <div class="ingr_name md:w-7/10 text-xs md:text-sm">{ingr.ingredient ? ingr.ingredient : ""}</div>
+                            </div>
+                        {/if}
+                        {#if i < recipe.expand.ingr_list.length - 1}
+                            <hr class="mx-3"/>
+                        {/if}
+                    {/each}
+                {/if}
             </div>
         </div>
         
@@ -121,7 +122,7 @@
             </div>
         </div>
         
-        {#if recipe.expand.notes}
+        {#if recipe.expand && recipe.expand.notes}
             <div>Notes</div>
             {#each recipe.expand.notes as note, i}
                 <div class="notes_container flex items-center justify-center">

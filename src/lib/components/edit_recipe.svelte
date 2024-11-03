@@ -22,14 +22,14 @@
 
     /** @type {Props} */
     let {
-        recipe = $bindable(),
+        recipe,
         index,
         save = $bindable(false),
         show_alert,
         loading
     } = $props();
     let dispatch = createEventDispatcher();
-    let edited_recipe = $state(recipe);
+    let edited_recipe = $state(JSON.parse(JSON.stringify(recipe)));
     let categories = $state([]);
     
     let display_categories = $state([]);
