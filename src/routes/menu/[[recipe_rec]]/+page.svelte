@@ -13,8 +13,8 @@
     let menu_recipes = $derived(user_recipes.filter(r => r.checked));
     let mults = $state({});
     let mode = "menu";
-    let view_recipe;
-    let edit_recipe = $state();
+    let edit_id = $state("");
+    let edit_recipe = $derived(user_recipes.filter(r => r.id == edit_id)[0]);
     let edit_modal_recipe = $state(false);
     let loading = $state(true);
     let total_servings = $derived(get_servings(menu_recipes, {}, mults));
@@ -44,46 +44,22 @@
     });
 
     function update_edit(e){
-        view_recipe = null;
         if (e.detail.index != -1) {
-            for (let curr of user_recipes){
-                if (curr.id == e.detail.index){
-                    edit_recipe = curr;
-                    continue;
-                }
-            }
+            edit_id = e.detail.index;
             my_modal_3.showModal();
             mode = "edit";
         }else {
-            edit_recipe = null;
-            mode = "menu";
-        }
-    }
-
-    function update_view(e){
-        edit_recipe = null;
-        if (e.detail.index != -1){
-            for (let curr of user_recipes){
-                if (curr.id == e.detail.index){
-                    view_recipe = curr;
-                    continue;
-                }
-            }
-            mode = "view";
-        }else {
-            view_recipe = null;
+            edit_id = "";
             mode = "menu";
         }
     }
 
     function reset_mode(){
         mode = "menu";
-        view_recipe = null;
-        edit_recipe = null;
+        edit_id = "";
     }
 
     function update_mult(e){
-        console.log("update_mult", mults[e.detail.id], e.detail.mult);
         mults[e.detail.id] = e.detail.mult;
     }
 
@@ -105,11 +81,9 @@
     function update_recipe(e){
         for (let i = 0; i < user_recipes.length; i++){
             if (user_recipes[i].id == e.detail.recipe.id){
-                // $state.snapshot(user_recipes[i])
-                console.log("e.detail.recipe", e.detail.recipe)
-                // $state.snapshot(edit_recipe)
+                e.detail.recipe.checked = user_recipes[i].checked;
                 user_recipes[i] = e.detail.recipe;
-                edit_recipe = e.detail.recipe.id;
+                break;
             }
         }
     }
@@ -128,7 +102,7 @@
             <div id="content" class="flex flex-col md:flex-row   mt-0 md:space-x-3 md:w-full">
                 <div id="left_column" class="md:w-1/2">
                     <RecipeList recipes={user_recipes} 
-                        on:update_view={update_view} on:update_edit={update_edit} on:reset_mode={reset_mode} on:check_item={check_item}/>
+                        on:update_edit={update_edit} on:reset_mode={reset_mode} on:check_item={check_item}/>
                 </div>
                 <!-- --------------
                 MOBILE ONLY SECTION
@@ -172,13 +146,13 @@
                 <dialog id="my_modal_3" class="modal">
                         <div class="modal-box max-w-full md:w-2/3 p-1 h-[90svh]">
                             <form method="dialog">
-                                <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" onclick={()=>{edit_recipe = null}}>✕</button>
+                                <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" onclick={()=>{edit_id = ""; edit_modal_recipe = false}}>✕</button>
                             </form>
                             {#if edit_recipe}
                                 {#if edit_modal_recipe}
                                     <EditRecipe recipe={edit_recipe} on:update_edit={update_edit} on:update_recipe={update_recipe} on:done_editing={() => edit_modal_recipe = false}/>
                                 {:else}
-                                    <DisplayRecipe bind:recipe={edit_recipe} on:edit_recipe={()=>{edit_modal_recipe = true}}/>
+                                    <DisplayRecipe recipe={edit_recipe} on:edit_recipe={()=>{edit_modal_recipe = true}}/>
                                 {/if}
                             {/if}
                         </div>

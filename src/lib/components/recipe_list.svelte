@@ -213,7 +213,7 @@
                 update_selected_cats(selected_cat, clicked, type_cat);
             }
 
-            dispatch(`reset_mode`, {index: -1});
+            dispatch(`reset_mode`);
             document.getElementById("menu_loading").classList.add('hidden');
         }, delay_time);
     }
@@ -323,8 +323,8 @@
                     </div>
                     <div class="card-actions flex flex-col justify-evenly items-end items-center  py-1">
                         <div class="flex w-fit space-x-1">
-                            <button id={display_recipes[i].id} class="btn btn-xs  p-1 made flex content-center" onclick={update_fave_made_queue(e, "made")}><ThumbUp color={(display_recipes[i].made) ? "fill-primary" : "fill-neutral"}/></button>
-                            <button id={display_recipes[i].id} class="btn btn-xs p-1 favorite flex content-center" onclick={update_fave_made_queue(e, "favorite")}><Heart color={(display_recipes[i].favorite) ? "fill-primary" : "fill-neutral"}/></button>
+                            <button id={display_recipes[i].id} class="btn btn-xs  p-1 made flex content-center" onclick={(e) => {update_fave_made_queue(e, "made")}}><ThumbUp color={(display_recipes[i].made) ? "fill-primary" : "fill-neutral"}/></button>
+                            <button id={display_recipes[i].id} class="btn btn-xs p-1 favorite flex content-center" onclick={(e) => {update_fave_made_queue(e, "favorite")}}><Heart color={(display_recipes[i].favorite) ? "fill-primary" : "fill-neutral"}/></button>
                         </div>
                         <div class="flex w-fit space-x-2">
                             <input type="checkbox" onclick={check_item} class="checkbox checkbox-primary checkbox-lg p-1" id={display_recipes[i].id} checked={display_recipes[i].checked}>

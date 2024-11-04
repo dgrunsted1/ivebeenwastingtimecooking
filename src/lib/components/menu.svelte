@@ -36,6 +36,8 @@
     let basic_words = ['and', 'the', 'of', 'with', 'recipe'];
     let delay_timer;
     let title_lock = $state(false);
+    let save_menu_load = $state(false);
+    let save_menu_today_load = $state(false);
 
     onMount(async () => {
         overflow_len = ($page.url.pathname == "/menu") ? `max-h-[60vh]` : `max-h-[60vh]`;
@@ -168,12 +170,19 @@
     }
 
     async function save_and_set_today(e){
-        save_menu(e);
-        set_todays_menu();
+        save_menu_today_load = true;
+        await save_menu(e);
+        await set_todays_menu();
+        window.location.href = "/today";
+    }
+
+    async function save_menu_handle(e) {
+        save_menu_load = true;
+        await save_menu(e);
+        save_menu_load = false;
     }
 
     async function save_menu(e){
-        e.srcElement.innerHTML = '<span class="loading loading-dots loading-md mx-7"></span>';
         let recipe_ids = [];
         let made = {};
         for (let i = 0; i < menu.length; i++){
@@ -191,8 +200,6 @@
         };
         const record = await pb.collection('menus').create(data);
         id = record.id;
-        e.srcElement.innerHTML = 'save menu';
-        e.srcElement.disabled = true;
     }
     
     async function set_todays_menu(){
@@ -214,7 +221,6 @@
             "complete": false
         };
         const menu_log_result = await pb.collection('menu_log').create(menu_log_data);
-        window.location.href = "/today";
     }
 
     function close_modal(){
@@ -222,7 +228,6 @@
     }
 
     function update_mult(e){
-        console.log("update_mult", {id: e.srcElement.id, mult: e.srcElement.value});
         dispatch('update_mult', {id: e.srcElement.id, mult: e.srcElement.value});
     }
 
@@ -240,8 +245,20 @@
             <div class="dropdown dropdown-end">
                 <label tabindex="-1" for="save_menu" class="btn m-1 btn-primary btn-xs md:btn-sm">save menu</label>
                 <ul tabindex="-1" name="save_menu" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-max bg-primary">
-                    <li class="btn btn-xs btn-primary p-0"><button class="p-0" onclick={save_menu}>save menu</button></li>
-                    <li class="btn btn-xs btn-primary p-0"><button class="p-0" onclick={save_and_set_today}>save and set today</button></li>
+                    <li class="btn btn-xs btn-primary p-0"><button class="p-0" onclick={save_menu_handle}>
+                        {#if save_menu_load}
+                            <span class="loading loading-dots loading-md mx-7"></span>
+                        {:else}
+                            save menu
+                        {/if}
+                        </button></li>
+                    <li class="btn btn-xs btn-primary p-0"><button class="p-0" onclick={save_and_set_today}>
+                        {#if save_menu_today_load}
+                            <span class="loading loading-dots loading-md mx-7"></span>
+                        {:else}
+                            save and set today
+                        {/if}
+                        </button></li>
                 </ul>
             </div>
         {:else if $page.url.pathname == "/my_menus"}
