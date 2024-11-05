@@ -39,10 +39,10 @@ export const update_grocery_list = async function(grocery_list, id){
     let item_filter = "";
     // get ids of currently store items and create new items
     for (let i = 0; i < grocery_list.length; i++) {
-        if (grocery_list[i].id){
+        if (grocery_list[i].id && grocery_list[i].edited){
             item_ids.push(grocery_list[i].id);
             item_filter += (item_filter) ? ` || id = '${grocery_list[i].id}'` : `id = '${grocery_list[i].id}'`;
-        } else if (grocery_list[i].name && grocery_list[i].name != "\n"){
+        } else if (grocery_list[i].name && grocery_list[i].name != "\n" && grocery_list[i].edited){
             const data_item = {
                 "qty": grocery_list[i].qty,
                 "unit": grocery_list[i].unit,
@@ -54,15 +54,17 @@ export const update_grocery_list = async function(grocery_list, id){
                 ],
                 "active": true
             };
-        
+            console.log("create", data_item)
             const record_item = await pb.collection('grocery_items').create(data_item);
             grocery_list[i] = record_item;
             new_items.push(record_item.id);
         }
     }
+    console.log("getList", item_filter)
     const items_result = await pb.collection('grocery_items').getList(1, 50, {filter:item_filter})
     for (let i = 0; i < items_result.items.length; i++) {
         for (let j = 0; j < grocery_list.length; j++) {
+            // if (!grocery_list[j].edited) continue;
             if (grocery_list[j].id == items_result.items[i].id){
                 let data_item = {};
                 if (grocery_list[j].qty != items_result.items[i].qty){
@@ -84,6 +86,7 @@ export const update_grocery_list = async function(grocery_list, id){
                     data_item.ingrs = grocery_list[j].ingrs;
                 }
                 if (Object.keys(data_item).length) {
+                    console.log("update", data_item)
                     const record_item = await pb.collection('grocery_items').update(items_result.items[i].id, data_item);
                 }
             }
@@ -104,9 +107,11 @@ export const update_grocery_item = async function(item){
         "active": true
     };
     if (item.id){
+        console.log("update", data, item)
         const updated_record = await pb.collection('grocery_items').update(item.id, data);
         return updated_record;
     } else {
+        console.log("create", data)
         const new_record = await pb.collection('grocery_items').create(data);
         return new_record;
     }
@@ -166,4 +171,14 @@ export const log_made = async function(recipe_id, user_id){
         return false;
     }
     return true;
+}
+
+export const check_grocery_item = async function(id, checked){
+    console.log("check_grocery_item", id, checked)
+    const data = {
+        "checked": checked
+    };
+
+    const record = await pb.collection('grocery_items').update(id, data);
+    return record;
 }

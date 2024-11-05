@@ -38,34 +38,12 @@
     let title_lock = $state(false);
     let save_menu_load = $state(false);
     let save_menu_today_load = $state(false);
+    let set_todays_menu_load = $state(false);
 
     onMount(async () => {
         overflow_len = ($page.url.pathname == "/menu") ? `max-h-[60vh]` : `max-h-[60vh]`;
     });
 
-    // const update = () => {
-    //     clearTimeout(delay_timer);
-    //     grocery_list = [];
-
-    //     if (!menu.length){
-    //         if (document.getElementById('save_btn')) document.getElementById('save_btn').disabled = true;
-    //         return;
-    //     } else {
-    //         if (document.getElementById('save_btn')) document.getElementById('save_btn').disabled = false;
-    //     }
-    //     grocery_list = get_grocery_list(menu, mults, sub_recipes);
-
-    //     total_time = get_total_time(menu);
-
-    //     update_sub_recipes();
-
-    //     num_servings = get_servings(menu, sub_recipes, mults);
-
-    //     if (!menu.title || menu.title == "New Menu"){
-    //         menu.title = "New Menu";
-    //         if (menu.length > 1) menu.title = generate_menu_title();
-    //     }
-    // }
     $effect(() => {
         if (!menu_title || menu_title == "New Menu" || !title_lock){
             let title = (menu.length < 2) ? "New Menu" : generate_menu_title();
@@ -202,6 +180,11 @@
         id = record.id;
     }
     
+    async function set_today_handle(e){
+        set_todays_menu_load = true;
+        await set_todays_menu();
+        set_todays_menu_load = false;
+    }
     async function set_todays_menu(){
         const resultList = await pb.collection('menus').getList(1, 1, {
             filter: `user = '${$currentUser.id}' && today = True`,
@@ -262,7 +245,13 @@
                 </ul>
             </div>
         {:else if $page.url.pathname == "/my_menus"}
-            <button class="btn btn-primary self-end btn-xs md:btn-sm" id="today_btn" onclick={set_todays_menu}>set today</button>
+            <button class="btn btn-primary self-end btn-xs md:btn-sm" id="today_btn" onclick={set_today_handle}>
+                {#if set_todays_menu_load}
+                    <span class="loading loading-dots loading-md mx-5"></span>
+                {:else}
+                    set today
+                {/if}
+            </button>
         {/if}
     </div>
     <div class="flex content-center">

@@ -71,13 +71,20 @@
         }
     }
 
-    const edit_item = () => {
-        if (status == "edited") return;
-        status = "edited";
+    const check_item_handle = (e) => {
+        let id = e.currentTarget.id;
+        let value = e.currentTarget.checked;
+        console.log("check_item_handle", id, value);
+        dispatch("check_grocery_item", {id: id, value: value});
+    }
+
+    const edit_item = (e) => {
+        console.log("edit_item", e.currentTarget.parentNode.id);
+        const id = e.currentTarget.parentNode.id;
         clearTimeout(delay_timer);
         delay_timer = setTimeout(function() {
-            dispatch("update_grocery_list", {grocery_list: grocery_list});
-        }, 2000);
+            dispatch("update_grocery_item", {id: id});
+        }, 500);
     }
 
     const reset_list = () => {
@@ -157,7 +164,7 @@
             {#if grocery_list.length > 0}
                 {#each grocery_list as item, i}
                     {#if edit}
-                        <div class="grocery_item flex relative my-1 tooltip {(i > 2) ? "tooltip-top": "tooltip-bottom"} space-x-2 justify-center items-center z-10" data-tip={ingrs_to_string(item.expand.ingrs)}>
+                        <div id={item.id} class="grocery_item flex relative my-1 tooltip {(i > 2) ? "tooltip-top": "tooltip-bottom"} space-x-2 justify-center items-center z-10" data-tip={ingrs_to_string(item.expand.ingrs)}>
                             <input type="text" class="amount input input-bordered input-xs px-1 mr-1 w-8 text-center h-fit" bind:value={item.qty} onkeyup={edit_item}>
                             <input type="text" class="unit input input-bordered input-xs px-1 mr-1 w-20 text-center h-fit" bind:value={item.unit} onkeyup={edit_item}>
                             <textarea class="name input input-bordered input-xs px-1 mr-1 w-3/4 h-fit" bind:value={item.name} onkeyup={edit_item} onkeypress={enter_new_item} bind:this={item.input}></textarea>
@@ -165,9 +172,9 @@
                         </div>
                     {:else}
                         <div class="grocery_item flex relative my-2 tooltip {(i > 2) ? "tooltip-top": "tooltip-bottom"} space-x-3 justify-end md:justify-start items-center z-100" data-tip={ingrs_to_string(item.expand.ingrs)}>
-                            {#if status != "none"}<input type="checkbox" class="hidden md:flex checkbox checkbox-primary checkbox-lg p-1" id="{item.name}" bind:checked={item.checked} onchange={edit_item}>{/if}
+                            {#if status != "none"}<input type="checkbox" class="hidden md:flex checkbox checkbox-primary checkbox-lg p-1" id={item.id} bind:checked={item.checked} onchange={check_item_handle}>{/if}
                             <p class="text-xs md:text-left -indent-5 pl-5">{ingrs_to_string([item])}</p>
-                            {#if status != "none"}<input type="checkbox" class="md:hidden checkbox checkbox-primary checkbox-lg p-1" id="{item.name}" bind:checked={item.checked} onchange={edit_item}>{/if}
+                            {#if status != "none"}<input type="checkbox" class="md:hidden checkbox checkbox-primary checkbox-lg p-1" id={item.id} bind:checked={item.checked} onchange={check_item_handle}>{/if}
                         </div>
                     {/if}
                 {/each} 
