@@ -398,24 +398,24 @@
                 <div class="form-control w-full max-w-xs">
                     <label class="input input-bordered input-xs input-primary flex items-center gap-2 pr-0">
                         <input type="text" class="input h-full p-0" placeholder="Search" onkeyup={search} bind:value={search_val}/>
-                        <div class="w-5" onclick={()=>{search_val = ""; search();}}>
+                        <button class="w-5" onclick={()=>{search_val = ""; search();}}>
                             {#if search_val}
                                 <Clear size="w-3 h-3"/>
                             {/if}
-                        </div>
+                        </button>
                     </label>
                 </div>
                 <div class="w-full flex space-x-1 text-xs"><div id="user_menus_length">{user_menus.length}</div><div>Menus</div></div>
             </div>
             
             <div class="dropdown dropdown-top dropdown-end">
-                <label tabindex="0" class="btn m-1 btn-primary btn-xs md:btn-sm">Sort</label>
-                <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-max bg-primary">
+                <label tabindex="-1" for="sort" class="btn m-1 btn-primary btn-xs md:btn-sm">Sort</label>
+                <ul tabindex="-1" name="sort" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-max bg-primary">
                     {#each sort_opts as opt}
                         {#if opt == sort_val}
-                        <li class="btn btn-xs btn-secondary"><a>{opt}</a></li>
+                        <li class="btn btn-xs btn-secondary"><div>{opt}</div></li>
                         {:else}
-                        <li class="btn btn-xs btn-primary"><a onclick={(e) => {sort_val = e.currentTarget.innerHTML; sort_menus();}}>{opt}</a></li>
+                        <li class="btn btn-xs btn-primary"><button onclick={(e) => {sort_val = e.currentTarget.innerHTML; sort_menus();}}>{opt}</button></li>
                         {/if}
                     {/each}
                 </ul>
