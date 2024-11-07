@@ -29,17 +29,16 @@
     let cuisines = $state([]);
     let authors = $state([]);
     let sort_opts = ["Least Ingredients", "Most Ingredients", "Least Servings", "Most Servings", "Least Time", "Most Time", "Most Recent", "Least Recent"];
-    let web_sites = [];
     let delay_timer;
 
 
-    let selected_category = $state(null);
+    let selected_category = $state("");
   
-    let selected_country = $state(null);
+    let selected_country = $state("");
   
-    let selected_cuisine = $state(null);
+    let selected_cuisine = $state("");
   
-    let selected_author = $state(null);
+    let selected_author = $state("");
   
 
     let loading = $state(true);
@@ -208,6 +207,10 @@
         loading = false;
 	});
 
+    $effect(() => {
+        console.log(selected_category, selected_country, selected_cuisine, selected_author);
+    });
+
   async function select_cat(e){
     loading = true;
     if (e.currentTarget.firstChild.innerHTML == 'category') {
@@ -337,25 +340,25 @@
   <div class="flex w-full justify-center flex-col md:flex-row md:mt-2 space-y-1 md:space-y-2">
     <div class="hidden md:flex flex-row md:flex-col mx-1 space-x-1 md:space-x-0 md:space-y-2">
         <select bind:value={selected_category} onchange={select_cat} class="select select-sm select-bordered border-primary w-full max-w-xs pl-1">
-            <option value={null}>category</option>
+            <option value="">Category</option>
             {#each categories as curr}
                 <option>{curr.id}</option>
             {/each}
         </select>
         <select bind:value={selected_country} onchange={select_cat} class="select select-sm select-bordered border-primary w-full max-w-xs pl-1">
-            <option value={null}>country</option>
+            <option value="">Country</option>
             {#each countries as curr}
                 <option>{curr.id}</option>
             {/each}
         </select>
         <select bind:value={selected_cuisine} onchange={select_cat} class="select select-sm select-bordered border-primary w-full max-w-xs pl-1">
-            <option value={null}>cuisine</option>
+            <option value="">Cuisine</option>
             {#each cuisines as curr}
                 <option>{curr.id}</option>
             {/each}
         </select>
         <select bind:value={selected_author} onchange={select_cat} class="select select-sm select-bordered border-primary w-full max-w-xs pl-1">
-            <option value={null}>author</option>
+            <option value="">Author</option>
             {#each authors as curr}
                 <option>{curr.id}</option>
             {/each}

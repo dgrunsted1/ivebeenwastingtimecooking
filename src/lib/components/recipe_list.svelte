@@ -234,7 +234,7 @@
 
     function update_fave_made_queue(e, click){
         e.stopPropagation();
-        display_recipes[i][click] = !display_recipes[i][click]
+        // display_recipes[i][click] = !display_recipes[i][click]
         update_fave_made_list.push(e.srcElement.id);
         clearTimeout(delay_timer);
         delay_timer = setTimeout(async () => {

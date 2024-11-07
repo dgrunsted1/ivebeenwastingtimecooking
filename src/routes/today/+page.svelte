@@ -216,7 +216,7 @@
                                         {/each}
                                     {/each}
                                 {/if}
-                                <div class="card card-bordered sm:card-side bg-base-200 shadow-xl max-h-24 my-1.5 mx-1 cursor-pointer" onclick={recipes_ready.includes(curr.id) ? window.location = `/cook_recipe/${curr.url_id}/${todays_menu.servings[curr.id]}` : ""} onkeydown={window.location = `/cook_recipe/${curr.url_id}/${todays_menu.servings[curr.id]}`}>
+                                <div class="card card-bordered sm:card-side bg-base-200 shadow-xl max-h-24 my-1.5 mx-1 cursor-pointer" onclick={window.location = `/cook_recipe/${curr.url_id}/${todays_menu.servings[curr.id]}`} onkeydown={window.location = `/cook_recipe/${curr.url_id}/${todays_menu.servings[curr.id]}`}>
                                     <figure class="md:w-3/5 "><img src={curr.image} alt={curr.title}/></figure>
                                     <div class="card-body max-h-full flex flex-row p-2 items-center w-full">
                                         <p id={i} class="w-1/2 text-xs">{curr.title}</p>

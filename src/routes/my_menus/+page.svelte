@@ -18,7 +18,7 @@
     let loading = $state(true);
     
     let sort_val = $state("Most Recent");
-    
+    let total_servings = $derived(get_servings(modal_menu.expand.recipes, {}, modal_menu.servings));
     let delay_timer;
     let sort_opts = ["Least Recipes", "Most Recipes", "Least Ingredients", "Most Ingredients", "Least Servings", "Most Servings", "Least Time", "Most Time", "Most Recent", "Least Recent"];
     let search_val = $state("");
@@ -319,6 +319,10 @@
         }
         return 0;
     }
+
+    function update_mult(e){
+        modal_menu.servings[e.detail.id] = e.detail.mult;
+    }
 </script>
 
 <svelte:head>
@@ -425,7 +429,7 @@
             {#if modal_menu.id}
                 <form method="dialog" class="modal-box max-w-full md:w-2/3 p-1">
                     <button class="btn btn-xs p-2 flex content-center fixed top-1 right-1">x</button>
-                    <Menu title={modal_menu.title} menu={modal_menu.expand.recipes} mults={modal_menu.servings} sub_recipes={modal_menu.sub_recipes} id={modal_menu.id}/>
+                    <Menu title={modal_menu.title} menu={modal_menu.expand.recipes} mults={modal_menu.servings} sub_recipes={modal_menu.sub_recipes} id={modal_menu.id} menu_title={modal_menu.title} {total_servings} on:update_mult={update_mult}/>
                 </form>
                 <form method="dialog" class="modal-backdrop">
                     <button>close</button>
@@ -443,7 +447,7 @@
     </div>
     <div id="desktop_menu" class="hidden md:flex w-1/2">
         {#if modal_menu.id}
-            <Menu title={modal_menu.title} menu={modal_menu.expand.recipes} mults={modal_menu.servings} menu_title={modal_menu.title} sub_recipes={modal_menu.sub_recipes} id={modal_menu.id}/>
+            <Menu title={modal_menu.title} menu={modal_menu.expand.recipes} mults={modal_menu.servings} menu_title={modal_menu.title} sub_recipes={modal_menu.sub_recipes} id={modal_menu.id} {total_servings} on:update_mult={update_mult}/>
         {/if}
     </div>
 </div>

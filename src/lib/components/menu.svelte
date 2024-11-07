@@ -262,7 +262,7 @@
     </div>
     <div class="flex justify-around m-1 items-center">
         <p class="text-xs">{menu.length} recipes</p>
-        <p class="text-xs">{total_servings} servings menu</p>
+        <p class="text-xs">{total_servings} servings</p>
         <p class="text-xs">{total_time}</p>
     </div>
     

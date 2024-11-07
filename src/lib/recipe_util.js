@@ -1,4 +1,5 @@
 export const get_servings = function(recipes, sub_recipes, mults){
+    console.log({recipes, sub_recipes, mults});
     let sub_recipe_id_list = [];
     for (let k in sub_recipes){
         for (let i = 0; i < sub_recipes[k].length; i++){
@@ -7,12 +8,16 @@ export const get_servings = function(recipes, sub_recipes, mults){
             }
         }
     }
+    console.log({sub_recipe_id_list});
     let total_serv = 0;
     for (let i = 0; i < recipes.length; i++){
         if (!sub_recipe_id_list.includes(recipes[i].id)){
+            // console.log(mults[recipes[i].id]);
+            console.log(recipes[i].servings);
             total_serv += (mults && mults[recipes[i].id]) ? parseInt(mults[recipes[i].id]) : parseInt(recipes[i].servings);
         }
     }
+    console.log({total_serv});
     return total_serv;
 }
 
