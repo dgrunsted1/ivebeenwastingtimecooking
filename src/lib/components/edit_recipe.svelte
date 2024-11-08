@@ -5,7 +5,7 @@
     import { createEventDispatcher,onMount, tick } from 'svelte';
     import { page } from '$app/stores';
     import { save_recipe, update_image_upload } from '/src/lib/save_recipe.js';
-    import { process_ingr } from '/src/lib/process_recipe.js';
+    import { process_ingr, process_directions } from '/src/lib/process_recipe.js';
     import ThumbUp from "/src/lib/icons/ThumbUp.svelte";
     import Heart from "/src/lib/icons/Heart.svelte";
     import Edit from "/src/lib/icons/EditIcon.svelte";
@@ -67,7 +67,12 @@
     ];
     let display_countries = $state(countries);
 
+    let ingr_input = $state("");
+    let dir_input = $state("");
+
     onMount(async () => {
+        console.log("mount");
+        console.log({recipe});
         // edited_recipe = recipe;
         let cuisines_result = await pb.collection('recipes').getList(1, 1000, {field: `cuisine`});
         for (let i = 0; i < cuisines_result.items.length; i++) if (!cuisines.includes(cuisines_result.items[i].cuisine) && cuisines_result.items[i].cuisine) cuisines.push(cuisines_result.items[i].cuisine);
@@ -81,6 +86,9 @@
     })
 
     $effect(() => {
+        console.log("effect");
+        console.log({edited_recipe});
+        console.log({recipe});
         let textareas = document.getElementsByTagName("textarea");
         for (let i = 0; i < textareas.length; i++) {
             resizeIt(textareas[i]);
@@ -220,12 +228,12 @@
     }
 
     const parse_ingredients = function(e) {
-        let ingr_list = process_ingr(e.data.split("\n"));
+        let ingr_list = process_ingr(ingr_input.split("\n"));
         edited_recipe.expand.ingr_list = ingr_list;
     }
 
     const parse_directions = function(e){
-        edited_recipe.directions = e.data.split("\n");
+        edited_recipe.directions = process_directions(dir_input.split("\n"));
     }
     
     const done_editing = function(){
@@ -344,7 +352,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="w-full flex justify-center mt-1"><a class="btn btn-accent btn-xs md:btn-sm" href={edited_recipe.url} target="_blank">original recipe</a></div>
+                    <div class="w-full flex justify-center mt-1"><a class="btn btn-primary btn-xs md:btn-sm" href={edited_recipe.url} target="_blank">original recipe</a></div>
                 </div>
             {:else}
                 <div class="flex h-[350px] w-full justify-center items-center">
@@ -366,14 +374,17 @@
                                 <input onclick={check_item} id={edited_recipe.expand.ingr_list[i].ingredient} type="checkbox" class="checkbox checkbox-accent checkbox-sm"/>
                             </div>
                     {/each}
+                    <div class="flex justify-center mt-2">
+                        <button class="btn btn-primary btn-xs" onclick={add_ingr}>add ingredient</button>
+                    </div>
                 {:else}
                     <div class="flex justify-center w-4/5 m-auto h-52">
-                        <textarea class="w-full textarea textarea-bordered" oninput={preventDefault(parse_ingredients)}></textarea>
+                        <textarea class="w-full textarea textarea-bordered" bind:value={ingr_input}></textarea>
+                    </div>
+                    <div class="flex justify-center mt-2">
+                        <button class="btn btn-primary btn-xs" onclick={preventDefault(parse_ingredients)}>parse ingredients</button>
                     </div>
                 {/if}
-                <div class="flex justify-center mt-2">
-                    <button class="btn btn-primary btn-xs" onclick={add_ingr}>add ingredient</button>
-                </div>
             {:else}
                 <div class="flex h-56 w-4/5 justify-center items-center m-auto">
                     <span id="loading" class="loading loading-bars loading-lg"></span>
@@ -399,7 +410,10 @@
                     {/each}
                 {:else}
                     <div class="flex justify-center w-4/5 m-auto h-52">
-                        <textarea class="w-full textarea textarea-bordered" oninput={preventDefault(parse_directions)}></textarea>
+                        <textarea class="w-full textarea textarea-bordered" bind:value={dir_input}></textarea>
+                    </div>
+                    <div class="flex justify-center mt-2">
+                        <button class="btn btn-primary btn-xs" onclick={preventDefault(parse_directions)}>parse directions</button>
                     </div>
                 {/if}
                 {#if edited_recipe.directions && edited_recipe.directions.length}

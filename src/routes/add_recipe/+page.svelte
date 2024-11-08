@@ -32,6 +32,8 @@
 
     let alert = $state({show: false, msg: "", title: "", type: "warning"});
 
+    let edit = $state(false);
+
     let loading = $state(false);
 
     onMount(async () => {
@@ -63,10 +65,12 @@
             result.data.url = e.srcElement.value;
             result.data.directions = process_directions(result.data.directions);
             recipe = result.data;
+            console.log(recipe);
             const recipe_exist = await check_recipe_exists(recipe.title);
             if (recipe_exist){
                 show_alert("You have already added this recipe", "warning", "Recipe already exists");
             }
+            edit = true;
         }
         loading = false;
     }
@@ -79,9 +83,13 @@
     }
 
     async function check_recipe_exists(title){
-        let result = await pb.collection('recipes').getList(1, 1, {filter: `user = '${$currentUser.id}' && title = '${title}'`});
-        if (result.items.length) return true;
-        return false;
+        try{
+            let result = await pb.collection('recipes').getList(1, 1, {filter: `user = '${$currentUser.id}' && title = '${title}'`});
+            if (result.items.length) return true;
+            return false;
+        } catch(e){
+            return false;
+        }
     }
 
 </script>
@@ -94,21 +102,17 @@
     <meta property="og:type" content="website" />
 </svelte:head>
 
-<div class="flex flex-col max-w-5xl px-1 space-y-5 mb-5 w-full m-auto">
-    <div class="link mt-5">
-        <form method='POST' oninput={preventDefault(fetch_recipe)} class="text-center w-full">
-            <input placeholder="Link to recipe" name="url" type="text" class="input input-bordered input-xs w-full text-center input-accent"/>
-        </form>
-    </div>
-    <!-- <div class="h-5 flex justify-center">
-        <span id="loading" class="loading loading-dots loading-lg hidden"></span>
-    </div> -->
-    <Alerts msg={alert.msg} type={alert.type} bind:show={alert.show} title={alert.title}/>
-    <!-- {#if !loading} -->
-        <EditRecipe {recipe} index=0 save={true} show_alert={alert.show} {loading} on:update_recipe={() => {show_alert("Recipe Saved", "success", "Success")}}/>
-    <!-- {:else}
-        <div class="flex h-[calc(100svh-120px)] w-full justify-center items-center">
-            <span id="loading" class="loading loading-bars loading-lg"></span>
+<div class="flex flex-col max-w-5xl m-auto h-[95svh]">
+    {#if !edit}
+        <div class="link my-auto">
+            <form method='POST' oninput={preventDefault(fetch_recipe)} class="text-center w-full flex flex-col gap-5">
+                <input placeholder="Link to recipe" name="url" type="text" class="input input-bordered input-xs w-full text-center input-accent"/>
+                <p>or</p>
+                <button class="btn btn-primary btn-lg m-auto" onclick={edit = true}>Input Recipe</button>
+            </form>
         </div>
-    {/if} -->
+    {:else}
+        <EditRecipe {recipe} index=0 save={true} show_alert={alert.show} {loading} on:update_recipe={() => {show_alert("Recipe Saved", "success", "Success")}}/>
+    {/if}
+    <Alerts msg={alert.msg} type={alert.type} bind:show={alert.show} title={alert.title}/>
 </div>
