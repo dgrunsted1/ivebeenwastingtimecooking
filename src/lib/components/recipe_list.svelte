@@ -7,7 +7,7 @@
     import ThumbUp from "/src/lib/icons/ThumbUp.svelte";
     import Heart from "/src/lib/icons/Heart.svelte";
     import Clear from "/src/lib/icons/Clear.svelte";
-    import { update_fave_made } from '/src/lib/save_recipe.js';
+    import { update_fav_made } from '/src/lib/save_recipe.js';
     import { sort_recipes } from '/src/lib/sort.js';
 
     const dispatch = createEventDispatcher();
@@ -32,7 +32,6 @@
     
     let display_cats = $derived(update_diplay_cats());
     let sort_opts = ["Least Ingredients", "Most Ingredients", "Least Servings", "Most Servings", "Least Time", "Most Time", "Most Recent", "Least Recent"];
-    let update_fave_made_list = $state([]);
     let loading = $state(true);
 
     function view(e) {
@@ -232,23 +231,49 @@
         return recipes_with_ingr;
     }
 
-    function update_fave_made_queue(e, click){
+    async function update_fav(e){
         e.stopPropagation();
-        // display_recipes[i][click] = !display_recipes[i][click]
-        update_fave_made_list.push(e.srcElement.id);
-        clearTimeout(delay_timer);
-        delay_timer = setTimeout(async () => {
-            let id_update_list = [];
-            for (let i = 0; i < recipes.length; i++){
-                if (update_fave_made_list.includes(recipes[i].id)){
-                    id_update_list.push({id: recipes[i].id, favorite: recipes[i].favorite, made: recipes[i].made});
-                }
+        console.log(e.currentTarget.id);
+        console.log(e.target.id);
+        console.log(e.srcElement.id);
+        let val;
+        
+        for (let i = 0; i < recipes.length; i++){
+            if (recipes[i].id == e.srcElement.id){
+                val = !recipes[i].favorite;
+                break;
             }
-            await update_fave_made(id_update_list);
-            update_fave_made_list = [];
-
-        }, 1000);
+        }
+        const result = await update_fav_made(e.srcElement.id, "favorite", val);
+        dispatch("update_recipe", {recipe: result});
     }
+
+    async function update_made(e){
+        e.stopPropagation();
+        console.log(e.currentTarget.id);
+        console.log(e.target.id);
+        console.log(e.srcElement.id);
+        let val;
+        for (let i = 0; i < recipes.length; i++){
+            if (recipes[i].id == e.srcElement.id){
+                val = !recipes[i].made;
+                break;
+            }
+        }
+        const result = await update_fav_made(e.srcElement.id, "made", val);
+        console.log(result);
+        dispatch("update_recipe", {recipe: result});
+    }
+
+    // function update_fav(e){
+    //     const index = e.currentTarget.id;
+    //     dispatch("update_fav", {index: index});
+    // }
+
+    // function update_made(e){
+    //     const index = e.currentTarget.id;
+    //     dispatch("update_made", {index: index});
+    // }
 
     function check_item(e){
         const index = e.currentTarget.id;
@@ -323,8 +348,8 @@
                     </div>
                     <div class="card-actions flex flex-col justify-evenly items-end items-center  py-1">
                         <div class="flex w-fit space-x-1">
-                            <button id={display_recipes[i].id} class="btn btn-xs  p-1 made flex content-center" onclick={(e) => {update_fave_made_queue(e, "made")}}><ThumbUp color={(display_recipes[i].made) ? "fill-primary" : "fill-neutral"}/></button>
-                            <button id={display_recipes[i].id} class="btn btn-xs p-1 favorite flex content-center" onclick={(e) => {update_fave_made_queue(e, "favorite")}}><Heart color={(display_recipes[i].favorite) ? "fill-primary" : "fill-neutral"}/></button>
+                            <button id={display_recipes[i].id} class="btn btn-xs  p-1 made flex content-center" onclick={(e) => {update_made(e)}}><ThumbUp color={(display_recipes[i].made) ? "fill-primary" : "fill-neutral"}/></button>
+                            <button id={display_recipes[i].id} class="btn btn-xs p-1 favorite flex content-center" onclick={(e) => {update_fav(e, "favorite")}}><Heart color={(display_recipes[i].favorite) ? "fill-primary" : "fill-neutral"}/></button>
                         </div>
                         <div class="flex w-fit space-x-2">
                             <input type="checkbox" onclick={check_item} class="checkbox checkbox-primary checkbox-lg p-1" id={display_recipes[i].id} checked={display_recipes[i].checked}>
