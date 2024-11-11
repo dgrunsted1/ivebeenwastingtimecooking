@@ -9,6 +9,8 @@
     import ThumbUp from "/src/lib/icons/ThumbUp.svelte";
     import Heart from "/src/lib/icons/Heart.svelte";
     import Edit from "/src/lib/icons/EditIcon.svelte";
+    import { update_fav_made } from '/src/lib/save_recipe.js';
+
 
 
     /**
@@ -239,10 +241,32 @@
     const done_editing = function(){
         dispatch("done_editing");
     }
+
+    async function update_fav(e){
+        e.stopPropagation();
+        console.log(e.currentTarget.id);
+        console.log(e.target.id);
+        console.log(e.srcElement.id);
+        const val = !recipe.favorite;
+        const result = await update_fav_made(recipe.id, "favorite", val);
+        console.log(result);
+        dispatch("update_recipe", {recipe: result});
+    }
+
+    async function update_made(e){
+        e.stopPropagation();
+        console.log(e.currentTarget.firstChild.classList);
+        console.log(e.target.id);
+        console.log(e.srcElement.id);
+        const val = !recipe.made;
+        const result = await update_fav_made(recipe.id, "made", val);
+        console.log(result);
+        dispatch("update_recipe", {recipe: result});
+    }
 </script>
 
 <div id="recipe" class="flex flex-col">
-    {#if $page.url.pathname == "/menu"}<button class="btn btn-xs btn-ghost absolute left-4 top-2" onclick={done_editing}>done</button>{/if}
+    <!-- {#if $page.url.pathname == "/menu"}<button class="btn btn-xs btn-ghost absolute left-4 top-2" onclick={done_editing}>done</button>{/if} -->
     <div class="save_btn_container flex flex-col items-center mb-5 mt-1">
         <button class="save_btn btn btn-primary btn-xs md:btn-md w-1/3" disabled="true" onclick={save_recipe_v2}>
             save recipe
@@ -352,7 +376,10 @@
                             </div>
                         </div>
                     </div>
-                    <div class="w-full flex justify-center mt-1"><a class="btn btn-primary btn-xs md:btn-sm" href={edited_recipe.url} target="_blank">original recipe</a></div>
+                    <div class="w-full flex justify-evenly mt-1">
+                        <a class="btn btn-primary btn-xs md:btn-sm" href={edited_recipe.url} target="_blank">original recipe</a>
+                        <button class="btn btn-primary btn-xs md:btn-sm" onclick={done_editing}>done</button>
+                    </div>
                 </div>
             {:else}
                 <div class="flex h-[350px] w-full justify-center items-center">

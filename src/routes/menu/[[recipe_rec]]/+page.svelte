@@ -82,6 +82,7 @@
         console.log(e.detail.recipe);
         for (let i = 0; i < user_recipes.length; i++){
             if (user_recipes[i].id == e.detail.recipe.id){
+                console.log(e.detail.recipe);
                 e.detail.recipe.checked = user_recipes[i].checked;
                 user_recipes[i] = e.detail.recipe;
                 break;
@@ -156,7 +157,7 @@
                                 {#if edit_modal_recipe}
                                     <EditRecipe recipe={edit_recipe} on:update_edit={update_edit} on:update_recipe={update_recipe} on:done_editing={() => edit_modal_recipe = false}/>
                                 {:else}
-                                    <DisplayRecipe recipe={edit_recipe} on:edit_recipe={()=>{edit_modal_recipe = true}}/>
+                                    <DisplayRecipe recipe={edit_recipe} on:update_recipe={update_recipe} on:edit_recipe={()=>{edit_modal_recipe = true}}/>
                                 {/if}
                             {/if}
                         </div>

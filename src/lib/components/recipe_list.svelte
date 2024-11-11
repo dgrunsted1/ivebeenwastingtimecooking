@@ -245,12 +245,13 @@
             }
         }
         const result = await update_fav_made(e.srcElement.id, "favorite", val);
+        console.log(result);
         dispatch("update_recipe", {recipe: result});
     }
 
     async function update_made(e){
         e.stopPropagation();
-        console.log(e.currentTarget.id);
+        console.log(e.currentTarget.firstChild.classList);
         console.log(e.target.id);
         console.log(e.srcElement.id);
         let val;

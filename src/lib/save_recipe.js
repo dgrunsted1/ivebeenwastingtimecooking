@@ -205,11 +205,20 @@ const get_url_id = async function (recipe){
 
 export const update_fav_made = async function (id, col, val){
     console.log("update_fave_made");
-    const data = {
-        col: val
-    };
+    let data;
+    if (col == "favorite"){
+        data = {
+            favorite: val
+        };
+    } else{
+        data = {
+            made: val
+        };
+    }
     console.log({data})
-    const record = await pb.collection('recipes').update(id, data);
+    const record = await pb.collection('recipes').update(id, data, {
+        expand: 'notes,ingr_list'
+    });
     return record;
 }
 

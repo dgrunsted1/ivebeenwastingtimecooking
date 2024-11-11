@@ -3,6 +3,7 @@
     import { createEventDispatcher,onMount } from 'svelte';
     import ThumbUp from "/src/lib/icons/ThumbUp.svelte";
     import Heart from "/src/lib/icons/Heart.svelte";
+    import { update_fav_made } from '/src/lib/save_recipe.js';
 
 
     let { recipe = $bindable() } = $props();
@@ -20,6 +21,28 @@
         dispatch("edit_recipe");
     }
 
+    async function update_fav(e){
+        e.stopPropagation();
+        console.log(e.currentTarget.id);
+        console.log(e.target.id);
+        console.log(e.srcElement.id);
+        const val = !recipe.favorite;
+        const result = await update_fav_made(recipe.id, "favorite", val);
+        console.log(result);
+        dispatch("update_recipe", {recipe: result});
+    }
+
+    async function update_made(e){
+        e.stopPropagation();
+        console.log(e.currentTarget.firstChild.classList);
+        console.log(e.target.id);
+        console.log(e.srcElement.id);
+        const val = !recipe.made;
+        console.log(recipe.id, "made", val);
+        const result = await update_fav_made(recipe.id, "made", val);
+        console.log(result);
+        dispatch("update_recipe", {recipe: result});
+    }
 </script>
 
 <div id="recipe" class="flex flex-col m-auto py-2 space-y-6 cursor-default mt-5 md:mt-0">
@@ -36,7 +59,7 @@
             {/if}
             {#if recipe.description}
                 <div class="h-fit w-full">
-                    <div class="desc text-xs md:text-sm text-center md:text-left" >{recipe.description}</div>
+                    <div class="desc text-xs md:text-sm text-center md:text-left">{recipe.description}</div>
                 </div>
                 <hr class="m-3"/>
             {/if}
@@ -80,8 +103,8 @@
                 {#if recipe.url}
                     <a class="btn btn-primary btn-xs" href={recipe.url} target="_blank">original recipe</a>
                 {/if}
-                <button class="btn btn-xs md:btn-sm p-1 btn-ghost flex content-center" onclick={()=>{recipe.made = !recipe.made}}><ThumbUp color={(recipe.made) ? "fill-primary" : "fill-neutral"}/></button>
-                <button class="btn btn-xs md:btn-sm p-1 btn-ghost flex content-center" onclick={()=>{recipe.favorite = !recipe.favorite}}><Heart color={(recipe.favorite) ? "fill-primary" : "fill-neutral"}/></button>
+                <button class="btn btn-xs md:btn-sm p-1 btn-ghost flex content-center" onclick={update_made}><ThumbUp color={(recipe.made) ? "fill-primary" : "fill-neutral"}/></button>
+                <button class="btn btn-xs md:btn-sm p-1 btn-ghost flex content-center" onclick={update_fav}><Heart color={(recipe.favorite) ? "fill-primary" : "fill-neutral"}/></button>
                 <button class="btn btn-xs md:btn-sm btn-primary" onclick={edit_groceries}><EditIcon/></button>
             </div>
         </div>
