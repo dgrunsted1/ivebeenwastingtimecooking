@@ -2,6 +2,7 @@
     import { onMount } from 'svelte';
     import { pb, currentUser } from '/src/lib/pocketbase.js';
     import CheckMark from "/src/lib/icons/CheckMark.svelte";
+    import { get_servings } from '/src/lib/recipe_util.js';
     import Menu from "/src/lib/components/menu.svelte";
     import { page } from '$app/stores';
 
@@ -24,6 +25,8 @@
         menu: true,
         recipe: true
     });
+    let total_servings = $derived(get_servings(menu_rec, {}, rec_mults));
+    let menu_title = $state("New Menu");
 
     onMount(async () => {
         if (!$currentUser){
@@ -94,6 +97,14 @@
             avatar: $currentUser.avatar
         });
         edit_profile = false;
+    }
+
+    function update_mult(e){
+        rec_mults[e.detail.id] = e.detail.mult;
+    }
+
+    function update_title(e){
+        menu_title = e.detail.title;
     }
 </script>
 
@@ -205,7 +216,7 @@
                     <div class="flex h-[500px] items-center"><span class="loading loading-bars loading-lg"></span></div>
                 {:else}
                     {#if menu_rec.length}
-                        <Menu title="New Menu" menu={menu_rec} mults={rec_mults} page={page}/>
+                        <Menu title={menu_title} menu={menu_rec} mults={rec_mults} {page} on:update_mult={update_mult} on:update_title={update_title} {total_servings}/>
                     {/if}
                 {/if}
             </div>
