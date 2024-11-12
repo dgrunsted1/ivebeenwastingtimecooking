@@ -1,18 +1,20 @@
 <script>
-    import { afterUpdate, beforeUpdate, onMount } from 'svelte';
+    import { preventDefault } from 'svelte/legacy';
+
+    import { onMount } from 'svelte';
     import { currentUser, pb } from '/src/lib/pocketbase.js';
     import { merge, trim_verbs, groupBySimilarity } from '/src/lib/merge_ingredients.js';
 
-    $: results = [];
-    $: passed = 0;
-    $: failed = 0;
-    $: is_auth_user = false;
-    $: verify_email = "";
-    $: unset_cat = [];
-    $: categories = [];
-    $: unset_cuis = [];
-    $: cuisines = [];
-    $: grocery_list_test = [];
+    let results = [];
+    let passed = 0;
+    let failed = 0;
+    let is_auth_user = false;
+    let verify_email = "";
+    let unset_cat = [];
+    let categories = [];
+    let unset_cuis = [];
+    let cuisines = [];
+    let grocery_list_test = [];
 
     const tables = ["menus_strict", "grocery_lists", "ingredients_strict", "menu_log_strict", "grocery_items", "recipes_log_strict", "recipes_strict", "sub_recipes"];
 
@@ -30,7 +32,7 @@
         cuisines = await pb.collection('cuisines').getFullList({sort: `+id`});
     });
 
-    beforeUpdate(async () => {
+    $effect.pre(async () => {
         if (!$currentUser || $currentUser.id != "67gxu7xk6x46gjy"){
             window.location.href = "/";
         } else {
@@ -131,7 +133,6 @@
             const data = { "ingr_num": recipes[i].ingr_list.length };
             
             const updated_record = await pb.collection('recipes').update(recipes[i].id, data);
-            console.log(updated_record);
             results.push(recipes[i].ingr_list.length);
             results = results;
         }
@@ -535,15 +536,15 @@
                     fill ingr_num
                 </button> -->
 
-                <button id="compare_parsers_btn" class="btn btn-primary w-56" on:click={migrate_recipes}>
+                <button id="compare_parsers_btn" class="btn btn-primary w-56" onclick={migrate_recipes}>
                     migrate recipes
                 </button>
 
-                <button id="compare_parsers_btn" class="btn btn-primary w-56" on:click={migrate_menus}>
+                <button id="compare_parsers_btn" class="btn btn-primary w-56" onclick={migrate_menus}>
                     migrate menus
                 </button>
                 {#each tables as table}
-                    <button id="compare_parsers_btn" class="btn btn-xs btn-error" on:click={(e) => {delete_table(e, table)}}>
+                    <button id="compare_parsers_btn" class="btn btn-xs btn-error" onclick={(e) => {delete_table(e, table)}}>
                         {table}
                     </button>
                 {/each}
@@ -560,12 +561,12 @@
                 </div>
         </div>
         <div class="my-10 mx-5 flex">
-            <form on:submit|preventDefault={send_verify_email} class="border rounded-lg p-5">
+            <form onsubmit={preventDefault(send_verify_email)} class="border rounded-lg p-5">
                 <input placeholder="email" name="email" type="text" bind:value={verify_email} class="input input-bordered input-xs w-56 text-center input-accent"/>
                 <button type="submit" class="btn btn-primary">send verification email</button>
             </form>
             <div class="flex flex-col justify-center items-center space-y-10 m-auto">
-                <div class="btn btn-primary btn-sm" on:click={update_cuis} on:keydown={update_cuis}>update cuisines</div>
+                <div class="btn btn-primary btn-sm" onclick={update_cuis} onkeydown={update_cuis}>update cuisines</div>
                 {#each unset_cuis as cuis}
                     <div class="flex justify-center items-center space-x-5">
                         <p>{cuis.title}</p>
@@ -575,7 +576,7 @@
                             <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box mt-8">
                                 <div class="flex flex-col max-w-52 max-h-[50svh] overflow-y-scroll">
                                     {#each cuisines as cuisine}
-                                        <li class="cursor-pointer" on:click={()=>{cuis.cuisine = cuisine.id; document.activeElement.blur();}}>{cuisine.id}</li>
+                                        <li class="cursor-pointer" onclick={()=>{cuis.cuisine = cuisine.id; document.activeElement.blur();}}>{cuisine.id}</li>
                                     {/each}
                                 </div>
                             </ul>
@@ -586,7 +587,7 @@
         </div>
         <div>
             <div class="flex m-10 flex-col p-10 border rounded-lg">
-                <div class="btn btn-primary btn-sm" on:click={test_merge} on:keydown={test_merge}>test merge</div>
+                <div class="btn btn-primary btn-sm" onclick={test_merge} onkeydown={test_merge}>test merge</div>
                 <div class="flex flex-col">
                     <!-- <div class="text text-sm bg-error text-black px-2 m-2">qty:4 | unit:cup | name:all-purpose flour</div> -->
                     {#each grocery_list_test as curr}

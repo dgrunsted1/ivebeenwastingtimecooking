@@ -1,4 +1,6 @@
 <script>
+  import { preventDefault, handlers } from 'svelte/legacy';
+
     import { deserialize } from '$app/forms';
     import { onMount } from 'svelte';
     import { currentUser, pb } from '/src/lib/pocketbase.js';
@@ -7,14 +9,20 @@
     import { page } from '$app/stores';
 
 
-$: scraper_test_result = [];
-$: process_recipe_results = [];
+let scraper_test_result = $state([]);
+  
+let process_recipe_results = $state([]);
+  
 // $: test_recipe_link = null;
-$: test_recipe_link = {"id":"gc48952q9l8ixuw","title":"Moroccan Chicken Brochettes","url":"https://www.bonappetit.com/recipe/moroccan-chicken-brochettes","img":"https://assets.bonappetit.com/photos/57ad3f29f1c801a1038bcadb/master/w_1280%2Cc_limit/moroccan-chicken-brochettes.jpg"};
-$: recipe_links = [];
-$: num_tests = 10;
-$: test_site = null;
-$: test_sites = ['www.seriouseats.com', 'cooking.nytimes.com', 'www.bonappetit.com'];
+let test_recipe_link = $state({"id":"gc48952q9l8ixuw","title":"Moroccan Chicken Brochettes","url":"https://www.bonappetit.com/recipe/moroccan-chicken-brochettes","img":"https://assets.bonappetit.com/photos/57ad3f29f1c801a1038bcadb/master/w_1280%2Cc_limit/moroccan-chicken-brochettes.jpg"});
+  
+let recipe_links = $state([]);
+  
+let num_tests = $state(10);
+  
+let test_site = $state(null);
+  
+let test_sites = $derived(['www.seriouseats.com', 'cooking.nytimes.com', 'www.bonappetit.com']);
 
 onMount(async () => {
     if (!$currentUser) window.location.href = "/login";
@@ -303,7 +311,7 @@ function update_recipe(e){
          <div class="flex w-full m-5 w-full">
             <div class="w-full justify-center w-full">
                 <div class="flex justify-center space-x-10 content-center w-full">
-                    <form method="POST" action="?/scrape_ingr" class="w-52"  on:click|preventDefault={process_recipe_test}>
+                    <form method="POST" action="?/scrape_ingr" class="w-52"  onclick={preventDefault(process_recipe_test)}>
                         <button id="compare_parsers_btn" class="btn btn-primary w-56" disabled>
                             Test Scraper
                         </button>
@@ -312,7 +320,7 @@ function update_recipe(e){
                         <label tabindex="0" class="btn m-1 w-full" id="num_tests_label">Number of Recipes</label>
                         <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box">
                             {#each [1,3,5,7,10] as curr}
-                                <li class="cursor-pointer" on:click={()=>{num_tests = curr}} on:click={set_num_tests}>{curr}</li>
+                                <li class="cursor-pointer" onclick={handlers(()=>{num_tests = curr}, set_num_tests)}>{curr}</li>
                             {/each}
                         </ul>
                     </div>
@@ -320,7 +328,7 @@ function update_recipe(e){
                         <label tabindex="0" class="btn m-1 w-full" id="test_sites_label">site</label>
                         <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box">
                             {#each test_sites as curr}
-                                <li class="cursor-pointer" on:click={()=>{test_site = curr}} on:click={set_test_site}>{curr}</li>
+                                <li class="cursor-pointer" onclick={handlers(()=>{test_site = curr}, set_test_site)}>{curr}</li>
                             {/each}
                         </ul>
                     </div>
@@ -331,7 +339,7 @@ function update_recipe(e){
                         <div class="flex flex-col justify-center w-full space-y-3">
                             <div class="text-center">Testing {test_recipe_link.title}</div>
                             <div  class="flex justify-evenly">
-                                <div class="btn" on:click={remove_test_recipe}>stop testing recipe</div>
+                                <div class="btn" onclick={remove_test_recipe}>stop testing recipe</div>
                                 <div class="btn" href={test_recipe_link.url} target="_blank">{get_website_name(test_recipe_link.url)}</div>
                             </div>
                         </div>
@@ -349,7 +357,7 @@ function update_recipe(e){
                                         </div>
                                         <div class="flex justify-center space-x-3">
                                             <div class="btn"><a href={recipe.url} target="_blank">{get_website_name(recipe.url)}</a></div>
-                                            <div class="btn" on:click={set_test_recipe} id={recipe.id}>test</div>
+                                            <div class="btn" onclick={set_test_recipe} id={recipe.id}>test</div>
                                         </div>
                                     </div>
                                 {:else}
@@ -360,10 +368,10 @@ function update_recipe(e){
                                         </div>
                                         <div class="flex justify-center space-x-3">
                                             <div class="btn"><a href={recipe.url} target="_blank">{get_website_name(recipe.url)}</a></div>
-                                            <div class="btn" on:click={set_test_recipe} id={recipe.id}>test</div>
+                                            <div class="btn" onclick={set_test_recipe} id={recipe.id}>test</div>
                                         </div>
                                         <div class="dropdown w-52">
-                                            <button class="btn btn-primary w-56" id={recipe.id} on:click={update_recipe}>
+                                            <button class="btn btn-primary w-56" id={recipe.id} onclick={update_recipe}>
                                                 update recipe solution
                                             </button>
                                         </div>
@@ -413,7 +421,7 @@ function update_recipe(e){
                                         </div>
                                         <div class="flex justify-center space-x-3">
                                             <div class="btn"><a href={recipe.url} target="_blank">{get_website_name(recipe.url)}</a></div>
-                                            <div class="btn" on:click={set_test_recipe} id={recipe.id}>test</div>
+                                            <div class="btn" onclick={set_test_recipe} id={recipe.id}>test</div>
                                         </div>
                                     </div>
                                 {:else}
@@ -424,7 +432,7 @@ function update_recipe(e){
                                         </div>
                                         <div class="flex justify-center space-x-3">
                                             <div class="btn"><a href={recipe.url} target="_blank">{get_website_name(recipe.url)}</a></div>
-                                            <div class="btn" on:click={set_test_recipe} id={recipe.id}>test</div>
+                                            <div class="btn" onclick={set_test_recipe} id={recipe.id}>test</div>
                                         </div>
                                     </div>
                                 {/if}

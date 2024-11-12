@@ -1,11 +1,12 @@
 <script>
     import EditIcon from "/src/lib/icons/EditIcon.svelte";
-    import { createEventDispatcher,afterUpdate, onMount } from 'svelte';
+    import { createEventDispatcher,onMount } from 'svelte';
     import ThumbUp from "/src/lib/icons/ThumbUp.svelte";
     import Heart from "/src/lib/icons/Heart.svelte";
+    import { update_fav_made } from '/src/lib/save_recipe.js';
 
 
-    export let recipe;
+    let { recipe = $bindable() } = $props();
     let dispatch = createEventDispatcher();
 
 
@@ -20,6 +21,19 @@
         dispatch("edit_recipe");
     }
 
+    async function update_fav(e){
+        e.stopPropagation();
+        const val = !recipe.favorite;
+        const result = await update_fav_made(recipe.id, "favorite", val);
+        dispatch("update_recipe", {recipe: result});
+    }
+
+    async function update_made(e){
+        e.stopPropagation();
+        const val = !recipe.made;
+        const result = await update_fav_made(recipe.id, "made", val);
+        dispatch("update_recipe", {recipe: result});
+    }
 </script>
 
 <div id="recipe" class="flex flex-col m-auto py-2 space-y-6 cursor-default mt-5 md:mt-0">
@@ -36,7 +50,7 @@
             {/if}
             {#if recipe.description}
                 <div class="h-fit w-full">
-                    <div class="desc text-xs md:text-sm text-center md:text-left" >{recipe.description}</div>
+                    <div class="desc text-xs md:text-sm text-center md:text-left">{recipe.description}</div>
                 </div>
                 <hr class="m-3"/>
             {/if}
@@ -80,9 +94,9 @@
                 {#if recipe.url}
                     <a class="btn btn-primary btn-xs" href={recipe.url} target="_blank">original recipe</a>
                 {/if}
-                <button class="btn btn-xs md:btn-sm p-1 btn-ghost flex content-center" on:click={()=>{recipe.made = !recipe.made}}><ThumbUp color={(recipe.made) ? "fill-primary" : "fill-neutral"}/></button>
-                <button class="btn btn-xs md:btn-sm p-1 btn-ghost flex content-center" on:click={()=>{recipe.favorite = !recipe.favorite}}><Heart color={(recipe.favorite) ? "fill-primary" : "fill-neutral"}/></button>
-                <button class="btn btn-xs md:btn-sm btn-primary" on:click={edit_groceries}><EditIcon/></button>
+                <button class="btn btn-xs md:btn-sm p-1 btn-ghost flex content-center" onclick={update_made}><ThumbUp color={(recipe.made) ? "fill-primary" : "fill-neutral"}/></button>
+                <button class="btn btn-xs md:btn-sm p-1 btn-ghost flex content-center" onclick={update_fav}><Heart color={(recipe.favorite) ? "fill-primary" : "fill-neutral"}/></button>
+                <button class="btn btn-xs md:btn-sm btn-primary" onclick={edit_groceries}><EditIcon/></button>
             </div>
         </div>
     </div>
@@ -90,19 +104,20 @@
         <div>
             <div class="text-sm">Ingredients</div>
             <div id="ingredient_list" class="flex flex-col m-2 border rounded-md w-fit m-auto py-1">
-                
-                {#each recipe.expand.ingr_list as ingr, i}
-                    {#if ingr}
-                        <div class="ingr_row flex w-full space-x-1 items-center px-5">
-                            <div class="ingr_amount text-xs md:text-sm my-1 text-center md:w-9">{ingr.quantity ? ingr.quantity : ""}</div>
-                            <div class="ingr_unit md:w-24 text-center text-xs md:text-sm my-1">{ingr.unit ? ingr.unit : ""}</div>
-                            <div class="ingr_name md:w-7/10 text-xs md:text-sm">{ingr.ingredient ? ingr.ingredient : ""}</div>
-                        </div>
-                    {/if}
-                    {#if i < recipe.expand.ingr_list.length - 1}
-                        <hr class="mx-3"/>
-                    {/if}
-                {/each}
+                {#if recipe.expand && recipe.expand.ingr_list}
+                    {#each recipe.expand.ingr_list as ingr, i}
+                        {#if ingr}
+                            <div class="ingr_row flex w-full space-x-1 items-center px-5">
+                                <div class="ingr_amount text-xs md:text-sm my-1 text-center md:w-9">{ingr.quantity ? ingr.quantity : ""}</div>
+                                <div class="ingr_unit md:w-24 text-center text-xs md:text-sm my-1">{ingr.unit ? ingr.unit : ""}</div>
+                                <div class="ingr_name md:w-7/10 text-xs md:text-sm">{ingr.ingredient ? ingr.ingredient : ""}</div>
+                            </div>
+                        {/if}
+                        {#if i < recipe.expand.ingr_list.length - 1}
+                            <hr class="mx-3"/>
+                        {/if}
+                    {/each}
+                {/if}
             </div>
         </div>
         
@@ -121,7 +136,7 @@
             </div>
         </div>
         
-        {#if recipe.expand.notes}
+        {#if recipe.expand && recipe.expand.notes}
             <div>Notes</div>
             {#each recipe.expand.notes as note, i}
                 <div class="notes_container flex items-center justify-center">

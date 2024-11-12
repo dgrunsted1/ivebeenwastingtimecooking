@@ -171,14 +171,14 @@ function make_singular(unit) {
 export const process_directions = function(in_lines) {
     let out = [];
     const conv_unit_string = `[ |\d+-](${Object.values(conv_unit).join('|')})$`;
-    console.log(conv_unit_string);
+    
     for (let i = 0; i < in_lines.length; i++){
         const line_arr = in_lines[i].split('.');
         for (let j = 0; j < line_arr.length; j++){
             let sentence = line_arr[j].trim();
 
             while (sentence.match(new RegExp(conv_unit_string, 'i'))){
-                console.log(sentence);
+                
                 sentence = sentence+". "+line_arr[j+1].trim();
                 j++;
             }

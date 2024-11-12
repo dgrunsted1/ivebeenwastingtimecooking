@@ -1,88 +1,52 @@
+<!-- @migration-task Error while migrating Svelte code: Can't migrate code with afterUpdate. Please migrate by hand. -->
 <script>
     import { createEventDispatcher } from 'svelte';
     import { pb } from '/src/lib/pocketbase';
     import DeleteIcon from "/src/lib/icons/DeleteIcon.svelte";
-    import { onMount, afterUpdate } from "svelte";
+    import { onMount } from "svelte";
     import ThumbUp from "/src/lib/icons/ThumbUp.svelte";
     import Heart from "/src/lib/icons/Heart.svelte";
     import Clear from "/src/lib/icons/Clear.svelte";
-    import { update_fave_made } from '/src/lib/save_recipe.js';
+    import { update_fav_made } from '/src/lib/save_recipe.js';
     import { sort_recipes } from '/src/lib/sort.js';
 
     const dispatch = createEventDispatcher();
-    export let recipes = [];
-    $: display_recipes = recipes;
-    let curr_recipe_id = -1;
-    let categories = {cuisines:[], countries:[], cats:[]};
-    let selected_cats = {cuisines:[], countries:[], cats:[]};
-    $: display_cats = {cuisines:[], countries:[], cats:[]};
-    let sort_opts = ["Least Ingredients", "Most Ingredients", "Least Servings", "Most Servings", "Least Time", "Most Time", "Most Recent", "Least Recent"];
-    $: sort_val = "Most Recent";
-    let update_fave_made_list = [];
-    let delay_timer;
-    let search_val = "";
-    let loading = false;
-
-    afterUpdate(async () => {
-        loading = true;
-        if (!recipes.length) return;
+    let { recipes = $bindable() } = $props();
+    const get_categories = () => {
+        let out = {cuisines:[], countries:[], cats:[]};
         for (let i = 0; i < recipes.length; i++){
-            if (!categories.cuisines.includes(recipes[i].cuisine) && recipes[i].cuisine) categories.cuisines.push(recipes[i].cuisine);
-            if (!categories.countries.includes(recipes[i].country) && recipes[i].country) categories.countries.push(recipes[i].country);
-            if (!categories.cats.includes(recipes[i].category) && recipes[i].category) categories.cats.push(recipes[i].category);
+            if (!out.cuisines.includes(recipes[i].cuisine) && recipes[i].cuisine) out.cuisines.push(recipes[i].cuisine);
+            if (!out.countries.includes(recipes[i].country) && recipes[i].country) out.countries.push(recipes[i].country);
+            if (!out.cats.includes(recipes[i].category) && recipes[i].category) out.cats.push(recipes[i].category);
         }
-        
-
-        categories = categories;
-        display_cats = categories;
-        let found_recipes = search(search_val);
-        filter_recipes(found_recipes);
-
-        display_recipes = sort_recipes(sort_val, display_recipes);
-        loading = false;
-    });
-
-    function check_item(e){
-        let index = 0;
-        let check_box;
-        if (e.srcElement.parentNode.getElementsByTagName("h2")[0]){
-            index = e.srcElement.parentNode.getElementsByTagName("h2")[0].id;
-            check_box = e.target.firstChild;
-            if (check_box.checked) {
-                check_box.checked = false;
-                dispatch("remove_from_menu", {index: index});
-            } else {
-                dispatch("add_to_menu", {index: index});
-                check_box.checked = true;
-            }
-        }else {
-            index = e.srcElement.parentNode.parentNode.parentNode.getElementsByTagName("h2")[0].id;
-            check_box = e.srcElement;
-            if (check_box.checked) {
-                dispatch("add_to_menu", {index: index});
-            } else {
-                dispatch("remove_from_menu", {index: index});
-            }
-        }
-        for (let recipe of recipes){
-            if (recipe.id == index) recipe.checked = false;
-        }
-       
+        return out;
     }
 
+    let categories = $derived(get_categories());
+    let selected_cats = $state({cuisines:[], countries:[], cats:[]});
+    let sort_val = $state("Most Recent");
+    let search_val = $state("");
+    let display_recipes = $derived(sort_recipes(sort_val, filter_recipes(search(search_val))));
+    let delay_timer;
+
+    
+    let display_cats = $derived(update_diplay_cats());
+    let sort_opts = ["Least Ingredients", "Most Ingredients", "Least Servings", "Most Servings", "Least Time", "Most Time", "Most Recent", "Least Recent"];
+    let loading = $state(true);
+
     function view(e) {
-        let index = e.currentTarget.getElementsByTagName("h2")[0].id;
-        for (let i = 0; i < display_recipes.length; i++){
-            if (display_recipes[i].id == index){
-                display_recipes[i].mode = `edit`;
-                dispatch(`update_edit`, {index: index});
-            } else {
-                display_recipes[i].mode = null;
+        if (e.target.tagName != "INPUT" && e.target.tagName != "BUTTON") {
+            let index = e.currentTarget.getElementsByTagName("h2")[0].id;
+            for (let i = 0; i < display_recipes.length; i++){
+                if (display_recipes[i].id == index){
+                    dispatch(`update_edit`, {index: index});
+                }
             }
         }
     }
 
     async function delete_recipe(e){
+        e.stopPropagation();
         let delete_recipe = confirm("Are you sure you want to delete this recipe?");
         if (delete_recipe){
             await pb.collection('recipes').delete(e.srcElement.id);
@@ -118,8 +82,7 @@
     function update_diplay_cats(){
         let output = {cuisines:[], countries:[], cats:[]};
         if (!selected_cats.cats.length && !selected_cats.cuisines.length && !selected_cats.countries.length){
-            display_cats = categories;
-            return;
+            return categories;
         }
         let has_heart_or_thumb = (selected_cats.cats.includes("heart") || selected_cats.cats.includes("thumb_up"));
         if (selected_cats.cats.length){
@@ -147,7 +110,7 @@
         }
         
         if (!has_heart_or_thumb) output.cats = categories.cats;
-        display_cats = output;
+        return output;
     }
 
     function filter_recipes(recipes_in){
@@ -209,11 +172,10 @@
                 }
             }
 
-            display_recipes = new_display;
+            return new_display;
         }else{
-            display_recipes = recipes_in;
+            return recipes_in;
         }
-        update_diplay_cats();
     }
 
     function get_cat_name(classes){
@@ -250,7 +212,7 @@
                 update_selected_cats(selected_cat, clicked, type_cat);
             }
 
-            dispatch(`reset_mode`, {index: -1});
+            dispatch(`reset_mode`);
             document.getElementById("menu_loading").classList.add('hidden');
         }, delay_time);
     }
@@ -269,55 +231,70 @@
         return recipes_with_ingr;
     }
 
-    function update_fave_made_queue(e){
-        update_fave_made_list.push(e.srcElement.id);
-        clearTimeout(delay_timer);
-        delay_timer = setTimeout(async () => {
-            let id_update_list = [];
-            for (let i = 0; i < recipes.length; i++){
-                if (update_fave_made_list.includes(recipes[i].id)){
-                    id_update_list.push({id: recipes[i].id, favorite: recipes[i].favorite, made: recipes[i].made});
-                }
+    async function update_fav(e){
+        e.stopPropagation();
+        let val;
+        
+        for (let i = 0; i < recipes.length; i++){
+            if (recipes[i].id == e.srcElement.id){
+                val = !recipes[i].favorite;
+                break;
             }
-            await update_fave_made(id_update_list);
-            update_fave_made_list = [];
-
-        }, 1000);
+        }
+        const result = await update_fav_made(e.srcElement.id, "favorite", val);
+        dispatch("update_recipe", {recipe: result});
     }
-    
+
+    async function update_made(e){
+        e.stopPropagation();
+        let val;
+        for (let i = 0; i < recipes.length; i++){
+            if (recipes[i].id == e.srcElement.id){
+                val = !recipes[i].made;
+                break;
+            }
+        }
+        const result = await update_fav_made(e.srcElement.id, "made", val);
+        dispatch("update_recipe", {recipe: result});
+    }
+
+    function check_item(e){
+        const index = e.currentTarget.id;
+        dispatch("check_item", {index: index});
+    }
 </script>
 <div class="hidden md:flex flex-col w-full">
     <div class="w-full carousel carousel-center rounded-box space-x-1 border border-primary rounded-md p-1">
-        <button id="thumb_up" class="btn btn-xs p-1 made flex content-center category btn-neutral" on:click={select_cat}><ThumbUp color={(selected_cats.cats.includes("thumb_up")) ? "fill-primary" : "fill-black"}/></button>
-        <button id="heart" class="btn btn-xs p-1 made flex content-center category btn-neutral" on:click={select_cat}><Heart color={(selected_cats.cats.includes("heart")) ? "fill-primary" : "fill-black"}/></button>
+        <button id="thumb_up" class="btn btn-xs p-1 made flex content-center category btn-neutral" onclick={select_cat}><ThumbUp color={(selected_cats.cats.includes("thumb_up")) ? "fill-primary" : "fill-black"}/></button>
+        <button id="heart" class="btn btn-xs p-1 made flex content-center category btn-neutral" onclick={select_cat}><Heart color={(selected_cats.cats.includes("heart")) ? "fill-primary" : "fill-black"}/></button>
         {#each display_cats.cats as cat}
-            <button id="category" class="btn btn-xs {selected_cats.cats.includes(cat)?'btn-primary text-black':'btn-neutral text-black'} category" on:click={select_cat}>{cat}</button> 
+            <button id="category" class="btn btn-xs {selected_cats.cats.includes(cat)?'btn-primary text-black':'btn-neutral text-black'} category" onclick={select_cat}>{cat}</button> 
         {/each}
         {#each display_cats.cuisines as cuisine}
-            <button id="cuisine" class="btn btn-xs {selected_cats.cuisines.includes(cuisine)?'btn-primary text-black':'btn-neutral text-black'} cuisine" on:click={select_cat}>{cuisine}</button> 
+            <button id="cuisine" class="btn btn-xs {selected_cats.cuisines.includes(cuisine)?'btn-primary text-black':'btn-neutral text-black'} cuisine" onclick={select_cat}>{cuisine}</button> 
         {/each}
         {#each display_cats.countries as country}
-            <button id="country" class="btn btn-xs {selected_cats.countries.includes(country)?'btn-primary text-black':'btn-neutral text-black'} country" on:click={select_cat}>{country}</button> 
+            <button id="country" class="btn btn-xs {selected_cats.countries.includes(country)?'btn-primary text-black':'btn-neutral text-black'} country" onclick={select_cat}>{country}</button> 
         {/each}
     </div>
     <div class="form-control flex flex-row justify-between w-full items-center">
         <div clas="flex flex-row content-center items-center">
             <label class="input input-bordered input-sm input-primary flex items-center gap-2 pr-2">
                 <input type="text" class="input h-full p-0" placeholder="Search" bind:value={search_val}/>
-                <div class="w-5" on:click={()=>{search_val = ""}} on:keydown={()=>{search_val = ""}}>
+                <button class="w-5" onclick={()=>{search_val = ""}} onkeydown={()=>{search_val = ""}}>
                     {#if search_val}
                         <Clear size="w-4 h-4"/>
                     {/if}
-                </div>
+                </button>
             </label>
             <span id="menu_loading" class="hidden loading loading-dots loading-lg align-middle"></span>
         </div>
         <p class="mx-5 text-xs md:text-sm">{display_recipes ? display_recipes.length+" Recipes" : ""}</p>
         <div class="dropdown dropdown-top md:dropdown-bottom dropdown-end">
-            <label tabindex="0" class="btn m-1 btn-primary btn-xs md:btn-sm">{sort_val}</label>
-            <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-max bg-primary">
+            <label tabindex="-1" for="sort" class="btn m-1 btn-primary btn-xs md:btn-sm">{sort_val}</label>
+            <ul tabindex="-1" name="sort" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-max bg-primary">
                 {#each sort_opts as opt}
-                    <li class="btn btn-xs {opt == sort_val ? 'btn-neutral': 'btn-primary'}"><a on:click={() => {sort_val = opt; document.activeElement.blur();}}>{opt}</a></li>
+                    <li class="btn btn-xs {opt == sort_val ? 'btn-neutral': 'btn-primary'}"><button onclick={() => {sort_val = opt; document.activeElement.blur();}}>{opt}</button></li>
                 {/each}
             </ul>
         </div>
@@ -325,9 +302,9 @@
 </div>
 
 <div id="recipes" class="h-[calc(100svh-160px)] md:h-[calc(100svh-135px)] overflow-y-auto space-y-2 border border-primary rounded-md md:border-none py-2">
-    {#if display_recipes.length}
+    {#if display_recipes && display_recipes.length}
         {#each display_recipes as curr, i}
-            <div class="card card-side bg-base-200 shadow-xl h-24 card-bordered cursor-pointer mx-1" on:click={view} on:keydown={view}>
+            <div class="card card-side bg-base-200 shadow-xl h-24 card-bordered cursor-pointer mx-1" onclick={view} onkeydown={view}>
                 <figure class="w-1/4 bg-cover bg-no-repeat bg-center" style="background-image: url('{display_recipes[i].image}')"></figure>
                 <div class="card-body h-full flex flex-row p-1 w-3/4 justify-between">
                     <div class="flex flex-col justify-between p-1 w-[70%]">
@@ -354,12 +331,12 @@
                     </div>
                     <div class="card-actions flex flex-col justify-evenly items-end items-center  py-1">
                         <div class="flex w-fit space-x-1">
-                            <button id={display_recipes[i].id} class="btn btn-xs  p-1 made flex content-center" on:click|stopPropagation={(e)=>{display_recipes[i].made = !display_recipes[i].made; update_fave_made_queue(e);}}><ThumbUp color={(display_recipes[i].made) ? "fill-primary" : "fill-neutral"}/></button>
-                            <button id={display_recipes[i].id} class="btn btn-xs p-1 favorite flex content-center" on:click|stopPropagation={(e)=>{display_recipes[i].favorite = !display_recipes[i].favorite; update_fave_made_queue(e);}}><Heart color={(display_recipes[i].favorite) ? "fill-primary" : "fill-neutral"}/></button>
+                            <button id={display_recipes[i].id} class="btn btn-xs  p-1 made flex content-center" onclick={(e) => {update_made(e)}}><ThumbUp color={(display_recipes[i].made) ? "fill-primary" : "fill-neutral"}/></button>
+                            <button id={display_recipes[i].id} class="btn btn-xs p-1 favorite flex content-center" onclick={(e) => {update_fav(e, "favorite")}}><Heart color={(display_recipes[i].favorite) ? "fill-primary" : "fill-neutral"}/></button>
                         </div>
                         <div class="flex w-fit space-x-2">
-                            <input type="checkbox" on:click|self|stopPropagation={check_item} class="checkbox checkbox-primary checkbox-lg p-1" id={display_recipes[i].id} bind:checked={display_recipes[i].checked}>
-                            <button class="btn btn-sm p-1 btn-accent {display_recipes[i].id} " on:click|stopPropagation={delete_recipe} id={display_recipes[i].id}><DeleteIcon/></button>
+                            <input type="checkbox" onclick={check_item} class="checkbox checkbox-primary checkbox-lg p-1" id={display_recipes[i].id} checked={display_recipes[i].checked}>
+                            <button class="btn btn-sm p-1 btn-accent {display_recipes[i].id} " onclick={delete_recipe} id={display_recipes[i].id}><DeleteIcon/></button>
                         </div>
                     </div>
                 </div>
@@ -384,36 +361,36 @@
         <div class="flex w-fit space-x-2 my-1">
             <label class="input input-bordered input-xs input-primary flex items-center gap-2 pr-0">
                 <input type="text" class="input h-full p-0" placeholder="Search" bind:value={search_val}/>
-                <div class="w-5" on:click={()=>{search_val = ""}}>
+                <button class="w-5" onclick={()=>{search_val = ""}}>
                     {#if search_val}
                         <Clear size="w-3 h-3"/>
                     {/if}
-                </div>
+                </button>
             </label>
             <span id="menu_loading" class="hidden loading loading-dots loading-sm md:loading-lg align-middle"></span>
         </div>
 
         <p class="mx-5 text-xs md:text-sm">{display_recipes ? display_recipes.length+" Recipes" : ""}</p>
         <div class="dropdown dropdown-top md:dropdown-bottom dropdown-end">
-            <label tabindex="0" class="btn m-1 btn-primary btn-xs md:btn-sm">Sort</label>
-            <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-max bg-primary">
+            <label tabindex="-1" for="sort_mobile" class="btn m-1 btn-primary btn-xs md:btn-sm">Sort</label>
+            <ul tabindex="-1" id="sort_mobile" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-max bg-primary">
                 {#each sort_opts as opt}
-                    <li class="btn btn-xs {opt == sort_val ? 'btn-neutral': 'btn-primary'}"><a on:click={() => {sort_val = opt; document.activeElement.blur();}}>{opt}</a></li>
+                    <li class="btn btn-xs {opt == sort_val ? 'btn-neutral': 'btn-primary'}"><button tabindex="0" onclick={() => {sort_val = opt; document.activeElement.blur();}}>{opt}</button></li>
                 {/each}
             </ul>
         </div>
     </div>
     <div class="w-full carousel carousel-center rounded-box space-x-1 border border-primary rounded-md p-1">
-        <button id="thumb_up" class="btn btn-neutral btn-xs category" on:click={select_cat}><ThumbUp color={selected_cats.cats.includes("thumb_up")?'fill-primary':'fill-black'}/></button> 
-        <button id="heart" class="btn btn-xs category btn-neutral" on:click={select_cat}><Heart color={selected_cats.cats.includes("heart")?'fill-primary':'fill-black'}/></button> 
+        <button id="thumb_up" class="btn btn-neutral btn-xs category" onclick={select_cat}><ThumbUp color={selected_cats.cats.includes("thumb_up")?'fill-primary':'fill-black'}/></button> 
+        <button id="heart" class="btn btn-xs category btn-neutral" onclick={select_cat}><Heart color={selected_cats.cats.includes("heart")?'fill-primary':'fill-black'}/></button> 
         {#each display_cats.cats as cat}
-            <button id="category" class="btn btn-xs {selected_cats.cats.includes(cat)?'btn-primary text-black':'btn-neutral text-black'} category" on:click={select_cat}>{cat}</button> 
+            <button id="category" class="btn btn-xs {selected_cats.cats.includes(cat)?'btn-primary text-black':'btn-neutral text-black'} category" onclick={select_cat}>{cat}</button> 
         {/each}
         {#each display_cats.cuisines as cuisine}
-            <button id="cuisine" class="btn btn-xs {selected_cats.cuisines.includes(cuisine)?'btn-primary text-black':'btn-neutral text-black'} cuisine" on:click={select_cat}>{cuisine}</button> 
+            <button id="cuisine" class="btn btn-xs {selected_cats.cuisines.includes(cuisine)?'btn-primary text-black':'btn-neutral text-black'} cuisine" onclick={select_cat}>{cuisine}</button> 
         {/each}
         {#each display_cats.countries as country}
-            <button id="country" class="btn btn-xs {selected_cats.countries.includes(country)?'btn-primary text-black':'btn-neutral text-black'} country" on:click={select_cat}>{country}</button> 
+            <button id="country" class="btn btn-xs {selected_cats.countries.includes(country)?'btn-primary text-black':'btn-neutral text-black'} country" onclick={select_cat}>{country}</button> 
         {/each}
     </div>
 </div>

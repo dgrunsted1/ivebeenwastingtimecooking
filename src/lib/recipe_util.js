@@ -2,12 +2,16 @@ export const get_servings = function(recipes, sub_recipes, mults){
     let sub_recipe_id_list = [];
     for (let k in sub_recipes){
         for (let i = 0; i < sub_recipes[k].length; i++){
-            if (sub_recipes[k][i].recipe_id && !sub_recipe_id_list.includes(sub_recipes[k][i].recipe_id)) sub_recipe_id_list.push(sub_recipes[k][i].recipe_id);
+            if (sub_recipes[k][i].recipe_id && !sub_recipe_id_list.includes(sub_recipes[k][i].recipe_id)){
+                sub_recipe_id_list.push(sub_recipes[k][i].recipe_id);
+            }
         }
     }
     let total_serv = 0;
     for (let i = 0; i < recipes.length; i++){
-        if (!sub_recipe_id_list.includes(recipes[i].id)) total_serv += parseInt(recipes[i].servings);
+        if (!sub_recipe_id_list.includes(recipes[i].id)){
+            total_serv += (mults && mults[recipes[i].id]) ? parseInt(mults[recipes[i].id]) : parseInt(recipes[i].servings);
+        }
     }
     return total_serv;
 }

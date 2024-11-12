@@ -39,8 +39,9 @@ export async function save_recipe(e, recipe, user, new_note) {
         "favorite": recipe.favorite
     };
     if (note_ids.length) data.notes = note_ids;
+    let recipe_result;
     if (recipe.id){
-        recipe = await pb.collection('recipes').update(recipe.id, data, {expand: "notes,ingr_list"});
+        recipe_result = await pb.collection('recipes').update(recipe.id, data, {expand: "notes,ingr_list"});
     }else {
         data.user = user.id;
         data.url = recipe.url;
@@ -53,7 +54,7 @@ export async function save_recipe(e, recipe, user, new_note) {
     
     
     e.srcElement.innerHTML = "saved";
-    return recipe;
+    return recipe_result;
 }
 
 function get_mins(time_in){
@@ -189,15 +190,21 @@ const get_url_id = async function (recipe){
     }
 }
 
-export const update_fave_made = async function (id_list){
-    for (let i = 0; i < id_list.length; i++){
-        const data = {
-            "made": id_list[i].made,
-            "favorite": id_list[i].favorite
+export const update_fav_made = async function (id, col, val){
+    let data;
+    if (col == "favorite"){
+        data = {
+            favorite: val
         };
-        const record = await pb.collection('recipes').update(id_list[i].id, data);
+    } else{
+        data = {
+            made: val
+        };
     }
-    
+    const record = await pb.collection('recipes').update(id, data, {
+        expand: 'notes,ingr_list'
+    });
+    return record;
 }
 
 export const update_fave = async function (id_list){

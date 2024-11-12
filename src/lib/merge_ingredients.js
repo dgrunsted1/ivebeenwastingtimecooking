@@ -3,7 +3,7 @@ import { get_conversion_rates, conv_unit } from '/src/lib/unit_conversions.js';
 import convert from "convert";
 
 // remove exact words
-const prepositions = ["of", "with", "to", "in", "on", "at", "for", "by", "from", "into", "over", "under", "through", "around", "beside", "between", "among", "towards", "room", "very", "more for serving", "for serving", "melon baller", "a", "press", "freshly ground", "seeded"];
+const prepositions = ["of", "with", "to", "in", "on", "at", "for", "by", "from", "into", "over", "under", "through", "around", "beside", "between", "among", "towards", "room", "very", "more for serving", "for serving", "melon baller", "a", "press", "freshly ground", "crack", "seeded"];
 
 const conjunctions = ["and", "or", "nor", "but", "yet", "so"];
 const remove_when_matching = ["(optional)"];
@@ -61,7 +61,6 @@ const verbs = [
 		"count",
         "coarsely",
 		"cover",
-		"crack",
 		"crease",
 		"crisscross",
 		"cross",
@@ -178,7 +177,6 @@ const verbs = [
 		"remove",
 		"rinse",
 		"rise",
-		"roast",
 		"rub",
 		"rusty",
 		"sauté",

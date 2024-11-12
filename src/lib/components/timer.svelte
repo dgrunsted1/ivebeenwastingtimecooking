@@ -1,53 +1,56 @@
 <script>
-    import { createEventDispatcher, onDestroy } from 'svelte';
+    import { createEventDispatcher, onDestroy, tick } from 'svelte';
     import { tweened } from 'svelte/motion';
     import { linear as easing } from 'svelte/easing';
-    import { fly } from 'svelte/transition';
   
     const dispatch = createEventDispatcher();
   
-    export let countdown;
-    let audio;
+    let { countdown = $bindable() } = $props();
+    let audio = $state();
   
-    let now = Date.now();
-    let end = now + countdown * 1000;
+    let start = $state(Date.now());
+    let now = $state(Date.now());
+    let end = $derived(start + countdown * 1000);
   
-    $: count = Math.round((end - now) / 1000);
-    $: h = Math.floor(count / 3600);
-    $: m = Math.floor((count - h * 3600) / 60);
-    $: s = count - h * 3600 - m * 60;
-    $: if (count === 0) audio.play();
-  
-    function updateTimer() {
-      now = Date.now();
-    }
-  
-    let interval = setInterval(updateTimer, 1000);
-    $: if (count === 0) clearInterval(interval);
-  
-    let isPaused = false;
-    let isResetting;
+    let count = $derived(Math.round((end - now) / 1000));
+    let h = $derived(Math.floor(count / 3600));
+    let m = $derived(Math.floor((count - h * 3600) / 60));
+    let s = $derived(count - h * 3600 - m * 60);
     const duration = 1000;
-  
     let offset = tweened(1, { duration, easing });
     let rotation = tweened(360, { duration, easing });
+    let isPaused = $state(false);
   
-    $: offset.set(Math.max(count - 1, 0) / countdown);
-    $: rotation.set((Math.max(count - 1, 0) / countdown) * 360);
+    async function updateTimer() {
+      now = Date.now();
+      offset.set(Math.max(count - 1, 0) / countdown);
+      rotation.set((Math.max(count - 1, 0) / countdown) * 360);
+      if (count === 0) audio.play();
+      if (count === 0) clearInterval(interval);
+    }
+  
+    let interval = $state(setInterval(updateTimer, 1000));
+  
+    let isResetting = $state();
+  
+    
   
     function handleNew() {
-    //   interval = setInterval(updateTimer, 1000);
-    //   clearInterval(interval);
       let new_time = prompt("How many minutes would you like to change the timer too?");
-      console.log(new_time);
+      
       countdown = new_time * 60;
-      end = now + countdown * 1000;
-      console.log(countdown);
+      
     }
   
     function handleStart() {
-      now = Date.now();
-      end = now + count * 1000;
+      if (!isPaused) {
+        start = Date.now();
+      } else {
+        // When resuming, adjust the start time to maintain the correct remaining time
+        const remainingTime = count;
+        start = Date.now() - (countdown - remainingTime) * 1000;
+        now = Date.now();
+      }
       interval = setInterval(updateTimer, 1000);
       offset.set(Math.max(count - 1, 0) / countdown);
       rotation.set((Math.max(count - 1, 0) / countdown) * 360);
@@ -55,8 +58,6 @@
     }
   
     function handlePause() {
-      offset.set(count / countdown);
-      rotation.set((count / countdown) * 360);
       clearInterval(interval);
       isPaused = true;
     }
@@ -68,7 +69,7 @@
       Promise.all([offset.set(1), rotation.set(360)]).then(() => {
         isResetting = false;
         now = Date.now();
-        end = now + countdown * 1000;
+        start = Date.now();
         interval = setInterval(updateTimer, 1000);
       });
     }
@@ -101,8 +102,6 @@
   
       <g fill="currentColor" text-anchor="middle" dominant-baseline="baseline" font-size="32">
         <text x="-3" y="6.5">
-          <!-- {#each Object.entries({ h, m, s }) as [key, value], i} -->
-            <!-- {console.log(h, m, s)} -->
                 {#if h > 0}
                     <tspan dx="3" font-weight="bold">
                         {#if m > 30}
@@ -125,18 +124,17 @@
                     <tspan dx="3" font-weight="bold">{padValue(s)}</tspan>
                     <tspan dx="0.5" font-size="12">s</tspan>
                 {/if}
-          <!-- {/each} -->
         </text>
       </g>
     </svg>
   
     <div class="flex w-full flex-col md:flex-row justify-evenly items-center">
         <div class="flex flex-row md:flex-col items-center">
-            <button class="reset_new m-1" on:click={handleNew}>New</button>
-            <button class="reset_new m-1" on:click={handleReset}>Reset</button>
+            <button class="reset_new m-1" onclick={handleNew}>New</button>
+            <button class="reset_new m-1" onclick={handleReset}>Reset</button>
         </div>
       {#if isPaused}
-        <button class="play_pause bg-primary" disabled={isResetting || count === 0} on:click={handleStart}>
+        <button class="play_pause bg-primary" disabled={isResetting || count === 0} onclick={handleStart}>
           <!-- <span class="visually-hidden">Start timer</span> -->
   
           <svg class="w-1/3" viewBox="-50 -50 100 100">
@@ -146,7 +144,7 @@
           </svg>
         </button>
       {:else}
-        <button class="play_pause bg-primary" disabled={isResetting || count === 0} on:click={handlePause}>
+        <button class="play_pause bg-primary" disabled={isResetting || count === 0} onclick={handlePause}>
           <!-- <span class="visually-hidden">Pause timer</span> -->
           <svg viewBox="-50 -50 100 100">
             <g fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round" stroke-linejoin="round">
@@ -160,23 +158,6 @@
 </div>
   
   <style>
-    main {
-      padding: 0rem .5rem;
-    }
-  
-    main > svg {
-      width: 100%;
-      height: auto;
-      display: block;
-      /* margin: 0 auto 2rem; */
-    }
-  
-    /* div {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    } */
-  
     .reset_new {
       width: max-content;
       font-size: .75rem;
