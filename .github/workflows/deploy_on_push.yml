@@ -22,7 +22,7 @@ jobs:
             git fetch --all
             git reset --hard origin/Master
             git status
-            npm install
+            npm ci
             npm run build
             sudo systemctl restart ivebeenwastingtime
             systemctl status ivebeenwastingtime
