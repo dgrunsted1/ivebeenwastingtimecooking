@@ -133,7 +133,6 @@
             const data = { "ingr_num": recipes[i].ingr_list.length };
             
             const updated_record = await pb.collection('recipes').update(recipes[i].id, data);
-            console.log(updated_record);
             results.push(recipes[i].ingr_list.length);
             results = results;
         }

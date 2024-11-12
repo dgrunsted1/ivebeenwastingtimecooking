@@ -54,13 +54,11 @@ export const update_grocery_list = async function(grocery_list, id){
                 ],
                 "active": true
             };
-            console.log("create", data_item)
             const record_item = await pb.collection('grocery_items').create(data_item);
             grocery_list[i] = record_item;
             new_items.push(record_item.id);
         }
     }
-    console.log("getList", item_filter)
     const items_result = await pb.collection('grocery_items').getList(1, 50, {filter:item_filter})
     for (let i = 0; i < items_result.items.length; i++) {
         for (let j = 0; j < grocery_list.length; j++) {
@@ -86,7 +84,6 @@ export const update_grocery_list = async function(grocery_list, id){
                     data_item.ingrs = grocery_list[j].ingrs;
                 }
                 if (Object.keys(data_item).length) {
-                    console.log("update", data_item)
                     const record_item = await pb.collection('grocery_items').update(items_result.items[i].id, data_item);
                 }
             }
@@ -107,11 +104,9 @@ export const update_grocery_item = async function(item){
         "active": true
     };
     if (item.id){
-        console.log("update", data, item)
         const updated_record = await pb.collection('grocery_items').update(item.id, data);
         return updated_record;
     } else {
-        console.log("create", data)
         const new_record = await pb.collection('grocery_items').create(data);
         return new_record;
     }
@@ -174,7 +169,6 @@ export const log_made = async function(recipe_id, user_id){
 }
 
 export const check_grocery_item = async function(id, checked){
-    console.log("check_grocery_item", id, checked)
     const data = {
         "checked": checked
     };

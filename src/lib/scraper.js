@@ -389,7 +389,6 @@ export const scrape = async function(url) {
                 compare_time: `${((set_view_time-go_to_time)+(end-set_view_time)+(go_to_time-selector_time)+(selector_time-await_data)+(await_data-init_time)+(init_time-start))/1000}s`
             };
             await validate_recipe_data(results, url);
-            console.log(results.expand.ingr_list)
             return results;
         }catch (e){
             await browser.close();

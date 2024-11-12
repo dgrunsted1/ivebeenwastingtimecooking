@@ -207,10 +207,6 @@
         loading = false;
 	});
 
-    $effect(() => {
-        console.log(selected_category, selected_country, selected_cuisine, selected_author);
-    });
-
   async function select_cat(e){
     loading = true;
     if (e.currentTarget.firstChild.innerHTML == 'category') {
@@ -263,7 +259,6 @@
     async function update_search(e){
         clearTimeout(delay_timer);
         delay_timer = setTimeout(async () => {
-            console.log({search_val});
             loading = true;
             page = 1; 
             

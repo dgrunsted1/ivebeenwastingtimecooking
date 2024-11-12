@@ -21,7 +21,7 @@
     
     let delay_timer;
     let update_fave_list = [];
-    let tab = $state("recipe_list");
+    let tab = $state("grocery_list");
     let sub_recipe_ids = $state([]);
     let recipes_ready = $state([]);
     
@@ -114,7 +114,6 @@
     }
 
     async function update_groceries(e){
-        console.log("update_groceries", e.detail.id)
         grocery_list_status = "updating";
         for (let i = 0; i <  grocery_list.length; i++){
             if (grocery_list[i].id = e.detail.id){
@@ -129,7 +128,7 @@
 
     async function reset_list(){
         grocery_list = get_grocery_list(todays_menu, todays_menu.servings, todays_menu.sub_recipes);
-        await update_grocery_list(grocery_list, grocery_list_id);
+        grocery_list.id = await create_grocery_list(grocery_list, todays_menu.id);
     }
 
     async function toggle_made(e){
@@ -172,7 +171,6 @@
     }
 
     const handle_check_item = async (e) => {
-        console.log("handle_check_item", e.detail);
         check_grocery_item(e.detail.id, e.detail.value);
     }
 </script>
@@ -190,7 +188,7 @@
             <h1 class="text-xl h-6 text-ellipsis overflow-hidden text-center">{todays_menu.title ? todays_menu.title : ""}</h1>
         </div>
         <div id="content" class="flex flex-col md:flex-row md:space-x-3 md:mx-2">
-            <div id="left_column" class="{tab == "recipe_list" ? "" : "hidden"}  md:w-1/2">
+            <div id="left_column" class="{tab == "recipe_list" ? "" : "hidden md:flex"}  md:w-1/2">
                 <div id="recipes" class="h-[calc(100svh-90px)] md:h-[calc(100svh-75px)] overflow-y-auto border border-primary rounded-md md:border-none">
                     {#if todays_menu.expand}
                         {#each todays_menu.expand.recipes as curr, i}
@@ -254,7 +252,7 @@
             </div>
         </div>
         <div class="tabs tabs-boxed w-fit mx-auto flex items-center bg-base-300 md:bg-base-200 md:hidden my-1">
-            <button id="recipe_list" class="tab tab-active tab-xs" onclick={switch_tab}>Recipes</button> 
-            <button id="grocery_list" class="tab tab-xs" onclick={switch_tab}>Grocery List</button>
+            <button id="recipe_list" class="tab tab-xs" onclick={switch_tab}>Recipes</button> 
+            <button id="grocery_list" class="tab tab-active tab-xs" onclick={switch_tab}>Grocery List</button>
         </div>
     </div>

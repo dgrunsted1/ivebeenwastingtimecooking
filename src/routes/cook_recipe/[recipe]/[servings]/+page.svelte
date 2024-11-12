@@ -6,7 +6,7 @@
     import Heart from "/src/lib/icons/Heart.svelte";
     import Edit from "/src/lib/icons/EditIcon.svelte";
     import { onMount } from 'svelte';
-    import { update_fave_made, update_notes } from '/src/lib/save_recipe.js';
+    import { update_fav_made, update_notes } from '/src/lib/save_recipe.js';
     import { update_made, log_made } from '/src/lib/groceries.js'
     import { update_image_upload, update_recipe_image } from '/src/lib/save_recipe.js';
     import EditRecipe from "/src/lib/components/edit_recipe.svelte";
@@ -121,7 +121,21 @@
     }
 
     async function update_fave_made_pre(){
-        await update_fave_made([{id: recipe.id, favorite: recipe.favorite, made: recipe.made}]);
+        await update_fav_made(recipe.id);
+    }
+
+    async function update_fav(e){
+        e.stopPropagation();
+        const val = !recipe.favorite;
+        const result = await update_fav_made(recipe.id, "favorite", val);
+        recipe = result;
+    }
+
+    async function update_made_2(e){
+        e.stopPropagation();
+        const val = !recipe.made;
+        const result = await update_fav_made(recipe.id, "made", val);
+        recipe = result;
     }
 
     async function update_notes_action(e){
@@ -245,8 +259,8 @@
                         {:else}
                             not ready
                         {/if}
-                        <button class="btn btn-xs md:btn-sm p-1 btn-ghost made flex content-center" onclick={()=>{recipe.made = !recipe.made; update_fave_made_pre();}}><ThumbUp color={(recipe.made) ? "fill-primary" : "fill-neutral"}/></button>
-                        <button class="btn btn-xs md:btn-sm p-1 btn-ghost favorite flex content-center" onclick={()=>{recipe.favorite = !recipe.favorite; update_fave_made_pre();}}><Heart color={(recipe.favorite) ? "fill-primary" : "fill-neutral"}/></button>
+                        <button class="btn btn-xs md:btn-sm p-1 btn-ghost made flex content-center" onclick={update_made_2}><ThumbUp color={(recipe.made) ? "fill-primary" : "fill-neutral"}/></button>
+                        <button class="btn btn-xs md:btn-sm p-1 btn-ghost favorite flex content-center" onclick={update_fav}><Heart color={(recipe.favorite) ? "fill-primary" : "fill-neutral"}/></button>
                         <button class="btn btn-xs md:btn-sm btn-primary w-8 md:w-10" onclick={() => {my_modal_3.showModal(); document.getElementById('modal_content').classList.remove('hidden');}}><Edit/></button>
                     {:else if $currentUser}
                         <input type="checkbox" class="checkbox checkbox-primary checkbox-lg p-1" id={recipe.id} onclick={stopPropagation(log_made(recipe.id, $currentUser.id))}>

@@ -233,9 +233,6 @@
 
     async function update_fav(e){
         e.stopPropagation();
-        console.log(e.currentTarget.id);
-        console.log(e.target.id);
-        console.log(e.srcElement.id);
         let val;
         
         for (let i = 0; i < recipes.length; i++){
@@ -245,15 +242,11 @@
             }
         }
         const result = await update_fav_made(e.srcElement.id, "favorite", val);
-        console.log(result);
         dispatch("update_recipe", {recipe: result});
     }
 
     async function update_made(e){
         e.stopPropagation();
-        console.log(e.currentTarget.firstChild.classList);
-        console.log(e.target.id);
-        console.log(e.srcElement.id);
         let val;
         for (let i = 0; i < recipes.length; i++){
             if (recipes[i].id == e.srcElement.id){
@@ -262,19 +255,8 @@
             }
         }
         const result = await update_fav_made(e.srcElement.id, "made", val);
-        console.log(result);
         dispatch("update_recipe", {recipe: result});
     }
-
-    // function update_fav(e){
-    //     const index = e.currentTarget.id;
-    //     dispatch("update_fav", {index: index});
-    // }
-
-    // function update_made(e){
-    //     const index = e.currentTarget.id;
-    //     dispatch("update_made", {index: index});
-    // }
 
     function check_item(e){
         const index = e.currentTarget.id;

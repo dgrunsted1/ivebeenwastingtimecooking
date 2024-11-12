@@ -74,12 +74,10 @@
     const check_item_handle = (e) => {
         let id = e.currentTarget.id;
         let value = e.currentTarget.checked;
-        console.log("check_item_handle", id, value);
         dispatch("check_grocery_item", {id: id, value: value});
     }
 
     const edit_item = (e) => {
-        console.log("edit_item", e.currentTarget.parentNode.id);
         const id = e.currentTarget.parentNode.id;
         clearTimeout(delay_timer);
         delay_timer = setTimeout(function() {
@@ -97,8 +95,8 @@
     const uncheck_list = () => {
         for (let i = 0; i < grocery_list.length; i++){
             grocery_list[i].checked = false;
+            dispatch("check_grocery_item", {id: grocery_list[i].id, value: false})
         }
-        edit_item();
     }
 
     const new_item = async () => {
@@ -145,7 +143,7 @@
         {#if grocery_list.length > 0}
             <div>
                 {#if status != "none" && $page.url.pathname == "/today"}<div id="update_status" class="text-xs">{status}</div>{/if}
-                <div id="count" class="text-xs">{grocery_list.length} Items</div>
+                <div id="count" class="text-xs">{grocery_list.reduce((count, item) => count + (item.checked ? 0 : 1), 0)}/{grocery_list.length} Items</div>
             </div>
             <button id="copy" class="btn btn-xs btn-primary cursor-copy" onclick={copy_to_clipboard}>
                 {#if just_copied}

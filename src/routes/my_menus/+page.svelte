@@ -78,11 +78,9 @@
             else menu = user_menus[i];
         }
         if (menu && confirm(`Are you sure you want to delete your "${menu.title}" menu?`)) {
-            console.log(`menu = "${e.srcElement.id}"`);
             const resultList = await pb.collection('grocery_lists').getList(1, 50, {
                 filter: `menu = "${e.srcElement.id}"`,
             });
-            console.log(resultList);
             if (resultList.items.length > 0){
                 for (let i = 0; i < resultList.items.length; i++){
                     await pb.collection('grocery_lists').update(resultList.items[i].id, { "menu": null });
@@ -91,7 +89,6 @@
             const resultListLog = await pb.collection('menu_log').getList(1, 50, {
                 filter: `menu = "${e.srcElement.id}"`,
             });
-            console.log(resultListLog);
             if (resultListLog.items.length > 0){
                 for (let i = 0; i < resultListLog.items.length; i++){
                     await pb.collection('menu_log').update(resultListLog.items[i].id, { "menu": null });

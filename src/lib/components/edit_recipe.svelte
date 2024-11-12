@@ -73,9 +73,6 @@
     let dir_input = $state("");
 
     onMount(async () => {
-        console.log("mount");
-        console.log({recipe});
-        // edited_recipe = recipe;
         let cuisines_result = await pb.collection('recipes').getList(1, 1000, {field: `cuisine`});
         for (let i = 0; i < cuisines_result.items.length; i++) if (!cuisines.includes(cuisines_result.items[i].cuisine) && cuisines_result.items[i].cuisine) cuisines.push(cuisines_result.items[i].cuisine);
         cuisines = cuisines;
@@ -88,9 +85,6 @@
     })
 
     $effect(() => {
-        console.log("effect");
-        console.log({edited_recipe});
-        console.log({recipe});
         let textareas = document.getElementsByTagName("textarea");
         for (let i = 0; i < textareas.length; i++) {
             resizeIt(textareas[i]);
@@ -152,7 +146,6 @@
         if (e.srcElement.parentElement.parentElement.getElementsByClassName("desired_servings")[0]){
             desired_servings = e.srcElement.parentElement.parentElement.getElementsByClassName("desired_servings")[0].value;
         }
-        // multiplier = desired_servings / servings_in_recipe;
         dispatch("update_multiplier", {
             multiplier: desired_servings / servings_in_recipe,
             index: index
@@ -244,23 +237,15 @@
 
     async function update_fav(e){
         e.stopPropagation();
-        console.log(e.currentTarget.id);
-        console.log(e.target.id);
-        console.log(e.srcElement.id);
         const val = !recipe.favorite;
         const result = await update_fav_made(recipe.id, "favorite", val);
-        console.log(result);
         dispatch("update_recipe", {recipe: result});
     }
 
     async function update_made(e){
         e.stopPropagation();
-        console.log(e.currentTarget.firstChild.classList);
-        console.log(e.target.id);
-        console.log(e.srcElement.id);
         const val = !recipe.made;
         const result = await update_fav_made(recipe.id, "made", val);
-        console.log(result);
         dispatch("update_recipe", {recipe: result});
     }
 </script>

@@ -190,21 +190,7 @@ const get_url_id = async function (recipe){
     }
 }
 
-// export const update_fave_made = async function (id_list){
-//     console.log("update_fave_made");
-//     for (let i = 0; i < id_list.length; i++){
-//         const data = {
-//             "made": id_list[i].made,
-//             "favorite": !d_list[i].favorite
-//         };
-//         console.log({data})
-//         const record = await pb.collection('recipes').update(id_list[i].id, data);
-//     }
-    
-// }
-
 export const update_fav_made = async function (id, col, val){
-    console.log("update_fave_made");
     let data;
     if (col == "favorite"){
         data = {
@@ -215,7 +201,6 @@ export const update_fav_made = async function (id, col, val){
             made: val
         };
     }
-    console.log({data})
     const record = await pb.collection('recipes').update(id, data, {
         expand: 'notes,ingr_list'
     });

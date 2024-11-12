@@ -65,7 +65,6 @@
             result.data.url = e.srcElement.value;
             result.data.directions = process_directions(result.data.directions);
             recipe = result.data;
-            console.log(recipe);
             const recipe_exist = await check_recipe_exists(recipe.title);
             if (recipe_exist){
                 show_alert("You have already added this recipe", "warning", "Recipe already exists");

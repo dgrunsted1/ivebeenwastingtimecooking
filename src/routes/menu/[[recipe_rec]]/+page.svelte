@@ -79,10 +79,8 @@
     }
 
     function update_recipe(e){
-        console.log(e.detail.recipe);
         for (let i = 0; i < user_recipes.length; i++){
             if (user_recipes[i].id == e.detail.recipe.id){
-                console.log(e.detail.recipe);
                 e.detail.recipe.checked = user_recipes[i].checked;
                 user_recipes[i] = e.detail.recipe;
                 break;

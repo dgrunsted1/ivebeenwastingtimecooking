@@ -23,24 +23,15 @@
 
     async function update_fav(e){
         e.stopPropagation();
-        console.log(e.currentTarget.id);
-        console.log(e.target.id);
-        console.log(e.srcElement.id);
         const val = !recipe.favorite;
         const result = await update_fav_made(recipe.id, "favorite", val);
-        console.log(result);
         dispatch("update_recipe", {recipe: result});
     }
 
     async function update_made(e){
         e.stopPropagation();
-        console.log(e.currentTarget.firstChild.classList);
-        console.log(e.target.id);
-        console.log(e.srcElement.id);
         const val = !recipe.made;
-        console.log(recipe.id, "made", val);
         const result = await update_fav_made(recipe.id, "made", val);
-        console.log(result);
         dispatch("update_recipe", {recipe: result});
     }
 </script>
