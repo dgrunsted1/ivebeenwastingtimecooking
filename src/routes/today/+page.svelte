@@ -189,7 +189,7 @@
         </div>
         <div id="content" class="flex flex-col md:flex-row md:space-x-3 md:mx-2">
             <div id="left_column" class="{tab == "recipe_list" ? "" : "hidden md:flex"}  md:w-1/2">
-                <div id="recipes" class="h-[calc(100svh-100px)] md:h-[calc(100svh-75px)] overflow-y-auto border border-primary rounded-md md:border-none">
+                <div id="recipes" class="h-[calc(100svh-100px)] md:h-[calc(100svh-75px)] overflow-y-auto border border-primary rounded-md md:border-none w-full">
                     {#if todays_menu.expand}
                         {#each todays_menu.expand.recipes as curr, i}
                             {#if !sub_recipe_ids.includes(curr.id)}
@@ -239,10 +239,10 @@
             </div>
             <div id="right_column" class="{tab == "grocery_list" ? "" : "hidden"} md:flex md:w-1/2 ml-1 mr-2">
                 {#if todays_menu && mode == "menu"}
-                    {#if grocery_list}
+                    {#if grocery_list.length}
                         <GroceryList bind:grocery_list={grocery_list} on:update_grocery_item={update_groceries} bind:status={grocery_list_status}  on:reset_grocery_list={reset_list} on:check_grocery_item={handle_check_item}/>
                     {:else} 
-                        <div id="menu_loading" class="w-full flex justify-center content-center h-full">
+                        <div id="menu_loading" class="w-full flex justify-center content-center h-[calc(100svh-100px)]">
                             <span class="loading loading-bars loading-lg"></span>
                         </div>
                     {/if}
