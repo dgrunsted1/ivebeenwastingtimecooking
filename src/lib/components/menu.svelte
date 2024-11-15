@@ -271,7 +271,7 @@
             {#if menu.length}    
                 {#each menu as recipe}
                     {#if !recipe.is_sub_recipe}
-                        <div class="img_serv_container card card-bordered card-side flex flex-row w-auto place-items-stretch my-3.5 mx-3 shadow-xl bg-base-300 md:bg-base-200">
+                        <div class="img_serv_container card card-bordered card-side flex flex-row w-auto place-items-stretch my-3.5 mx-3 shadow-xl bg-base-200 border-primary">
                             <figure class="w-2/5">
                                 <img class="object-cover h-full" src={recipe.image} alt={recipe.title}/>
                             </figure>
@@ -319,7 +319,7 @@
                                 </div>
                                 <div class="collapse-content"> 
                                     {#each recipe.sub_recipe_data as sub_recipe}
-                                        <div class="img_serv_container card card-bordered card-side flex flex-row w-auto items-center bg-base-300 md:bg-base-200">
+                                        <div class="img_serv_container card card-bordered card-side flex flex-row w-auto items-center bg-base-200">
                                             <figure class="image w-1/4 h-full">
                                                 <img class="h-full" src={sub_recipe.image} alt={sub_recipe.title}/>
                                             </figure>
