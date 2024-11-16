@@ -318,36 +318,35 @@ async function validate_recipe_data(recipe_data, url){
 }
 
 export const scrape = async function(url) {
-        
-        const start = Date.now();
-        const browser = await puppeteer.launch({headless: 'new', args: [ '--incognito' ]});
-        return {err: {title: "Test", msg: "here"}};
-
-        const page = await browser.newPage();
-        const init_time = Date.now();
-        const await_data = Date.now();
-        let site_selectors;
-        if (url.includes("www.seriouseats.com")){
-            site_selectors = selectors.serious_eats;
-        }else if(url.includes("cooking.nytimes.com")){
-            site_selectors = selectors.nyt;
-        }else if(url.includes("www.bonappetit.com")){
-            site_selectors = selectors.ba;
-        }else{
-            const url_match = url.match(/http(|s):\/\/(www.)?(.*?)\.(com|co\.uk|org|net)/);
-            if (url_match){
-                const error_data = {
-                    message: url_match[3] ?? url_match[0],
-                    url: url,
-                    function: "url not supported"
-                }
-                await pb.collection('errors').create(error_data);
-            }
-            
-            return {err: {title: "website not supported", msg: "supported websites include bon appetit, serious eats, and nytimes"}};
-        }
-        const selector_time = Date.now();
         try{
+            const start = Date.now();
+            const browser = await puppeteer.launch({headless: 'new', args: [ '--incognito' ]});
+
+            const page = await browser.newPage();
+            const init_time = Date.now();
+            const await_data = Date.now();
+            let site_selectors;
+            if (url.includes("www.seriouseats.com")){
+                site_selectors = selectors.serious_eats;
+            }else if(url.includes("cooking.nytimes.com")){
+                site_selectors = selectors.nyt;
+            }else if(url.includes("www.bonappetit.com")){
+                site_selectors = selectors.ba;
+            }else{
+                const url_match = url.match(/http(|s):\/\/(www.)?(.*?)\.(com|co\.uk|org|net)/);
+                if (url_match){
+                    const error_data = {
+                        message: url_match[3] ?? url_match[0],
+                        url: url,
+                        function: "url not supported"
+                    }
+                    await pb.collection('errors').create(error_data);
+                }
+                
+                return {err: {title: "website not supported", msg: "supported websites include bon appetit, serious eats, and nytimes"}};
+            }
+            const selector_time = Date.now();
+        
             await page.goto(url);
             const go_to_time = Date.now();
             
