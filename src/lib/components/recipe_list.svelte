@@ -200,7 +200,7 @@
                 let classes = Array.from(e.srcElement.classList);
                 let clicked = false;
                 if (["heart", "thumb_up"].includes(e.srcElement.id)){
-                    clicked = Array.from(e.srcElement.firstChild.classList).includes('fill-base-300');
+                    clicked = Array.from(e.srcElement.firstChild.classList).includes('fill-neutral');
                 } else {
                     clicked = classes.includes('bg-base-300');
                 }
@@ -265,16 +265,16 @@
 </script>
 <div class="hidden md:flex flex-col w-full">
     <div class="w-full carousel carousel-center rounded-box space-x-1 border border-primary rounded-md p-1">
-        <button id="thumb_up" class="btn btn-xs p-1 made flex content-center category bg-transparent border-none" onclick={select_cat}><ThumbUp color={(selected_cats.cats.includes("thumb_up")) ? "fill-primary" : "fill-base-300"}/></button>
-        <button id="heart" class="btn btn-xs p-1 made flex content-center category  bg-transparent border-none" onclick={select_cat}><Heart color={(selected_cats.cats.includes("heart")) ? "fill-primary" : "fill-base-300"}/></button>
+        <button id="thumb_up" class="btn btn-xs p-1 made flex content-center category bg-transparent border-none" onclick={select_cat}><ThumbUp color={(selected_cats.cats.includes("thumb_up")) ? "fill-primary" : "fill-neutral"}/></button>
+        <button id="heart" class="btn btn-xs p-1 made flex content-center category  bg-transparent border-none" onclick={select_cat}><Heart color={(selected_cats.cats.includes("heart")) ? "fill-primary" : "fill-neutral"}/></button>
         {#each display_cats.cats as cat}
-            <button id="category" class="btn btn-xs {selected_cats.cats.includes(cat)?'btn-primary text-black':'bg-base-300 text-black'} category" onclick={select_cat}>{cat}</button> 
+            <button id="category" class="btn btn-xs {selected_cats.cats.includes(cat)?'btn-primary text-black':'bg-base-300 text-neutral'} category" onclick={select_cat}>{cat}</button> 
         {/each}
         {#each display_cats.cuisines as cuisine}
-            <button id="cuisine" class="btn btn-xs {selected_cats.cuisines.includes(cuisine)?'btn-primary text-black':'bg-base-300 text-black'} cuisine" onclick={select_cat}>{cuisine}</button> 
+            <button id="cuisine" class="btn btn-xs {selected_cats.cuisines.includes(cuisine)?'btn-primary text-black':'bg-base-300 text-neutral'} cuisine" onclick={select_cat}>{cuisine}</button> 
         {/each}
         {#each display_cats.countries as country}
-            <button id="country" class="btn btn-xs {selected_cats.countries.includes(country)?'btn-primary text-black':'bg-base-300 text-black'} country" onclick={select_cat}>{country}</button> 
+            <button id="country" class="btn btn-xs {selected_cats.countries.includes(country)?'btn-primary text-black':'bg-base-300 text-neutral'} country" onclick={select_cat}>{country}</button> 
         {/each}
     </div>
     <div class="form-control flex flex-row justify-between w-full items-center">
@@ -381,16 +381,16 @@
         </div>
     </div>
     <div class="w-full carousel carousel-center rounded-box space-x-1 border border-primary rounded-md p-1">
-        <button id="thumb_up" class="btn  bg-transparent border-none btn-xs category" onclick={select_cat}><ThumbUp color={selected_cats.cats.includes("thumb_up")?'fill-primary':'fill-base-300'}/></button> 
-        <button id="heart" class="btn btn-xs category  bg-transparent border-none" onclick={select_cat}><Heart color={selected_cats.cats.includes("heart")?'fill-primary':'fill-base-300'}/></button> 
+        <button id="thumb_up" class="btn  bg-transparent border-none btn-xs category" onclick={select_cat}><ThumbUp color={selected_cats.cats.includes("thumb_up")?'fill-primary':'fill-neutral'}/></button> 
+        <button id="heart" class="btn btn-xs category  bg-transparent border-none" onclick={select_cat}><Heart color={selected_cats.cats.includes("heart")?'fill-primary':'fill-neutral'}/></button> 
         {#each display_cats.cats as cat}
-            <button id="category" class="btn btn-xs {selected_cats.cats.includes(cat)?'btn-primary text-black':'bg-base-300 text-black'} category" onclick={select_cat}>{cat}</button> 
+            <button id="category" class="btn btn-xs {selected_cats.cats.includes(cat)?'btn-primary text-black':'bg-base-300 text-neutral'} category" onclick={select_cat}>{cat}</button> 
         {/each}
         {#each display_cats.cuisines as cuisine}
-            <button id="cuisine" class="btn btn-xs {selected_cats.cuisines.includes(cuisine)?'btn-primary text-black':'bg-base-300 text-black'} cuisine" onclick={select_cat}>{cuisine}</button> 
+            <button id="cuisine" class="btn btn-xs {selected_cats.cuisines.includes(cuisine)?'btn-primary text-black':'bg-base-300 text-neutral'} cuisine" onclick={select_cat}>{cuisine}</button> 
         {/each}
         {#each display_cats.countries as country}
-            <button id="country" class="btn btn-xs {selected_cats.countries.includes(country)?'btn-primary text-black':'bg-base-300 text-black'} country" onclick={select_cat}>{country}</button> 
+            <button id="country" class="btn btn-xs {selected_cats.countries.includes(country)?'btn-primary text-black':'bg-base-300 text-neutral'} country" onclick={select_cat}>{country}</button> 
         {/each}
     </div>
 </div>
