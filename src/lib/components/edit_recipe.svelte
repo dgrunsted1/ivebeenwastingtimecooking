@@ -362,8 +362,8 @@
                         </div>
                     </div>
                     <div class="w-full flex justify-evenly mt-1">
-                        <a class="btn btn-primary btn-xs md:btn-sm" href={edited_recipe.url} target="_blank">original recipe</a>
-                        <button class="btn btn-primary btn-xs md:btn-sm" onclick={done_editing}>done</button>
+                        {#if edited_recipe.url}<a class="btn btn-primary btn-xs md:btn-sm" href={edited_recipe.url} target="_blank">original recipe</a>{/if}
+                        {#if $page.url.pathname != "/add_recipe"}<button class="btn btn-primary btn-xs md:btn-sm" onclick={done_editing}>done</button>{/if}
                     </div>
                 </div>
             {:else}

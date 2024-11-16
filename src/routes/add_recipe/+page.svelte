@@ -101,13 +101,19 @@
     <meta property="og:type" content="website" />
 </svelte:head>
 
-<div class="flex flex-col max-w-5xl m-auto h-[95svh]">
+<div class="flex flex-col max-w-5xl m-auto h-[95svh] px-2">
     {#if !edit}
         <div class="link my-auto">
             <form method='POST' oninput={preventDefault(fetch_recipe)} class="text-center w-full flex flex-col gap-5">
-                <input placeholder="Link to recipe" name="url" type="text" class="input input-bordered input-xs w-full text-center input-accent"/>
-                <p>or</p>
-                <button class="btn btn-primary btn-lg m-auto" onclick={edit = true}>Input Recipe</button>
+                <input placeholder="Link to recipe" name="url" type="text" class="input input-bordered input-xs text-center input-accent mx-2"/>
+                {#if !loading}
+                    <p>or</p>
+                    <button class="btn btn-primary btn-lg m-auto" onclick={edit = true}>Input Recipe</button>
+                {:else}
+                    <div class="flex h-[110px] w-full justify-center items-center">
+                        <span id="loading" class="loading loading-bars loading-lg"></span>
+                    </div>
+                {/if}
             </form>
         </div>
     {:else}

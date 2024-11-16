@@ -336,7 +336,7 @@
             <div class="flex w-fit space-x-6 items-center">
                 <div class="form-control w-full max-w-xs">
                     <label class="input input-bordered input-sm input-primary flex items-center gap-2 pr-2">
-                        <input type="text" class="input h-full p-0" placeholder="Search" onkeyup={search} bind:value={search_val}/>
+                        <input type="text" class="input h-full p-0 w-28" placeholder="Search" onkeyup={search} bind:value={search_val}/>
                         <button class="w-5" onclick={()=>{search_val = ""; search();}} onkeydown={()=>{search_val = ""; search();}}>
                             {#if search_val}
                                 <Clear size="w-4 h-4"/>
@@ -398,7 +398,7 @@
             <div class="flex w-fit space-x-6 items-center">
                 <div class="form-control w-full max-w-xs">
                     <label class="input input-bordered input-xs input-primary flex items-center gap-2 pr-0">
-                        <input type="text" class="input h-full p-0" placeholder="Search" onkeyup={search} bind:value={search_val}/>
+                        <input type="text" class="input h-full p-0 w-28" placeholder="Search" onkeyup={search} bind:value={search_val}/>
                         <button class="w-5" onclick={()=>{search_val = ""; search();}}>
                             {#if search_val}
                                 <Clear size="w-3 h-3"/>
@@ -410,7 +410,7 @@
             </div>
             
             <div class="dropdown dropdown-top dropdown-end">
-                <label tabindex="-1" for="sort" class="btn m-1 btn-primary btn-xs md:btn-sm">Sort</label>
+                <label tabindex="-1" for="sort" class="btn m-1 btn-primary btn-xs md:btn-sm">{sort_val}</label>
                 <ul tabindex="-1" name="sort" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-max bg-primary">
                     {#each sort_opts as opt}
                         {#if opt == sort_val}
