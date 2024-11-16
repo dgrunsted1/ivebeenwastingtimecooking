@@ -329,7 +329,7 @@ export const scrape = async function(url) {
                     '--no-sandbox',
                     '--disable-setuid-sandbox'
                 ], 
-                xecutablePath: '/home/***/.cache/puppeteer/chrome/linux-130.0.6723.116/chrome-linux64/chrome'});
+                executablePath: '/home/git_actions/.cache/puppeteer/chrome/linux-130.0.6723.116/chrome-linux64/chrome'});
         } catch(err){
             console.log(err);
             return {err: {title: "scraper error", msg: err.message}};
