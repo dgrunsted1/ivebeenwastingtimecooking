@@ -319,13 +319,18 @@ async function validate_recipe_data(recipe_data, url){
 
 export const scrape = async function(url) {
     // return {err: {title: "test", msg: "return from scraper"}};
-
+        let browser 
         const start = Date.now();
-        const browser = await puppeteer.launch({headless: 'new', args: [
-            '--incognito',
-            '--no-sandbox',
-            '--disable-setuid-sandbox'
-        ]});
+        try{
+            browser = await puppeteer.launch({headless: 'new', args: [
+                '--incognito',
+                '--no-sandbox',
+                '--disable-setuid-sandbox'
+            ]});
+        } catch(err){
+            console.log(err);
+            return {err: {title: "scraper error", msg: "browser launch error"}};
+        }
 
         const page = await browser.newPage();
         const init_time = Date.now();
