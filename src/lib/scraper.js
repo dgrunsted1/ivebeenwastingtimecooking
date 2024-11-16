@@ -329,7 +329,7 @@ export const scrape = async function(url) {
             ]});
         } catch(err){
             console.log(err);
-            return {err: {title: "scraper error", msg: "browser launch error"}};
+            return {err: {title: "scraper error", msg: err.message}};
         }
 
         const page = await browser.newPage();
