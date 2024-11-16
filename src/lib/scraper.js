@@ -322,11 +322,14 @@ export const scrape = async function(url) {
         let browser 
         const start = Date.now();
         try{
-            browser = await puppeteer.launch({headless: 'new', args: [
-                '--incognito',
-                '--no-sandbox',
-                '--disable-setuid-sandbox'
-            ]});
+            browser = await puppeteer.launch({
+                headless: 'new', 
+                args: [
+                    '--incognito',
+                    '--no-sandbox',
+                    '--disable-setuid-sandbox'
+                ], 
+                xecutablePath: '/home/***/.cache/puppeteer/chrome/linux-130.0.6723.116/chrome-linux64/chrome'});
         } catch(err){
             console.log(err);
             return {err: {title: "scraper error", msg: err.message}};
