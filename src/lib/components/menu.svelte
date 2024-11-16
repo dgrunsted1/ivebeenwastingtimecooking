@@ -256,8 +256,8 @@
     </div>
     <div class="flex content-center">
         <div class="tabs tabs-boxed w-fit mx-auto flex items-center bg-base-300 md:bg-base-200">
-            <button id="recipe_list" class="tab tab-active tab-xs" onclick={switch_tab}>Recipes</button> 
-            <button id="grocery_list" class="tab tab-xs" onclick={switch_tab}>Grocery List</button>
+            <div id="recipe_list" class="tab tab-active tab-xs" onclick={switch_tab}>Recipes</div> 
+            <div id="grocery_list" class="tab tab-xs" onclick={switch_tab}>Grocery List</div>
         </div>
     </div>
     <div class="flex justify-around m-1 items-center">
@@ -267,7 +267,7 @@
     </div>
     
     {#if tab == "recipe_list"}
-        <div class="h-[calc(100svh-210px)] md:h-[calc(100svh-160px)] overflow-y-auto border rounded-md md:border-none flex flex-col">
+        <div class="h-[calc(100svh-210px)] md:h-[calc(100svh-160px)] overflow-y-auto border border-primary rounded-md md:border-none flex flex-col">
             {#if menu.length}    
                 {#each menu as recipe}
                     {#if !recipe.is_sub_recipe}

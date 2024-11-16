@@ -13,12 +13,12 @@
     
     let user_menus = $state([]);
     
-    let modal_menu = $state([]);
+    let modal_menu = $state({});
     
     let loading = $state(true);
     
     let sort_val = $state("Most Recent");
-    let total_servings = $derived(get_servings(modal_menu.expand.recipes, {}, modal_menu.servings));
+    let total_servings = $state(0);
     let delay_timer;
     let sort_opts = ["Least Recipes", "Most Recipes", "Least Ingredients", "Most Ingredients", "Least Servings", "Most Servings", "Least Time", "Most Time", "Most Recent", "Least Recent"];
     let search_val = $state("");
@@ -38,12 +38,16 @@
         loading = false;
     });
 
+    // $effect(() => {
+    // });
+
     function show_menu_modal(e){
         const is_mobile = (window.getComputedStyle(document.getElementById("desktop_menu")).display == "none") ? true : false;
         let id = e.currentTarget.id;
         for (let i = 0; i < user_menus.length; i++){
             if (user_menus[i].id == id){
                 modal_menu = user_menus[i];
+                total_servings = get_servings(modal_menu.expand.recipes, {}, modal_menu.servings);
             }
         }
         if (is_mobile) my_modal_2.showModal();

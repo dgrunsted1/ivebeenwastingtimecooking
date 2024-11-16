@@ -158,7 +158,7 @@
         {/if}
     </div>
     <div class="md:mx-3">
-        <div class="grocery_list {view_size_mobile} {view_size_desktop} overflow-y-auto border border-primary rounded-md md:border-none px-2">
+        <div class="grocery_list h-[calc(100svh-225px)] md:h-[calc(100svh-160px)] overflow-y-auto border border-primary rounded-md md:border-none px-2">
             {#if grocery_list.length > 0}
                 {#each grocery_list as item, i}
                     {#if edit}
@@ -169,9 +169,9 @@
                             {#if status != "none"}<button class="btn btn-sm p-1 btn-accent" onclick={() => remove_item(item.id)}><DeleteIcon/></button>{/if}
                         </div>
                     {:else}
-                        <div class="grocery_item flex relative my-2 tooltip {(i > 2) ? "tooltip-top": "tooltip-bottom"} space-x-3 justify-end md:justify-start items-center z-100" data-tip={ingrs_to_string(item.expand.ingrs)}>
+                        <div class="grocery_item flex relative my-2 tooltip {(i > 2) ? "tooltip-top": "tooltip-bottom"} space-x-3 {($page.url.pathname == "/today")? "justify-end md:justify-start" : "justify-start"} items-center z-100" data-tip={ingrs_to_string(item.expand.ingrs)}>
                             {#if status != "none"}<input type="checkbox" class="hidden md:flex checkbox checkbox-primary checkbox-lg p-1" id={item.id} bind:checked={item.checked} onchange={check_item_handle}>{/if}
-                            <p class="text-xs md:text-left -indent-5 pl-5">{ingrs_to_string([item])}</p>
+                            <p class="text-xs {($page.url.pathname == "/today")? "md:text-left" : "text-left"} -indent-5 pl-5">{ingrs_to_string([item])}</p>
                             {#if status != "none"}<input type="checkbox" class="md:hidden checkbox checkbox-primary checkbox-lg p-1" id={item.id} bind:checked={item.checked} onchange={check_item_handle}>{/if}
                         </div>
                     {/if}
