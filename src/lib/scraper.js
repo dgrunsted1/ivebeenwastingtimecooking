@@ -318,10 +318,11 @@ async function validate_recipe_data(recipe_data, url){
 }
 
 export const scrape = async function(url) {
-    return {err: {title: "an error has occurred", msg: "This has been reported,  sorry for the inconvenince, try again or copy/paste each field manually"}};
+    return {err: {title: "Test", msg: "here"}};
         
         const start = Date.now();
         const browser = await puppeteer.launch({headless: 'new', args: [ '--incognito' ]});
+
         const page = await browser.newPage();
         const init_time = Date.now();
         const await_data = Date.now();
