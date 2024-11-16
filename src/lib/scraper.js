@@ -318,7 +318,6 @@ async function validate_recipe_data(recipe_data, url){
 }
 
 export const scrape = async function(url) {
-    // return {err: {title: "test", msg: "return from scraper"}};
         let browser 
         const start = Date.now();
         try{
@@ -331,8 +330,13 @@ export const scrape = async function(url) {
                 ], 
                 executablePath: '/home/git_actions/.cache/puppeteer/chrome/linux-130.0.6723.116/chrome-linux64/chrome'});
         } catch(err){
-            console.log(err);
-            return {err: {title: "scraper error", msg: err.message}};
+            let data = {
+                message: e.message,
+                url: url,
+                function: "prep scrape"
+            };
+            const result = await pb.collection('errors').create(data);
+            return {err: {title: "an error has occurred", msg: "This has been reported,  sorry for the inconvenince, try again or copy/paste each field manually"}};
         }
 
         const page = await browser.newPage();
