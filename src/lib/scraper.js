@@ -318,7 +318,7 @@ async function validate_recipe_data(recipe_data, url){
 }
 
 export const scrape = async function(url) {
-    return {err: {title: "test", msg: "return from scraper"}};
+    // return {err: {title: "test", msg: "return from scraper"}};
 
         try{
             const start = Date.now();

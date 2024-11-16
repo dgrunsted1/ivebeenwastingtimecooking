@@ -23,7 +23,6 @@ jobs:
             git reset --hard origin/Master
             git status
             npm ci
-            ldd chrome | grep not
             npm run build
             sudo systemctl restart ivebeenwastingtime
             systemctl status ivebeenwastingtime
