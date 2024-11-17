@@ -22,7 +22,6 @@ jobs:
             git fetch --all
             git reset --hard origin/Master
             git status
-            npx puppeteer browsers install chrome
             npm ci
             npm run build
             sudo systemctl restart ivebeenwastingtime
