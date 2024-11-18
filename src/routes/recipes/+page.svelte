@@ -456,25 +456,25 @@
     </div>
     <div class="flex md:hidden flex-row md:flex-col mx-1 space-x-1 md:space-x-0 md:space-y-2">
         <select bind:value={selected_category} onchange={select_cat} class="select select-sm select-bordered border-primary w-full max-w-xs pl-1">
-            <option value={null}>category</option>
+            <option value="">category</option>
             {#each categories as curr}
                 <option>{curr.id}</option>
             {/each}
         </select>
         <select bind:value={selected_country} onchange={select_cat} class="select select-sm select-bordered border-primary w-full max-w-xs pl-1">
-            <option value={null}>country</option>
+            <option value="">country</option>
             {#each countries as curr}
                 <option>{curr.id}</option>
             {/each}
         </select>
         <select bind:value={selected_cuisine} onchange={select_cat} class="select select-sm select-bordered border-primary w-full max-w-xs pl-1">
-            <option value={null}>cuisine</option>
+            <option value="">cuisine</option>
             {#each cuisines as curr}
                 <option>{curr.id}</option>
             {/each}
         </select>
         <select bind:value={selected_author} onchange={select_cat} class="select select-sm select-bordered border-primary w-full max-w-xs pl-1">
-            <option value={null}>author</option>
+            <option value="">author</option>
             {#each authors as curr}
                 <option>{curr.id}</option>
             {/each}
