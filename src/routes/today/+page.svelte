@@ -199,7 +199,7 @@
                                             {#if curr_sub_recipe.id === sub_recipe.recipe_id}
                                                 <div class="flex justify-around items-center w-full">
                                                     <SubTask/>
-                                                    <div class="card card-bordered sm:card-side {(todays_menu.made && todays_menu.made[curr_sub_recipe.id]) ? "bg-base-300" : "bg-base-200"} shadow-xl max-h-24 my-1.5 mx-1 w-4/5" onclick={window.location = `/cook_recipe/${curr_sub_recipe.url_id}/${todays_menu.servings[curr_sub_recipe.id]}`} onkeydown={window.location = `/cook_recipe/${curr_sub_recipe.url_id}/${todays_menu.servings[curr_sub_recipe.id]}`}>
+                                                    <div class="card card-bordered sm:card-side {(todays_menu.made && todays_menu.made[curr_sub_recipe.id]) ? "bg-base-300" : "bg-base-200"} max-h-24 my-1.5 mx-1 w-4/5" onclick={window.location = `/cook_recipe/${curr_sub_recipe.url_id}/${todays_menu.servings[curr_sub_recipe.id]}`} onkeydown={window.location = `/cook_recipe/${curr_sub_recipe.url_id}/${todays_menu.servings[curr_sub_recipe.id]}`}>
                                                         <figure class="md:w-3/5 {(todays_menu.made && todays_menu.made[curr_sub_recipe.id]) ? "blur-sm" : ""}"><img src={curr_sub_recipe.image} alt={curr_sub_recipe.title}/></figure>
                                                         <div class="card-body max-h-full flex flex-row p-2 items-center w-full">
                                                             <p id={i} class="w-1/2 text-xs">{curr_sub_recipe.title}</p>
@@ -214,7 +214,7 @@
                                         {/each}
                                     {/each}
                                 {/if}
-                                <div class="card card-bordered sm:card-side bg-base-200 shadow-xl max-h-24 my-1.5 mx-1 cursor-pointer" onclick={window.location = `/cook_recipe/${curr.url_id}/${todays_menu.servings[curr.id]}`} onkeydown={window.location = `/cook_recipe/${curr.url_id}/${todays_menu.servings[curr.id]}`}>
+                                <div class="card card-bordered sm:card-side bg-base-200 border-primary max-h-24 my-1.5 mx-1 cursor-pointer" onclick={window.location = `/cook_recipe/${curr.url_id}/${todays_menu.servings[curr.id]}`} onkeydown={window.location = `/cook_recipe/${curr.url_id}/${todays_menu.servings[curr.id]}`}>
                                     <figure class="md:w-3/5 "><img src={curr.image} alt={curr.title}/></figure>
                                     <div class="card-body max-h-full flex flex-row p-2 items-center w-full">
                                         <p id={i} class="w-1/2 text-xs">{curr.title}</p>

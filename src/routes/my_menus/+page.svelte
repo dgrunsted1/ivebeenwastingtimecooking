@@ -371,7 +371,7 @@
                 </div>
             {:else}
                 {#each user_menus as curr, i}
-                    <div id={user_menus[i].id} class="card md:card-side card-bordered border-primary bg-base-200 shadow-xl h-24 my-1.5 mx-1 cursor-pointer" onclick={show_menu_modal} onkeypress={show_menu_modal}>
+                    <div id={user_menus[i].id} class="card md:card-side card-bordered border-primary bg-base-200 h-24 my-1.5 mx-1 cursor-pointer" onclick={show_menu_modal} onkeypress={show_menu_modal}>
                         <figure class="md:w-2/3">
                             {#each user_menus[i].expand.recipes as recipe, j}
                                     <img class="w-16 md:w-20" src={user_menus[i].expand.recipes[j].image} alt={user_menus[i].expand.recipes[j].title}/>

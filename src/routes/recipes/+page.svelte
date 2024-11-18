@@ -384,7 +384,7 @@
             </div>
         <ul class="flex flex-col w-full max-w-3xl space-y-2 md:space-y-4 h-[calc(100svh-135px)] md:h-[calc(100svh-125px)] overflow-y-auto">
           {#each data as item}
-              <div class="card card-side bg-base-200 shadow-xl h-24 card-bordered border-primary cursor-pointer mx-1" onkeydown={window.location = `/cook_recipe/${item.url_id}/${item.servings}`} onclick={window.location = `/cook_recipe/${item.url_id}/${item.servings}`}>
+              <div class="card card-side bg-base-200 h-24 card-bordered border-primary cursor-pointer mx-1" onkeydown={window.location = `/cook_recipe/${item.url_id}/${item.servings}`} onclick={window.location = `/cook_recipe/${item.url_id}/${item.servings}`}>
                   <figure class="w-1/4 bg-cover bg-no-repeat bg-center" style="background-image: url('{item.image}')"></figure>
                   <div class="card-body h-full flex flex-row p-1 w-3/4 justify-between">
                       <div class="flex flex-col justify-between p-1 md:p-3 w-full">
