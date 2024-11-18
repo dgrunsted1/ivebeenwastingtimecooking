@@ -382,7 +382,7 @@
                   </ul>
               </div>
             </div>
-        <ul class="flex flex-col w-full max-w-3xl space-y-2 md:space-y-4 h-[calc(100svh-135px)] md:h-[calc(100svh-125px)] overflow-y-auto">
+        <ul class="flex flex-col w-full max-w-3xl space-y-2 md:space-y-4 h-[calc(100svh-120px)] md:h-[calc(100svh-125px)] overflow-y-auto">
           {#each data as item}
               <div class="card card-side bg-base-200 h-24 card-bordered border-primary cursor-pointer mx-1" onkeydown={window.location = `/cook_recipe/${item.url_id}/${item.servings}`} onclick={window.location = `/cook_recipe/${item.url_id}/${item.servings}`}>
                   <figure class="w-1/4 bg-cover bg-no-repeat bg-center" style="background-image: url('{item.image}')"></figure>
@@ -432,9 +432,9 @@
           threshold={100}
           on:loadMore={load_more} />
       </ul>
-      <div class="flex justify-between items-center mx-1 md:hidden">
+      <div class="flex justify-between items-center mx-1 my-0 md:hidden">
         <div class="form-control md:w-auto md:max-w-xs">
-            <label class="input input-bordered input-sm input-primary flex items-center gap-2 pr-0">
+            <label class="input input-bordered input-xs input-primary flex items-center gap-2 pr-0">
                 <input type="text" class="input h-full p-0 w-28" placeholder="Search" onkeyup={update_search} bind:value={search_val}/>
                 <button class="w-5" onclick={()=>{search_val = ""; update_search();}} onkeydown={()=>{search_val = ""; update_search();}}>
                     {#if search_val}
@@ -445,7 +445,7 @@
         </div>
         <div class="mx-1 text-xs md:text-base">{(total_recipes_num > max_results) ? max_results : total_recipes_num} recipes</div>
         <div class="dropdown dropdown-top md:dropdown-bottom dropdown-end">
-              <label tabindex="-1" for="sort_mobile" class="btn m-1 btn-primary btn-xs md:btn-sm">{sort_val}</label>
+              <label tabindex="-1" for="sort_mobile" class="btn m-0 btn-primary btn-xs md:btn-sm">{sort_val}</label>
               <ul tabindex="-1" name="sort_mobile" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-max bg-primary">
                   {#each sort_opts as opt}
                       <li class="btn btn-xs {opt == sort_val ? 'btn-neutral': 'btn-primary'}"><button onclick={update_sort}>{opt}</button></li>
@@ -455,25 +455,25 @@
         </div>
     </div>
     <div class="flex md:hidden flex-row md:flex-col mx-1 space-x-1 md:space-x-0 md:space-y-2">
-        <select bind:value={selected_category} onchange={select_cat} class="select select-sm select-bordered border-primary w-full max-w-xs pl-1">
+        <select bind:value={selected_category} onchange={select_cat} class="select select-xs select-bordered border-primary w-full max-w-xs pl-1">
             <option value="">category</option>
             {#each categories as curr}
                 <option>{curr.id}</option>
             {/each}
         </select>
-        <select bind:value={selected_country} onchange={select_cat} class="select select-sm select-bordered border-primary w-full max-w-xs pl-1">
+        <select bind:value={selected_country} onchange={select_cat} class="select select-xs select-bordered border-primary w-full max-w-xs pl-1">
             <option value="">country</option>
             {#each countries as curr}
                 <option>{curr.id}</option>
             {/each}
         </select>
-        <select bind:value={selected_cuisine} onchange={select_cat} class="select select-sm select-bordered border-primary w-full max-w-xs pl-1">
+        <select bind:value={selected_cuisine} onchange={select_cat} class="select select-xs select-bordered border-primary w-full max-w-xs pl-1">
             <option value="">cuisine</option>
             {#each cuisines as curr}
                 <option>{curr.id}</option>
             {/each}
         </select>
-        <select bind:value={selected_author} onchange={select_cat} class="select select-sm select-bordered border-primary w-full max-w-xs pl-1">
+        <select bind:value={selected_author} onchange={select_cat} class="select select-xs select-bordered border-primary w-full max-w-xs pl-1">
             <option value="">author</option>
             {#each authors as curr}
                 <option>{curr.id}</option>
