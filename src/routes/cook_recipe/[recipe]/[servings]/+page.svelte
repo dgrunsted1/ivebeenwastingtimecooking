@@ -268,8 +268,8 @@
                 </div>    
             </div>
         </div>
-        <div class="ingr_directions_container flex flex-col md:flex-row mt-2 my-1 items-center">
-            <div id="ingredient_list" class="flex flex-col h-fit w-full md:w-2/5 m-2 max-h-[calc(33vh)] md:max-h-[calc(64vh)] overflow-y-auto border border-primary rounded-md py-1 md:py-4">
+        <div class="ingr_directions_container flex flex-col md:flex-row m-1 items-center">
+            <div id="ingredient_list" class="flex flex-col h-fit w-full md:w-2/5 m-2 max-h-[calc(40vh)] md:max-h-[calc(64vh)] overflow-y-auto border border-primary rounded-md py-1 md:py-4">
                 {#each recipe.expand.ingr_list as ingr}
                     {#if ingr}
                         <button class="ingr_row flex items-center ml-2 md:ml-4 mr-1 gap-x-1 md:gap-x-2" onclick={(e) => {e.currentTarget.classList.toggle('blur'); }}>
@@ -284,7 +284,7 @@
                 {/each}
             </div>
         
-            <div class="flex flex-col directions_list md:w-3/5 h-fit  max-h-[calc(33vh)] md:max-h-[calc(64vh)] overflow-y-auto border border-primary rounded-md cursor-pointer">
+            <div class="flex flex-col directions_list md:w-3/5 h-fit  max-h-[calc(40vh)] md:max-h-[calc(64vh)] overflow-y-auto border border-primary rounded-md cursor-pointer">
                 {#each recipe.directions as curr, i}
                 <div class="flex justify-between items-center mr-2">
                     <button class="step flex items-center justify-left gap-x-1 md:gap-x-3 md:mx-2 p-1 w-fit" onclick={(e) => {e.currentTarget.classList.toggle('blur'); }} onkeydown={(e) => {e.currentTarget.classList.toggle('blur'); }}>
