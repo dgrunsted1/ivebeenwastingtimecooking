@@ -67,7 +67,7 @@
 </svelte:head>
     <div class="w-full flex flex-col h-full">
         <div style="background-image: url('https://db.ivebeenwastingtime.com/api/files/photos/px7wc33f6m57f53/0071_8XzznOIN4G.jpg?thumb=400x0')" class="flex flex-col relative w-full h-screen m-auto bg-cover bg-no-repeat bg-center">
-            <div id="web_title" class="m-auto cursor-default md:text-5xl">
+            <div id="web_title" class="m-auto cursor-default md:text-5xl m-auto flex flex-col">
                 {#if !is_user}
                     <form class="m-auto flex flex-col">
                         <input
@@ -109,9 +109,9 @@
                         <button class="btn btn-primary border-black m-2.5 w-fit my-1 mx-auto" onclick={handle_click}>Sign Up</button>
                     </form>
                 {:else}
-                    <div class="m-auto flex flex-col  items-center space-y-10 md:space-y-20">
+                    <div class="m-auto flex flex-col items-center space-y-10 md:space-y-20 backdrop-blur-md rounded-xl shadow-lg p-6 md:p-8 border border-gray-500">
                         <p>verification email sent</p>
-                        <a class="btn" href="/recipes">recipe feed</a>
+                        <a class="btn btn-primary" href="/recipes">recipe feed</a>
                     </div>
                 {/if}
             </div>

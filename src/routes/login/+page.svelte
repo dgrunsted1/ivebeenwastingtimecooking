@@ -34,9 +34,9 @@
     <div style="background-image: url('https://db.ivebeenwastingtime.com/api/files/photos/s7f3suof21cxupr/0059_99ZbLSLOOM.jpg?thumb=400x0')" class="flex flex-col relative w-full h-screen m-auto bg-cover bg-no-repeat bg-center">
         <div id="web_title" class="m-auto cursor-default md:text-5xl">
           {#if $currentUser}
-            <div class="m-auto flex flex-col">
+            <div class="m-auto flex flex-col items-center space-y-10 md:space-y-20 backdrop-blur-md rounded-xl shadow-lg p-6 md:p-8 border border-gray-500">
               <p class="m-auto">Signed in as {$currentUser.username}</p> 
-              <button onclick={signOut}>Sign Out</button>
+              <button class="btn" onclick={signOut}>Sign Out</button>
             </div>
           {:else}
             <form onsubmit={preventDefault(bubble('submit'))} class="m-auto flex flex-col">
@@ -54,8 +54,8 @@
                 bind:value={password} 
               />
               <div class="flex">
-                <button class="btn btn-primary border-2 border-black m-2.5 w-fit my-1 mx-auto" onclick={login}>Login</button>
-                <a class="btn btn-success border-2 border-black m-2.5 w-fit my-1 mx-auto" href="/signup">Sign Up</a>
+                <button class="btn btn-primary border-gray-500 m-2.5 w-fit my-1 mx-auto" onclick={login}>Login</button>
+                <a class="btn btn-success border-gray-500 m-2.5 w-fit my-1 mx-auto" href="/signup">Sign Up</a>
               </div>
             </form>
           {/if}
