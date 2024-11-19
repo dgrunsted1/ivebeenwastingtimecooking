@@ -69,7 +69,7 @@
         <div style="background-image: url('https://db.ivebeenwastingtime.com/api/files/photos/px7wc33f6m57f53/0071_8XzznOIN4G.jpg?thumb=400x0')" class="flex flex-col relative w-full h-screen m-auto bg-cover bg-no-repeat bg-center">
             <div id="web_title" class="m-auto cursor-default md:text-5xl">
                 {#if !is_user}
-                    <form class="m-auto flex flex-col w-72">
+                    <form class="m-auto flex flex-col">
                         <input
                         placeholder="Username"
                         type="text"

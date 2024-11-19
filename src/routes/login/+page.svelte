@@ -34,12 +34,12 @@
     <div style="background-image: url('https://db.ivebeenwastingtime.com/api/files/photos/s7f3suof21cxupr/0059_99ZbLSLOOM.jpg?thumb=400x0')" class="flex flex-col relative w-full h-screen m-auto bg-cover bg-no-repeat bg-center">
         <div id="web_title" class="m-auto cursor-default md:text-5xl">
           {#if $currentUser}
-            <div class="m-auto mt-32 flex flex-col">
+            <div class="m-auto flex flex-col">
               <p class="m-auto">Signed in as {$currentUser.username}</p> 
               <button onclick={signOut}>Sign Out</button>
             </div>
           {:else}
-            <form onsubmit={preventDefault(bubble('submit'))} class="m-auto mt-32 flex flex-col w-72">
+            <form onsubmit={preventDefault(bubble('submit'))} class="m-auto flex flex-col">
               <input
                 placeholder="Username or Email"
                 type="text"
