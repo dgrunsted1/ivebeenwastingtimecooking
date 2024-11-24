@@ -1,12 +1,11 @@
 <script>
     import { stopPropagation } from 'svelte/legacy';
 
-    import { onMount,tick } from 'svelte';
+    import { onMount } from 'svelte';
     import { currentUser, pb } from '/src/lib/pocketbase.js';
     import GroceryList from "/src/lib/components/grocery_list.svelte";
-    import { page } from '$app/stores';
     import { get_grocery_list, groupBySimilarity } from '/src/lib/merge_ingredients.js'
-    import { update_grocery_list, create_grocery_list, update_made, log_made, check_grocery_item, update_grocery_item } from '/src/lib/groceries.js'
+    import { create_grocery_list, update_made, log_made, check_grocery_item, update_grocery_item } from '/src/lib/groceries.js'
     import Heart from "/src/lib/icons/Heart.svelte";
     import SubTask from "/src/lib/icons/subtask.svelte";
     import { update_fave } from '/src/lib/save_recipe.js';
@@ -69,14 +68,12 @@
                     todays_menu.made[todays_menu.expand.recipes[i].id] = false;
                 }
             }
+            if (grocery_list.reduce((count, item) => count + (item.checked ? 1 : 0),0) / grocery_list.length > 0.8) {
+                tab = "recipe_list";
+            }
         }
         loading = false;
     });
-
-    // $effect(() => {
-        // if (todays_menu.expand) update_recipes_ready();
-    // });
-
     
     function update_recipes_ready(){
         recipes_ready = [];
@@ -252,7 +249,7 @@
             </div>
         </div>
         <div class="tabs tabs-boxed w-fit mx-auto flex items-center bg-base-300 md:bg-base-200 md:hidden my-1">
-            <button id="recipe_list" class="tab tab-xs" onclick={switch_tab}>Recipes</button> 
-            <button id="grocery_list" class="tab tab-active tab-xs" onclick={switch_tab}>Grocery List</button>
+            <button id="recipe_list" class="tab tab-xs {(tab == "recipe_list") ? "tab-active" : ""}" onclick={switch_tab}>Recipes</button>
+            <button id="grocery_list" class="tab {(tab == "grocery_list") ? "tab-active" : ""} tab-xs" onclick={switch_tab}>Grocery List</button>
         </div>
     </div>
