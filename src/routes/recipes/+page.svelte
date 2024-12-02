@@ -25,9 +25,13 @@
 	let data = $state([]);
 	
     let categories = $state([]);
+    let display_categories = $state([]);
     let countries = $state([]);
+    let display_countries = $state([]);
     let cuisines = $state([]);
+    let display_cuisines = $state([]);
     let authors = $state([]);
+    let display_authors = $state([]);
     let sort_opts = ["Least Ingredients", "Most Ingredients", "Least Servings", "Most Servings", "Least Time", "Most Time", "Most Recent", "Least Recent"];
     let delay_timer;
 
@@ -136,6 +140,7 @@
                 for (let j = 0; j < ingredients.items[i].expand.recipe.length; j++){
                     
                     if (!ingr_recipes.includes(ingredients.items[i].expand.recipe[j]) && !recipe_ids.includes(ingredients.items[i].expand.recipe[j].id)){
+                        // TODO
                         if ((!selected_category || ingredients.items[i].expand.recipe[j].category == selected_category) &&
                             (!selected_country || ingredients.items[i].expand.recipe[j].country == selected_country) &&
                             (!selected_cuisine || ingredients.items[i].expand.recipe[j].cuisine == selected_cuisine) &&
@@ -173,6 +178,7 @@
     }
 
     function get_filter(){
+        // TODO
         let output = "";
         if (selected_category) output += `category="${selected_category}"`;
         if (selected_country) output += (!output) ? `country="${selected_country}"` : ` && country="${selected_country}"`;
@@ -208,6 +214,7 @@
 	});
 
   async function select_cat(e){
+    // TODO
     loading = true;
     if (e.currentTarget.firstChild.innerHTML == 'category') {
         if (e.currentTarget.value == "null") selected_category = null;
@@ -334,31 +341,19 @@
   <h4>See what others are cooking</h4>
   <div class="flex w-full justify-center flex-col md:flex-row md:mt-2 space-y-1 md:space-y-2">
     <div class="hidden md:flex flex-row md:flex-col mx-1 space-x-1 md:space-x-0 md:space-y-2">
-        <select bind:value={selected_category} onchange={select_cat} class="select select-sm select-bordered border-primary w-full max-w-xs pl-1">
-            <option value="">Category</option>
-            {#each categories as curr}
-                <option>{curr.id}</option>
+        <div class="w-full carousel carousel-center rounded-box space-x-1 border border-primary rounded-md p-1">
+            <!-- <button id="thumb_up" class="btn btn-xs p-1 made flex content-center category bg-transparent border-none" onclick={select_cat}><ThumbUp color={(selected_cats.cats.includes("thumb_up")) ? "fill-primary" : "fill-neutral"}/></button>
+            <button id="heart" class="btn btn-xs p-1 made flex content-center category  bg-transparent border-none" onclick={select_cat}><Heart color={(selected_cats.cats.includes("heart")) ? "fill-primary" : "fill-neutral"}/></button> -->
+            {#each display_cats.cats as cat}
+                <button id="category" class="btn btn-xs {selected_cats.cats.includes(cat)?'btn-primary text-black':'bg-base-300 text-neutral'} category" onclick={select_cat}>{cat}</button> 
             {/each}
-        </select>
-        <select bind:value={selected_country} onchange={select_cat} class="select select-sm select-bordered border-primary w-full max-w-xs pl-1">
-            <option value="">Country</option>
-            {#each countries as curr}
-                <option>{curr.id}</option>
+            {#each display_cats.cuisines as cuisine}
+                <button id="cuisine" class="btn btn-xs {selected_cats.cuisines.includes(cuisine)?'btn-primary text-black':'bg-base-300 text-neutral'} cuisine" onclick={select_cat}>{cuisine}</button> 
             {/each}
-        </select>
-        <select bind:value={selected_cuisine} onchange={select_cat} class="select select-sm select-bordered border-primary w-full max-w-xs pl-1">
-            <option value="">Cuisine</option>
-            {#each cuisines as curr}
-                <option>{curr.id}</option>
+            {#each display_cats.countries as country}
+                <button id="country" class="btn btn-xs {selected_cats.countries.includes(country)?'btn-primary text-black':'bg-base-300 text-neutral'} country" onclick={select_cat}>{country}</button> 
             {/each}
-        </select>
-        <select bind:value={selected_author} onchange={select_cat} class="select select-sm select-bordered border-primary w-full max-w-xs pl-1">
-            <option value="">Author</option>
-            {#each authors as curr}
-                <option>{curr.id}</option>
-            {/each}
-        </select>
-
+        </div>
     </div>
     <div class="flex flex-col w-full md:w-3/4 max-w-3xl space-y-1 md:space-y-2">
         <div class="hidden md:flex justify-between items-center mx-1">
@@ -455,6 +450,7 @@
         </div>
     </div>
     <div class="flex md:hidden flex-row md:flex-col mx-1 space-x-1 md:space-x-0 md:space-y-2">
+        <!-- TODO -->
         <select bind:value={selected_category} onchange={select_cat} class="select select-xs select-bordered border-primary w-full max-w-xs pl-1">
             <option value="">category</option>
             {#each categories as curr}
