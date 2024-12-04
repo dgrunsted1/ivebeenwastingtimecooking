@@ -181,7 +181,6 @@
         // TODO
         let output = "";
         if (selected_categories.length){
-            console.log("selected_categories");
             for (let i = 0; i < selected_categories.length; i++){
                 if (i == 0) output += `(category="${selected_categories[i]}"`;
                 else output += ` || category="${selected_categories[i]}"`;
@@ -242,20 +241,18 @@
 		await fetchData();
         max_results = total_recipes_num;
         categories = await pb.collection('categories').getFullList({sort: `+id`});
-        display_categories = categories;
+        display_categories = categories.map(c => c.id);
         countries = await pb.collection('countries').getFullList({sort: `+id`});
-        display_countries = countries;
+        display_countries = countries.map(c => c.id);
         cuisines = await pb.collection('cuisines').getFullList({sort: `+id`});
-        display_cuisines = cuisines;
+        display_cuisines = cuisines.map(c => c.id);
         authors = await pb.collection('authors').getFullList({sort: `+id`});
-        display_authors = authors;
+        display_authors = authors.map(a => a.id);
         loading = false;
 	});
 
   async function select_cat(e){
     // TODO
-    console.log("cat id", e.currentTarget.id)
-    // console.log(e.currentTarget.classList.includes("Category"))
     loading = true;
     if (e.currentTarget.id == "category"){
         console.log("add to categories", e.currentTarget.innerHTML);
@@ -264,44 +261,37 @@
         } else {
             selected_categories = selected_categories.filter(category => category !== e.currentTarget.innerHTML);
         }
+        display_countries = await update_display_countries();
+        display_cuisines = await update_display_cuisines();
+        display_authors = await update_display_authors();
     } else if (e.currentTarget.id == "country"){
         if (!selected_countries.includes(e.currentTarget.innerHTML)) {
             selected_countries.push(e.currentTarget.innerHTML);
         } else {
             selected_countries = selected_countries.filter(category => category !== e.currentTarget.innerHTML);
         }
+        display_categories = await update_display_categories();
+        display_cuisines = await update_display_cuisines();
+        display_authors = await update_display_authors();
     } else if (e.currentTarget.id == "cuisine"){
         if (!selected_cuisines.includes(e.currentTarget.innerHTML)) {
             selected_cuisines.push(e.currentTarget.innerHTML);
         } else {
             selected_cuisines = selected_cuisines.filter(category => category !== e.currentTarget.innerHTML);
         }
+        display_countries = await update_display_countries();
+        display_categories = await update_display_categories();
+        display_authors = await update_display_authors();
     } else if (e.currentTarget.id == "author"){
         if (!selected_authors.includes(e.currentTarget.innerHTML)) {
             selected_authors.push(e.currentTarget.innerHTML);
         } else {
             selected_authors = selected_authors.filter(category => category !== e.currentTarget.innerHTML);
         }
+        display_countries = await update_display_countries();
+        display_cuisines = await update_display_cuisines();
+        display_categories = await update_display_categories();
     }
-    $state.snapshot(selected_authors);
-    $state.snapshot(selected_countries);
-    $state.snapshot(selected_categories);
-    $state.snapshot(selected_cuisines);
-    // if (e.currentTarget.firstChild.innerHTML == 'category') {
-    //     if (e.currentTarget.value == "null") selected_category = null;
-    //     else selected_category = e.currentTarget.value;
-    // } else if (e.currentTarget.firstChild.innerHTML == 'country') {
-    //     if (e.currentTarget.value == "null") selected_country = null;
-    //     else selected_country = e.currentTarget.value;
-    // } else if (e.currentTarget.firstChild.innerHTML == 'cuisine') {
-    //     if (e.currentTarget.value == "null") selected_cuisine = null;
-    //     else selected_cuisine = e.currentTarget.value;
-    // } else if (e.currentTarget.firstChild.innerHTML == 'author') {
-    //     if (e.currentTarget.value == "null") selected_author = null;
-    //     else selected_author = e.currentTarget.value;
-    // }
-    // if (e.currentTarget.value == "null") e.currentTarget.value = null;
-
     page = 1; 
     
     newBatch = [];
@@ -320,6 +310,46 @@
     page++;
     await fetchData();
     loading = false;
+  }
+
+  async function update_display_categories(){
+    const records = await pb.collection('recipes').getFullList({
+        filter: get_filter(),
+        fields: 'category'
+    });
+
+    const uniqueCategory = [...new Set(records.map(record => record.category))].filter(category => category !== "");
+    return uniqueCategory;
+  }
+
+  async function update_display_countries(){
+    const records = await pb.collection('recipes').getFullList({
+        filter: get_filter(),
+        fields: 'country'
+    });
+
+    const uniqueCountries = [...new Set(records.map(record => record.country))].filter(country => country !== "");
+    return uniqueCountries;
+  }
+
+  async function update_display_cuisines(){
+    const records = await pb.collection('recipes').getFullList({
+        filter: get_filter(),
+        fields: 'cuisine'
+    });
+
+    const uniqueCuisines = [...new Set(records.map(record => record.cuisine))].filter(cuisine => cuisine !== "");
+    return uniqueCuisines;
+  }
+
+  async function update_display_authors(){
+    const records = await pb.collection('recipes').getFullList({
+        filter: get_filter(),
+        fields: 'author'
+    });
+
+    const uniqueAuthors = [...new Set(records.map(record => record.author))].filter(author => author !== "");
+    return uniqueAuthors;
   }
 
     async function update_sort(e){
@@ -417,16 +447,16 @@
             <!-- <button id="thumb_up" class="btn btn-xs p-1 made flex content-center category bg-transparent border-none" onclick={select_cat}><ThumbUp color={(selected_cats.cats.includes("thumb_up")) ? "fill-primary" : "fill-neutral"}/></button>
             <button id="heart" class="btn btn-xs p-1 made flex content-center category  bg-transparent border-none" onclick={select_cat}><Heart color={(selected_cats.cats.includes("heart")) ? "fill-primary" : "fill-neutral"}/></button> -->
             {#each display_categories as cat}
-                <button id="category" class="btn btn-xs {selected_categories.includes(cat.id)?'btn-primary text-black':'bg-base-300 text-neutral'} category" onclick={select_cat}>{cat.id}</button> 
+                <button id="category" class="btn btn-xs {selected_categories.includes(cat)?'btn-primary text-black':'bg-base-300 text-neutral'} category" onclick={select_cat}>{cat}</button> 
             {/each}
             {#each display_cuisines as cuisine}
-                <button id="cuisine" class="btn btn-xs {selected_cuisines.includes(cuisine.id)?'btn-primary text-black':'bg-base-300 text-neutral'} cuisine" onclick={select_cat}>{cuisine.id}</button> 
+                <button id="cuisine" class="btn btn-xs {selected_cuisines.includes(cuisine)?'btn-primary text-black':'bg-base-300 text-neutral'} cuisine" onclick={select_cat}>{cuisine}</button> 
             {/each}
             {#each display_authors as author}
-                <button id="author" class="btn btn-xs {selected_authors.includes(author.id)?'btn-primary text-black':'bg-base-300 text-neutral'} cuisine" onclick={select_cat}>{author.id}</button> 
+                <button id="author" class="btn btn-xs {selected_authors.includes(author)?'btn-primary text-black':'bg-base-300 text-neutral'} cuisine" onclick={select_cat}>{author}</button> 
             {/each}
             {#each display_countries as country}
-                <button id="country" class="btn btn-xs {selected_countries.includes(country.id)?'btn-primary text-black':'bg-base-300 text-neutral'} country" onclick={select_cat}>{country.id}</button> 
+                <button id="country" class="btn btn-xs {selected_countries.includes(country)?'btn-primary text-black':'bg-base-300 text-neutral'} country" onclick={select_cat}>{country}</button> 
             {/each}
         </div>
     </div>
@@ -531,16 +561,16 @@
             <!-- <button id="thumb_up" class="btn btn-xs p-1 made flex content-center category bg-transparent border-none" onclick={select_cat}><ThumbUp color={(selected_cats.cats.includes("thumb_up")) ? "fill-primary" : "fill-neutral"}/></button>
             <button id="heart" class="btn btn-xs p-1 made flex content-center category  bg-transparent border-none" onclick={select_cat}><Heart color={(selected_cats.cats.includes("heart")) ? "fill-primary" : "fill-neutral"}/></button> -->
             {#each display_categories as cat}
-                <button id="category" class="btn btn-xs {selected_categories.includes(cat)?'btn-primary text-black':'bg-base-300 text-neutral'} category" onclick={select_cat}>{cat.id}</button> 
+                <button id="category" class="btn btn-xs {selected_categories.includes(cat)?'btn-primary text-black':'bg-base-300 text-neutral'} category" onclick={select_cat}>{cat}</button> 
             {/each}
             {#each display_cuisines as cuisine}
-                <button id="cuisine" class="btn btn-xs {selected_cuisines.includes(cuisine)?'btn-primary text-black':'bg-base-300 text-neutral'} cuisine" onclick={select_cat}>{cuisine.id}</button> 
+                <button id="cuisine" class="btn btn-xs {selected_cuisines.includes(cuisine)?'btn-primary text-black':'bg-base-300 text-neutral'} cuisine" onclick={select_cat}>{cuisine}</button> 
             {/each}
             {#each display_authors as author}
-                <button id="cuisine" class="btn btn-xs {selected_authors.includes(author)?'btn-primary text-black':'bg-base-300 text-neutral'} cuisine" onclick={select_cat}>{author.id}</button> 
+                <button id="cuisine" class="btn btn-xs {selected_authors.includes(author)?'btn-primary text-black':'bg-base-300 text-neutral'} cuisine" onclick={select_cat}>{author}</button> 
             {/each}
             {#each display_countries as country}
-                <button id="country" class="btn btn-xs {selected_countries.includes(country)?'btn-primary text-black':'bg-base-300 text-neutral'} country" onclick={select_cat}>{country.id}</button> 
+                <button id="country" class="btn btn-xs {selected_countries.includes(country)?'btn-primary text-black':'bg-base-300 text-neutral'} country" onclick={select_cat}>{country}</button> 
             {/each}
         </div>
     </div>
