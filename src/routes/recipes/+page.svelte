@@ -36,13 +36,13 @@
     let delay_timer;
 
 
-    let selected_category = $state("");
+    let selected_categories = $state([]);
   
-    let selected_country = $state("");
+    let selected_countries = $state([]);
   
-    let selected_cuisine = $state("");
+    let selected_cuisines = $state([]);
   
-    let selected_author = $state("");
+    let selected_authors = $state([]);
   
 
     let loading = $state(true);
@@ -141,13 +141,13 @@
                     
                     if (!ingr_recipes.includes(ingredients.items[i].expand.recipe[j]) && !recipe_ids.includes(ingredients.items[i].expand.recipe[j].id)){
                         // TODO
-                        if ((!selected_category || ingredients.items[i].expand.recipe[j].category == selected_category) &&
-                            (!selected_country || ingredients.items[i].expand.recipe[j].country == selected_country) &&
-                            (!selected_cuisine || ingredients.items[i].expand.recipe[j].cuisine == selected_cuisine) &&
-                            (!selected_author || ingredients.items[i].expand.recipe[j].author == selected_author) &&
-                            ingredients.items[i].expand.recipe[j]){
-                            ingr_recipes.push(ingredients.items[i].expand.recipe[j]);
-                        }
+                        // if ((!selected_category || ingredients.items[i].expand.recipe[j].category == selected_category) &&
+                        //     (!selected_country || ingredients.items[i].expand.recipe[j].country == selected_country) &&
+                        //     (!selected_cuisine || ingredients.items[i].expand.recipe[j].cuisine == selected_cuisine) &&
+                        //     (!selected_author || ingredients.items[i].expand.recipe[j].author == selected_author) &&
+                        //     ingredients.items[i].expand.recipe[j]){
+                        //     ingr_recipes.push(ingredients.items[i].expand.recipe[j]);
+                        // }
                     }
                 }
             }
@@ -180,13 +180,48 @@
     function get_filter(){
         // TODO
         let output = "";
-        if (selected_category) output += `category="${selected_category}"`;
-        if (selected_country) output += (!output) ? `country="${selected_country}"` : ` && country="${selected_country}"`;
-        if (selected_cuisine) output += (!output) ? `cuisine="${selected_cuisine}"` : `&& cuisine="${selected_cuisine}"`;
-        if (selected_author) output += (!output) ? `author="${selected_author}"` : `&& author="${selected_author}"`;
-        if (['Least Time', 'Most Time'].includes(sort_val)) output += (!output) ? `time_new!=0` : `&& time_new!=0`;
-        if (search_val) output += (!output) ? `title~"${search_val}"` : `&& title~"${search_val}"`;
-        output += (!output) ? `made=true` : `&& made=true`;
+        if (selected_categories.length){
+            console.log("selected_categories");
+            for (let i = 0; i < selected_categories.length; i++){
+                if (i == 0) output += `(category="${selected_categories[i]}"`;
+                else output += ` || category="${selected_categories[i]}"`;
+                if (i == selected_categories.length - 1) output += ")";
+            }
+        }
+        if (selected_countries.length){
+            for (let i = 0; i < selected_countries.length; i++){
+                if (i == 0){
+                    if (output) output += " && ";
+                    output += `(country="${selected_countries[i]}"`;
+                }
+                else output += ` || country="${selected_countries[i]}"`;
+                if (i == selected_countries.length - 1) output += ")";
+            }
+        }
+        if (selected_cuisines.length){
+            for (let i = 0; i < selected_cuisines.length; i++){
+                if (i == 0){
+                    if (output) output += " && ";
+                    output += `(cuisine="${selected_cuisines[i]}"`;
+                }
+                else output += ` || cuisine="${selected_cuisines[i]}"`;
+                if (i == selected_cuisines.length - 1) output += ")";
+            }
+        }
+        if (selected_authors.length){
+            for (let i = 0; i < selected_authors.length; i++){
+                if (i == 0){
+                    if (output) output += " && ";
+                    output += `(author="${selected_authors[i]}"`;
+                }
+                else output += ` || author="${selected_authors[i]}"`;
+                if (i == selected_authors.length - 1) output += ")";
+            }
+        }
+        if (['Least Time', 'Most Time'].includes(sort_val)) output += (!output) ? `time_new!=0` : ` && time_new!=0`;
+        if (search_val) output += (!output) ? `title~"${search_val}"` : ` && title~"${search_val}"`;
+        output += (!output) ? `made=true` : ` && made=true`;
+        console.log(output);
         return output;
     }
 
@@ -207,29 +242,66 @@
 		await fetchData();
         max_results = total_recipes_num;
         categories = await pb.collection('categories').getFullList({sort: `+id`});
+        display_categories = categories;
         countries = await pb.collection('countries').getFullList({sort: `+id`});
+        display_countries = countries;
         cuisines = await pb.collection('cuisines').getFullList({sort: `+id`});
+        display_cuisines = cuisines;
         authors = await pb.collection('authors').getFullList({sort: `+id`});
+        display_authors = authors;
         loading = false;
 	});
 
   async function select_cat(e){
     // TODO
+    console.log("cat id", e.currentTarget.id)
+    // console.log(e.currentTarget.classList.includes("Category"))
     loading = true;
-    if (e.currentTarget.firstChild.innerHTML == 'category') {
-        if (e.currentTarget.value == "null") selected_category = null;
-        else selected_category = e.currentTarget.value;
-    } else if (e.currentTarget.firstChild.innerHTML == 'country') {
-        if (e.currentTarget.value == "null") selected_country = null;
-        else selected_country = e.currentTarget.value;
-    } else if (e.currentTarget.firstChild.innerHTML == 'cuisine') {
-        if (e.currentTarget.value == "null") selected_cuisine = null;
-        else selected_cuisine = e.currentTarget.value;
-    } else if (e.currentTarget.firstChild.innerHTML == 'author') {
-        if (e.currentTarget.value == "null") selected_author = null;
-        else selected_author = e.currentTarget.value;
+    if (e.currentTarget.id == "category"){
+        console.log("add to categories", e.currentTarget.innerHTML);
+        if (!selected_categories.includes(e.currentTarget.innerHTML)) {
+            selected_categories.push(e.currentTarget.innerHTML);
+        } else {
+            selected_categories = selected_categories.filter(category => category !== e.currentTarget.innerHTML);
+        }
+    } else if (e.currentTarget.id == "country"){
+        if (!selected_countries.includes(e.currentTarget.innerHTML)) {
+            selected_countries.push(e.currentTarget.innerHTML);
+        } else {
+            selected_countries = selected_countries.filter(category => category !== e.currentTarget.innerHTML);
+        }
+    } else if (e.currentTarget.id == "cuisine"){
+        if (!selected_cuisines.includes(e.currentTarget.innerHTML)) {
+            selected_cuisines.push(e.currentTarget.innerHTML);
+        } else {
+            selected_cuisines = selected_cuisines.filter(category => category !== e.currentTarget.innerHTML);
+        }
+    } else if (e.currentTarget.id == "author"){
+        if (!selected_authors.includes(e.currentTarget.innerHTML)) {
+            selected_authors.push(e.currentTarget.innerHTML);
+        } else {
+            selected_authors = selected_authors.filter(category => category !== e.currentTarget.innerHTML);
+        }
     }
-    if (e.currentTarget.value == "null") e.currentTarget.value = null;
+    $state.snapshot(selected_authors);
+    $state.snapshot(selected_countries);
+    $state.snapshot(selected_categories);
+    $state.snapshot(selected_cuisines);
+    // if (e.currentTarget.firstChild.innerHTML == 'category') {
+    //     if (e.currentTarget.value == "null") selected_category = null;
+    //     else selected_category = e.currentTarget.value;
+    // } else if (e.currentTarget.firstChild.innerHTML == 'country') {
+    //     if (e.currentTarget.value == "null") selected_country = null;
+    //     else selected_country = e.currentTarget.value;
+    // } else if (e.currentTarget.firstChild.innerHTML == 'cuisine') {
+    //     if (e.currentTarget.value == "null") selected_cuisine = null;
+    //     else selected_cuisine = e.currentTarget.value;
+    // } else if (e.currentTarget.firstChild.innerHTML == 'author') {
+    //     if (e.currentTarget.value == "null") selected_author = null;
+    //     else selected_author = e.currentTarget.value;
+    // }
+    // if (e.currentTarget.value == "null") e.currentTarget.value = null;
+
     page = 1; 
     
     newBatch = [];
@@ -339,26 +411,101 @@
 
 <main class="flex flex-col w-full justify-center items-center">
   <h4>See what others are cooking</h4>
-  <div class="flex w-full justify-center flex-col md:flex-row md:mt-2 space-y-1 md:space-y-2">
-    <div class="hidden md:flex flex-row md:flex-col mx-1 space-x-1 md:space-x-0 md:space-y-2">
-        <div class="w-full carousel carousel-center rounded-box space-x-1 border border-primary rounded-md p-1">
+  <div class="flex w-full justify-center flex-col md:mt-2 space-y-1 md:space-y-2">
+    <div class="hidden md:flex flex-row md:flex-col w-full">
+        <div class="carousel carousel-center rounded-box space-x-1 border border-primary rounded-md p-1 mx-2">
             <!-- <button id="thumb_up" class="btn btn-xs p-1 made flex content-center category bg-transparent border-none" onclick={select_cat}><ThumbUp color={(selected_cats.cats.includes("thumb_up")) ? "fill-primary" : "fill-neutral"}/></button>
             <button id="heart" class="btn btn-xs p-1 made flex content-center category  bg-transparent border-none" onclick={select_cat}><Heart color={(selected_cats.cats.includes("heart")) ? "fill-primary" : "fill-neutral"}/></button> -->
-            {#each display_cats.cats as cat}
-                <button id="category" class="btn btn-xs {selected_cats.cats.includes(cat)?'btn-primary text-black':'bg-base-300 text-neutral'} category" onclick={select_cat}>{cat}</button> 
+            {#each display_categories as cat}
+                <button id="category" class="btn btn-xs {selected_categories.includes(cat.id)?'btn-primary text-black':'bg-base-300 text-neutral'} category" onclick={select_cat}>{cat.id}</button> 
             {/each}
-            {#each display_cats.cuisines as cuisine}
-                <button id="cuisine" class="btn btn-xs {selected_cats.cuisines.includes(cuisine)?'btn-primary text-black':'bg-base-300 text-neutral'} cuisine" onclick={select_cat}>{cuisine}</button> 
+            {#each display_cuisines as cuisine}
+                <button id="cuisine" class="btn btn-xs {selected_cuisines.includes(cuisine.id)?'btn-primary text-black':'bg-base-300 text-neutral'} cuisine" onclick={select_cat}>{cuisine.id}</button> 
             {/each}
-            {#each display_cats.countries as country}
-                <button id="country" class="btn btn-xs {selected_cats.countries.includes(country)?'btn-primary text-black':'bg-base-300 text-neutral'} country" onclick={select_cat}>{country}</button> 
+            {#each display_authors as author}
+                <button id="author" class="btn btn-xs {selected_authors.includes(author.id)?'btn-primary text-black':'bg-base-300 text-neutral'} cuisine" onclick={select_cat}>{author.id}</button> 
+            {/each}
+            {#each display_countries as country}
+                <button id="country" class="btn btn-xs {selected_countries.includes(country.id)?'btn-primary text-black':'bg-base-300 text-neutral'} country" onclick={select_cat}>{country.id}</button> 
             {/each}
         </div>
     </div>
-    <div class="flex flex-col w-full md:w-3/4 max-w-3xl space-y-1 md:space-y-2">
-        <div class="hidden md:flex justify-between items-center mx-1">
+    <div class="flex w-full justify-center">
+        <div class="flex flex-col w-full md:w-3/4 max-w-3xl space-y-1 md:space-y-2 content-center">
+            <div class="hidden md:flex justify-between items-center mx-1">
+                <div class="form-control md:w-auto md:max-w-xs">
+                    <label class="input input-bordered input-sm input-primary flex items-center gap-2 pr-0">
+                        <input type="text" class="input h-full p-0 w-28" placeholder="Search" onkeyup={update_search} bind:value={search_val}/>
+                        <button class="w-5" onclick={()=>{search_val = ""; update_search();}} onkeydown={()=>{search_val = ""; update_search();}}>
+                            {#if search_val}
+                                <Clear size="w-3 h-3"/>
+                            {/if}
+                        </button>
+                    </label>
+                </div>
+                <div class="mx-1 text-xs md:text-base">{(total_recipes_num > max_results) ? max_results : total_recipes_num} recipes</div>
+                <div class="dropdown dropdown-top md:dropdown-bottom dropdown-end">
+                      <label tabindex="-1" for="sort" class="btn m-1 btn-primary btn-xs md:btn-sm">{sort_val}</label>
+                      <ul tabindex="-1" name="sort" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-max bg-primary">
+                          {#each sort_opts as opt}
+                              <li class="btn btn-xs {opt == sort_val ? 'btn-neutral': 'btn-primary'}"><button onclick={update_sort} onkeydown={update_sort}>{opt}</button></li>
+                          {/each}
+                      </ul>
+                  </div>
+                </div>
+            <ul class="flex flex-col w-full max-w-3xl space-y-2 md:space-y-4 h-[calc(100svh-130px)] md:h-[calc(100svh-125px)] overflow-y-auto">
+              {#each data as item}
+                  <div class="card card-side bg-base-200 h-24 card-bordered border-primary cursor-pointer mx-1" onkeydown={window.location = `/cook_recipe/${item.url_id}/${item.servings}`} onclick={window.location = `/cook_recipe/${item.url_id}/${item.servings}`}>
+                      <figure class="w-1/4 bg-cover bg-no-repeat bg-center" style="background-image: url('{item.image}')"></figure>
+                      <div class="card-body h-full flex flex-row p-1 w-3/4 justify-between">
+                          <div class="flex flex-col justify-between p-1 md:p-3 w-full">
+                              <h2 id={item.id} class="card-title text-sm text-ellipsis overflow-hidden">{item.title}</h2>
+                              <div class="flex w-full items-center">
+                                  <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit px-1 text-nowrap text-center basis-12 grow rounded-tl rounded-bl">
+                                      {#if isNaN(item.servings)}
+                                          {item.servings}
+                                      {:else}
+                                          {item.servings} servings
+                                      {/if}
+                                  </div>
+                                  <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit px-1 text-nowrap text-center basis-12 grow">
+                                      {#if item.time}
+                                          {item.time}
+                                      {:else}
+                                          no time
+                                      {/if}
+                                  </div>
+                                  <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit px-1 text-nowrap text-center basis-12 grow rounded-tr rounded-br">
+                                      {item.expand.ingr_list.length} ingredients
+                                  </div>
+                                  {#if !$currentUser || $currentUser.id != item.user}
+                                    <button id={item.id} class="btn btn-primary btn-xs w-6 ml-2 p-0" onclick={stopPropagation(add_recipe)} onkeydown={stopPropagation(add_recipe)}>
+                                        {#if just_copied == item.id}
+                                            <CheckMark color=""/>
+                                        {:else}
+                                            <Plus/>
+                                        {/if}
+                                    </button>
+                                  {/if}
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              {/each}
+              <div class="flex w-full h-full justify-center">
+                <span class="{has_more ? "" : "hidden"} loading loading-bars loading-lg mx-7 self-center"></span>
+              </div>
+              <div class="{no_results ? "" : "hidden"} w-full flex justify-center items-center h-full">
+                    no results
+                </div>
+              <InfiniteScroll
+              hasMore={has_more}
+              threshold={100}
+              on:loadMore={load_more} />
+          </ul>
+          <div class="flex justify-between items-center mx-1 my-0 md:hidden">
             <div class="form-control md:w-auto md:max-w-xs">
-                <label class="input input-bordered input-sm input-primary flex items-center gap-2 pr-0">
+                <label class="input input-bordered input-xs input-primary flex items-center gap-2 pr-0">
                     <input type="text" class="input h-full p-0 w-28" placeholder="Search" onkeyup={update_search} bind:value={search_val}/>
                     <button class="w-5" onclick={()=>{search_val = ""; update_search();}} onkeydown={()=>{search_val = ""; update_search();}}>
                         {#if search_val}
@@ -369,113 +516,33 @@
             </div>
             <div class="mx-1 text-xs md:text-base">{(total_recipes_num > max_results) ? max_results : total_recipes_num} recipes</div>
             <div class="dropdown dropdown-top md:dropdown-bottom dropdown-end">
-                  <label tabindex="-1" for="sort" class="btn m-1 btn-primary btn-xs md:btn-sm">{sort_val}</label>
-                  <ul tabindex="-1" name="sort" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-max bg-primary">
+                  <label tabindex="-1" for="sort_mobile" class="btn m-0 btn-primary btn-xs md:btn-sm">{sort_val}</label>
+                  <ul tabindex="-1" name="sort_mobile" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-max bg-primary">
                       {#each sort_opts as opt}
-                          <li class="btn btn-xs {opt == sort_val ? 'btn-neutral': 'btn-primary'}"><button onclick={update_sort} onkeydown={update_sort}>{opt}</button></li>
+                          <li class="btn btn-xs {opt == sort_val ? 'btn-neutral': 'btn-primary'}"><button onclick={update_sort}>{opt}</button></li>
                       {/each}
                   </ul>
               </div>
             </div>
-        <ul class="flex flex-col w-full max-w-3xl space-y-2 md:space-y-4 h-[calc(100svh-120px)] md:h-[calc(100svh-125px)] overflow-y-auto">
-          {#each data as item}
-              <div class="card card-side bg-base-200 h-24 card-bordered border-primary cursor-pointer mx-1" onkeydown={window.location = `/cook_recipe/${item.url_id}/${item.servings}`} onclick={window.location = `/cook_recipe/${item.url_id}/${item.servings}`}>
-                  <figure class="w-1/4 bg-cover bg-no-repeat bg-center" style="background-image: url('{item.image}')"></figure>
-                  <div class="card-body h-full flex flex-row p-1 w-3/4 justify-between">
-                      <div class="flex flex-col justify-between p-1 md:p-3 w-full">
-                          <h2 id={item.id} class="card-title text-sm text-ellipsis overflow-hidden">{item.title}</h2>
-                          <div class="flex w-full items-center">
-                              <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit px-1 text-nowrap text-center basis-12 grow rounded-tl rounded-bl">
-                                  {#if isNaN(item.servings)}
-                                      {item.servings}
-                                  {:else}
-                                      {item.servings} servings
-                                  {/if}
-                              </div>
-                              <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit px-1 text-nowrap text-center basis-12 grow">
-                                  {#if item.time}
-                                      {item.time}
-                                  {:else}
-                                      no time
-                                  {/if}
-                              </div>
-                              <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit px-1 text-nowrap text-center basis-12 grow rounded-tr rounded-br">
-                                  {item.expand.ingr_list.length} ingredients
-                              </div>
-                              {#if !$currentUser || $currentUser.id != item.user}
-                                <button id={item.id} class="btn btn-primary btn-xs w-6 ml-2 p-0" onclick={stopPropagation(add_recipe)} onkeydown={stopPropagation(add_recipe)}>
-                                    {#if just_copied == item.id}
-                                        <CheckMark color=""/>
-                                    {:else}
-                                        <Plus/>
-                                    {/if}
-                                </button>
-                              {/if}
-                          </div>
-                      </div>
-                  </div>
-              </div>
-          {/each}
-          <div class="flex w-full h-full justify-center">
-            <span class="{has_more ? "" : "hidden"} loading loading-bars loading-lg mx-7 self-center"></span>
-          </div>
-          <div class="{no_results ? "" : "hidden"} w-full flex justify-center items-center h-full">
-                no results
-            </div>
-          <InfiniteScroll
-          hasMore={has_more}
-          threshold={100}
-          on:loadMore={load_more} />
-      </ul>
-      <div class="flex justify-between items-center mx-1 my-0 md:hidden">
-        <div class="form-control md:w-auto md:max-w-xs">
-            <label class="input input-bordered input-xs input-primary flex items-center gap-2 pr-0">
-                <input type="text" class="input h-full p-0 w-28" placeholder="Search" onkeyup={update_search} bind:value={search_val}/>
-                <button class="w-5" onclick={()=>{search_val = ""; update_search();}} onkeydown={()=>{search_val = ""; update_search();}}>
-                    {#if search_val}
-                        <Clear size="w-3 h-3"/>
-                    {/if}
-                </button>
-            </label>
-        </div>
-        <div class="mx-1 text-xs md:text-base">{(total_recipes_num > max_results) ? max_results : total_recipes_num} recipes</div>
-        <div class="dropdown dropdown-top md:dropdown-bottom dropdown-end">
-              <label tabindex="-1" for="sort_mobile" class="btn m-0 btn-primary btn-xs md:btn-sm">{sort_val}</label>
-              <ul tabindex="-1" name="sort_mobile" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-max bg-primary">
-                  {#each sort_opts as opt}
-                      <li class="btn btn-xs {opt == sort_val ? 'btn-neutral': 'btn-primary'}"><button onclick={update_sort}>{opt}</button></li>
-                  {/each}
-              </ul>
-          </div>
         </div>
     </div>
     <div class="flex md:hidden flex-row md:flex-col mx-1 space-x-1 md:space-x-0 md:space-y-2">
-        <!-- TODO -->
-        <select bind:value={selected_category} onchange={select_cat} class="select select-xs select-bordered border-primary w-full max-w-xs pl-1">
-            <option value="">category</option>
-            {#each categories as curr}
-                <option>{curr.id}</option>
+        <div class="carousel carousel-center rounded-box space-x-1 border border-primary rounded-md p-1">
+            <!-- <button id="thumb_up" class="btn btn-xs p-1 made flex content-center category bg-transparent border-none" onclick={select_cat}><ThumbUp color={(selected_cats.cats.includes("thumb_up")) ? "fill-primary" : "fill-neutral"}/></button>
+            <button id="heart" class="btn btn-xs p-1 made flex content-center category  bg-transparent border-none" onclick={select_cat}><Heart color={(selected_cats.cats.includes("heart")) ? "fill-primary" : "fill-neutral"}/></button> -->
+            {#each display_categories as cat}
+                <button id="category" class="btn btn-xs {selected_categories.includes(cat)?'btn-primary text-black':'bg-base-300 text-neutral'} category" onclick={select_cat}>{cat.id}</button> 
             {/each}
-        </select>
-        <select bind:value={selected_country} onchange={select_cat} class="select select-xs select-bordered border-primary w-full max-w-xs pl-1">
-            <option value="">country</option>
-            {#each countries as curr}
-                <option>{curr.id}</option>
+            {#each display_cuisines as cuisine}
+                <button id="cuisine" class="btn btn-xs {selected_cuisines.includes(cuisine)?'btn-primary text-black':'bg-base-300 text-neutral'} cuisine" onclick={select_cat}>{cuisine.id}</button> 
             {/each}
-        </select>
-        <select bind:value={selected_cuisine} onchange={select_cat} class="select select-xs select-bordered border-primary w-full max-w-xs pl-1">
-            <option value="">cuisine</option>
-            {#each cuisines as curr}
-                <option>{curr.id}</option>
+            {#each display_authors as author}
+                <button id="cuisine" class="btn btn-xs {selected_authors.includes(author)?'btn-primary text-black':'bg-base-300 text-neutral'} cuisine" onclick={select_cat}>{author.id}</button> 
             {/each}
-        </select>
-        <select bind:value={selected_author} onchange={select_cat} class="select select-xs select-bordered border-primary w-full max-w-xs pl-1">
-            <option value="">author</option>
-            {#each authors as curr}
-                <option>{curr.id}</option>
+            {#each display_countries as country}
+                <button id="country" class="btn btn-xs {selected_countries.includes(country)?'btn-primary text-black':'bg-base-300 text-neutral'} country" onclick={select_cat}>{country.id}</button> 
             {/each}
-        </select>
-
+        </div>
     </div>
   </div>
   <Alerts msg={alert.msg} type={alert.type} bind:show={alert.show} title={alert.title}/>
