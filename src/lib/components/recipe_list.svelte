@@ -304,6 +304,7 @@
 <div id="recipes" class="h-[calc(100svh-160px)] md:h-[calc(100svh-135px)] overflow-y-auto space-y-2 rounded-md md:border-none py-2">
     {#if display_recipes && display_recipes.length}
         {#each display_recipes as curr, i}
+            <!-- svelte-ignore a11y_no_static_element_interactions-->
             <div class="card card-side bg-base-200 h-24 card-bordered cursor-pointer border-primary" onclick={view} onkeydown={view}>
                 <figure class="w-1/4 bg-cover bg-no-repeat bg-center" style="background-image: url('{display_recipes[i].image}')"></figure>
                 <div class="card-body h-full flex flex-row p-1 w-3/4 justify-between">

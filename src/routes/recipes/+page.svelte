@@ -461,7 +461,7 @@
         </div>
     </div>
     <div class="flex w-full justify-center">
-        <div class="flex flex-col w-full md:max-w-[1500px] space-y-1 md:space-y-2 content-center">
+        <div class="flex flex-col w-full md:max-w-[1000px] space-y-1 md:space-y-2 content-center">
             <div class="hidden md:flex justify-between items-center mx-1">
                 <div class="form-control md:w-auto md:max-w-xs">
                     <label class="input input-bordered input-sm input-primary flex items-center gap-2 pr-0">
@@ -485,8 +485,9 @@
                 </div>
             <ul class="flex flex-col w-full space-y-2 md:space-y-4 h-[calc(100svh-130px)] md:h-[calc(100svh-160px)] overflow-y-auto">
               {#each data as item}
-                  <div class="card card-side bg-base-200 h-24 card-bordered border-primary cursor-pointer mx-1" onkeydown={window.location = `/cook_recipe/${item.url_id}/${item.servings}`} onclick={window.location = `/cook_recipe/${item.url_id}/${item.servings}`}>
-                      <figure class="w-1/4 md:w-1/2 bg-cover bg-no-repeat bg-center" style="background-image: url('{item.image}')"></figure>
+                    <!-- svelte-ignore a11y_no_static_element_interactions-->
+                  <div class="card card-side bg-base-200 h-24 md:h-28 card-bordered border-primary cursor-pointer mx-1" onkeydown={window.location = `/cook_recipe/${item.url_id}/${item.servings}`} onclick={window.location = `/cook_recipe/${item.url_id}/${item.servings}`}>
+                      <figure class="w-1/4 bg-cover bg-no-repeat bg-center" style="background-image: url('{item.image}')"></figure>
                       <div class="card-body h-full flex flex-row p-1 w-3/4 justify-between">
                           <div class="flex flex-col justify-between p-1 md:p-3 w-full">
                               <h2 id={item.id} class="card-title text-sm text-ellipsis overflow-hidden">{item.title}</h2>
