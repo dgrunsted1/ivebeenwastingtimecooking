@@ -180,10 +180,10 @@
     function get_filter(){
         // TODO
         let output = "";
-        output += cat_filter_string("category", selected_categories);
-        output += cat_filter_string("cuisine", selected_cuisines);
-        output += cat_filter_string("country", selected_countries);
-        output += cat_filter_string("author", selected_authors);
+        output = cat_filter_string("category", selected_categories, output);
+        output = cat_filter_string("cuisine", selected_cuisines, output);
+        output = cat_filter_string("country", selected_countries, output);
+        output = cat_filter_string("author", selected_authors, output);
         
         if (['Least Time', 'Most Time'].includes(sort_val)) output += (!output) ? `time_new!=0` : ` && time_new!=0`;
         if (search_val) output += (!output) ? `title~"${search_val}"` : ` && title~"${search_val}"`;
@@ -191,18 +191,17 @@
         return output;
     }
 
-    function cat_filter_string(type, selected){
-        if (selected.length == 0) return "";
-        let output = "";
+    function cat_filter_string(type, selected, curr_string){
+        if (selected.length == 0) return curr_string;
         for (let i = 0; i < selected.length; i++){
             if (i == 0){
-                if (output) output += " && ";
-                output += `(${type}="${selected[i]}"`;
+                if (curr_string) curr_string += " && ";
+                curr_string += `(${type}="${selected[i]}"`;
             }
-            else output += ` || ${type}="${selected[i]}"`;
-            if (i == selected.length - 1) output += ")";
+            else curr_string += ` || ${type}="${selected[i]}"`;
+            if (i == selected.length - 1) curr_string += ")";
         }
-        return output;
+        return curr_string;
     }
 
     function get_sort(){
