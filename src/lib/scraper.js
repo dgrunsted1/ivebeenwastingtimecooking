@@ -328,10 +328,11 @@ export const scrape = async function(url) {
                     '--no-sandbox',
                     '--disable-setuid-sandbox'
                 ], 
-                executablePath: '/home/git_actions/.cache/puppeteer/chrome/linux-130.0.6723.116/chrome-linux64/chrome'});
+                executablePath: '/home/git_actions/.cache/puppeteer/chrome/linux-130.0.6723.116/chrome-linux64/chrome'
+            });
         } catch(err){
             let data = {
-                message: e.message,
+                message: err.message,
                 url: url,
                 function: "prep scrape"
             };

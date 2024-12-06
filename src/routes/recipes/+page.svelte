@@ -180,47 +180,28 @@
     function get_filter(){
         // TODO
         let output = "";
-        if (selected_categories.length){
-            for (let i = 0; i < selected_categories.length; i++){
-                if (i == 0) output += `(category="${selected_categories[i]}"`;
-                else output += ` || category="${selected_categories[i]}"`;
-                if (i == selected_categories.length - 1) output += ")";
-            }
-        }
-        if (selected_countries.length){
-            for (let i = 0; i < selected_countries.length; i++){
-                if (i == 0){
-                    if (output) output += " && ";
-                    output += `(country="${selected_countries[i]}"`;
-                }
-                else output += ` || country="${selected_countries[i]}"`;
-                if (i == selected_countries.length - 1) output += ")";
-            }
-        }
-        if (selected_cuisines.length){
-            for (let i = 0; i < selected_cuisines.length; i++){
-                if (i == 0){
-                    if (output) output += " && ";
-                    output += `(cuisine="${selected_cuisines[i]}"`;
-                }
-                else output += ` || cuisine="${selected_cuisines[i]}"`;
-                if (i == selected_cuisines.length - 1) output += ")";
-            }
-        }
-        if (selected_authors.length){
-            for (let i = 0; i < selected_authors.length; i++){
-                if (i == 0){
-                    if (output) output += " && ";
-                    output += `(author="${selected_authors[i]}"`;
-                }
-                else output += ` || author="${selected_authors[i]}"`;
-                if (i == selected_authors.length - 1) output += ")";
-            }
-        }
+        output += cat_filter_string("category", selected_categories);
+        output += cat_filter_string("cuisine", selected_cuisines);
+        output += cat_filter_string("country", selected_countries);
+        output += cat_filter_string("author", selected_authors);
+        
         if (['Least Time', 'Most Time'].includes(sort_val)) output += (!output) ? `time_new!=0` : ` && time_new!=0`;
         if (search_val) output += (!output) ? `title~"${search_val}"` : ` && title~"${search_val}"`;
         output += (!output) ? `made=true` : ` && made=true`;
-        console.log(output);
+        return output;
+    }
+
+    function cat_filter_string(type, selected){
+        if (selected.length == 0) return "";
+        let output = "";
+        for (let i = 0; i < selected.length; i++){
+            if (i == 0){
+                if (output) output += " && ";
+                output += `(${type}="${selected[i]}"`;
+            }
+            else output += ` || ${type}="${selected[i]}"`;
+            if (i == selected.length - 1) output += ")";
+        }
         return output;
     }
 
@@ -254,54 +235,57 @@
   async function select_cat(e){
     // TODO
     loading = true;
-    if (e.currentTarget.id == "category"){
-        console.log("add to categories", e.currentTarget.innerHTML);
-        if (!selected_categories.includes(e.currentTarget.innerHTML)) {
-            selected_categories.push(e.currentTarget.innerHTML);
-        } else {
-            selected_categories = selected_categories.filter(category => category !== e.currentTarget.innerHTML);
-        }
-        display_countries = await update_display_countries();
-        display_cuisines = await update_display_cuisines();
-        display_authors = await update_display_authors();
-    } else if (e.currentTarget.id == "country"){
-        if (!selected_countries.includes(e.currentTarget.innerHTML)) {
-            selected_countries.push(e.currentTarget.innerHTML);
-        } else {
-            selected_countries = selected_countries.filter(category => category !== e.currentTarget.innerHTML);
-        }
-        display_categories = await update_display_categories();
-        display_cuisines = await update_display_cuisines();
-        display_authors = await update_display_authors();
-    } else if (e.currentTarget.id == "cuisine"){
-        if (!selected_cuisines.includes(e.currentTarget.innerHTML)) {
-            selected_cuisines.push(e.currentTarget.innerHTML);
-        } else {
-            selected_cuisines = selected_cuisines.filter(category => category !== e.currentTarget.innerHTML);
-        }
-        display_countries = await update_display_countries();
-        display_categories = await update_display_categories();
-        display_authors = await update_display_authors();
-    } else if (e.currentTarget.id == "author"){
-        if (!selected_authors.includes(e.currentTarget.innerHTML)) {
-            selected_authors.push(e.currentTarget.innerHTML);
-        } else {
-            selected_authors = selected_authors.filter(category => category !== e.currentTarget.innerHTML);
-        }
-        display_countries = await update_display_countries();
-        display_cuisines = await update_display_cuisines();
-        display_categories = await update_display_categories();
-    }
+    toggle_cat(e.currentTarget.id, e.currentTarget.innerHTML);
     page = 1; 
     
     newBatch = [];
     data = [];
     await fetchData();
+    if (!selected_categories.length) display_categories = await update_display_categories();
+    if (!selected_cuisines.length) display_cuisines = await update_display_cuisines();
+    if (!selected_countries.length) display_countries = await update_display_countries();
+    if (!selected_authors.length) display_authors = await update_display_authors();
     loading = false;
     if (!newBatch.length){
         no_results = true;
     } else {
         no_results = false;
+    }
+  }
+
+
+  function toggle_cat(type, val){
+    switch (type) {
+        case "category":
+            if (selected_categories.includes(val)) {
+                selected_categories = selected_categories.filter(category => category !== val);
+            } else {
+                selected_categories.push(val);
+            }
+            break;
+        case "country":
+            if (selected_countries.includes(val)) {
+                selected_countries = selected_countries.filter(country => country !== val);
+            } else {
+                selected_countries.push(val);
+            }
+            break;
+        case "cuisine":
+            if (selected_cuisines.includes(val)) {
+                selected_cuisines = selected_cuisines.filter(cuisine => cuisine !== val);
+            } else {
+                selected_cuisines.push(val);
+            }
+            break;
+        case "author":
+            if (selected_authors.includes(val)) {
+                selected_authors = selected_authors.filter(author => author !== val);
+            } else {
+                selected_authors.push(val);
+            }
+            break;
+        default:
+            break;
     }
   }
 
@@ -506,9 +490,12 @@
                                           no time
                                       {/if}
                                   </div>
-                                  <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit px-1 text-nowrap text-center basis-12 grow rounded-tr rounded-br">
+                                  <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit px-1 text-nowrap text-center basis-12 grow">
                                       {item.expand.ingr_list.length} ingredients
                                   </div>
+                                  <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit px-1 text-nowrap text-center basis-12 grow rounded-tr rounded-br">
+                                    {item.directions.length} steps
+                                </div>
                                   {#if !$currentUser || $currentUser.id != item.user}
                                     <button id={item.id} class="btn btn-primary btn-xs w-6 ml-2 p-0" onclick={stopPropagation(add_recipe)} onkeydown={stopPropagation(add_recipe)}>
                                         {#if just_copied == item.id}
