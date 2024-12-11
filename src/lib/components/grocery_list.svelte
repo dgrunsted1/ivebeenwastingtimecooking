@@ -24,7 +24,7 @@
 
     onMount(async () => {
         if ($page.url.pathname == "/today"){
-            view_size_mobile = `max-h-[calc(100svh-130px)]`;
+            view_size_mobile = `max-h-[calc(100svh-150px)]`;
             view_size_desktop = `md:max-h-[calc(100svh-120px)]`;
         }
     });
@@ -89,18 +89,20 @@
         }, 500);
     }
 
-    const reset_list = () => {
+    const reset_list = (e) => {
         let reset_list = confirm("Are you sure you want to reset your grocery list?");
         if (reset_list){
             dispatch("reset_grocery_list");
         }
+        e.srcElement.parentNode.parentNode.blur();
     }
 
-    const uncheck_list = () => {
+    const uncheck_list = (e) => {
         for (let i = 0; i < grocery_list.length; i++){
             grocery_list[i].checked = false;
             dispatch("check_grocery_item", {id: grocery_list[i].id, value: false})
         }
+        e.srcElement.parentNode.parentNode.blur();
     }
 
     const add_new_item = async () => {
@@ -122,8 +124,9 @@
         document.getElementById("modal_ingr").focus();
     }
 
-    const edit_groceries = () => {
+    const edit_groceries = (e) => {
         edit = !edit;
+        e.srcElement.parentNode.parentNode.blur();
     }
 
     const tool_tip_string = (item) => {
@@ -155,7 +158,7 @@
 </script>
 
 <div id="list" class="flex flex-col w-full">
-    <div id="header" class="flex {($page.url.pathname == "/today") ? `justify-between` : `justify-evenly`} items-center mt-0">
+    <div id="header" class="hidden md:flex {($page.url.pathname == "/today") ? `justify-between` : `justify-evenly`} items-center mt-0">
         {#if grocery_list.length > 0}
             <div>
                 {#if status != "none" && $page.url.pathname == "/today"}<div id="update_status" class="text-xs">{status}</div>{/if}
@@ -175,31 +178,62 @@
         {/if}
     </div>
     <div class="md:mx-3">
-        <div class="grocery_list {view_size_mobile} {view_size_desktop} overflow-y-auto px-2">
+        <div class="grocery_list {view_size_mobile} {view_size_desktop} overflow-y-auto p-2 space-y-4">
             {#if grocery_list.length > 0}
                 {#each grocery_list as item, i}
                     {#if edit}
-                        <div id={item.id} class="grocery_item flex relative my-1 tooltip {(i > 2) ? "tooltip-top": "tooltip-bottom"} space-x-2 justify-center items-center z-10" data-tip={tool_tip_string(item)}>
+                        <div id={item.id} class="grocery_item flex relative my-1 tooltip {(i > 2) ? "tooltip-top": "tooltip-bottom"} space-x-2 justify-center items-center" data-tip={tool_tip_string(item)}>
                             <input type="text" class="amount input input-bordered input-xs px-1 mr-1 w-8 text-center h-fit" bind:value={item.qty} onkeyup={edit_item}>
                             <input type="text" class="unit input input-bordered input-xs px-1 mr-1 w-20 text-center h-fit" bind:value={item.unit} onkeyup={edit_item}>
                             <textarea class="name input input-bordered input-xs px-1 mr-1 w-3/4 h-fit" bind:value={item.name} onkeyup={edit_item} bind:this={item.input}></textarea>
                             {#if status != "none"}<button class="btn btn-sm p-1 btn-accent" onclick={() => remove_item(item.id)}><DeleteIcon/></button>{/if}
                         </div>
                     {:else}
-                        <div class="grocery_item flex relative my-2 tooltip {(i > 2) ? "tooltip-top": "tooltip-bottom"} space-x-3 {($page.url.pathname == "/today")? "justify-end md:justify-start" : "justify-start"}justify-end md:justify-start items-center z-100" data-tip={tool_tip_string(item)}>
+                        <div class="flex space-x-3 {($page.url.pathname == "/today")? "justify-end md:justify-start" : "justify-start"} items-center">
                             {#if status != "none"}<input type="checkbox" class="hidden md:flex checkbox checkbox-primary checkbox-lg p-1" id={item.id} bind:checked={item.checked} onchange={check_item_handle}>{/if}
-                            <p class="text-xs {($page.url.pathname == "/today")? "md:text-left" : "text-left"} -indent-5 pl-5">{ingrs_to_string([item])}</p>
+                            <div class="flex md:tooltip {(i > 2) ? "tooltip-top": "tooltip-bottom"}" data-tip={tool_tip_string(item)}>
+                                <p class="text-sm">{ingrs_to_string([item])}</p>
+                            </div>
                             {#if status != "none"}<input type="checkbox" class="md:hidden checkbox checkbox-primary checkbox-lg p-1" id={item.id} bind:checked={item.checked} onchange={check_item_handle}>{/if}
                         </div>
                     {/if}
-                {/each} 
-                {#if status != "none"}
-                    <div class="flex relative my-1 space-x-2 justify-center items-center">
-                        <button class="btn btn-xs btn-primary" onclick={add_item_modal}>new item</button>
-                    </div>
-                {/if}
+                {/each}
             {/if}
         </div>
+    </div>
+    <div id="header" class="flex md:hidden {($page.url.pathname == "/today") ? `justify-between` : `justify-evenly`} items-center mt-0">
+        {#if grocery_list.length > 0}
+            <div>
+                {#if status != "none" && $page.url.pathname == "/today"}<div id="update_status" class="text-xs">{status}</div>{/if}
+                <div id="count" class="text-xs">{grocery_list.reduce((count, item) => count + (item.checked ? 0 : 1), 0)}/{grocery_list.length} Items</div>
+            </div>
+            <div class="flex items-center space-x-4 mx-1 my-2">
+                {#if status != "none"}
+                    <div class="dropdown dropdown-top">
+                        <label tabindex="-1" for="save_menu" class="btn btn-primary btn-sm md:btn-sm">options</label>
+                        <ul tabindex="-1" name="save_menu" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-max bg-primary">
+                            <li class="btn btn-sm btn-primary p-0"><button class="p-0" onclick={edit_groceries}>
+                                edit
+                            </button></li>
+                            <li class="btn btn-sm btn-primary p-0"><button class="p-0" onclick={uncheck_list}>
+                                uncheck
+                            </button></li>
+                            <li class="btn btn-sm btn-primary p-0"><button class="p-0" onclick={reset_list}>
+                                reset
+                            </button></li>
+                        </ul>
+                    </div>
+                {/if}
+                <button id="copy" class="btn btn-sm btn-primary cursor-copy" onclick={copy_to_clipboard}>
+                    {#if just_copied}
+                        <CheckMark color=""/>
+                    {:else}
+                        copy
+                    {/if}
+                </button>
+                {#if status != "none"}<button id="add" class="btn btn-sm btn-primary" onclick={add_item_modal}><Plus/></button>{/if}
+            </div>
+        {/if}
     </div>
 </div>
 <!-- <button class="btn" onclick="my_modal_1.showModal()">open modal</button> -->
