@@ -198,7 +198,7 @@
                         </div>
                     {/if}
                     {#if i != grocery_list.length-1}
-                        <div class="divider my-1"></div>
+                        <div class="divider my-0 h-3"></div>
                     {/if}
                 {/each}
             {/if}
