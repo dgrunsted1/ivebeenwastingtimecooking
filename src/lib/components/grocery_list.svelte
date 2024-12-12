@@ -192,7 +192,7 @@
                         <div class="grocery_item flex space-x-3 {($page.url.pathname == "/today")? "justify-end md:justify-start" : "justify-start"} items-center">
                             {#if status != "none"}<input type="checkbox" class="hidden md:flex checkbox checkbox-primary checkbox-lg p-1" id={item.id} bind:checked={item.checked} onchange={check_item_handle}>{/if}
                             <div class="flex md:tooltip {(i > 2) ? "tooltip-top": "tooltip-bottom"}" data-tip={tool_tip_string(item)}>
-                                <p class="text-sm">{ingrs_to_string([item])}</p>
+                                <p class="text-xs">{ingrs_to_string([item])}</p>
                             </div>
                             {#if status != "none"}<input type="checkbox" class="md:hidden checkbox checkbox-primary checkbox-lg p-1" id={item.id} bind:checked={item.checked} onchange={check_item_handle}>{/if}
                         </div>
