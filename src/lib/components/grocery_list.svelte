@@ -178,7 +178,7 @@
         {/if}
     </div>
     <div class="md:mx-3">
-        <div class="grocery_list {view_size_mobile} {view_size_desktop} overflow-y-auto p-2 space-y-4">
+        <div class="grocery_list {view_size_mobile} {view_size_desktop} overflow-y-auto px-2 py-4">
             {#if grocery_list.length > 0}
                 {#each grocery_list as item, i}
                     {#if edit}
@@ -196,6 +196,9 @@
                             </div>
                             {#if status != "none"}<input type="checkbox" class="md:hidden checkbox checkbox-primary checkbox-lg p-1" id={item.id} bind:checked={item.checked} onchange={check_item_handle}>{/if}
                         </div>
+                    {/if}
+                    {#if i != grocery_list.length-1}
+                        <div class="divider my-1"></div>
                     {/if}
                 {/each}
             {/if}
