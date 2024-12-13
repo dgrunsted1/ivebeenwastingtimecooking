@@ -285,11 +285,6 @@
             </div>
         
             <div class="flex space-x-1">
-                <ul class="steps steps-vertical w-44 md:w-12 max-h-[calc(40vh)] md:max-h-[calc(64vh)]">
-                    {#each recipe.directions as curr, i}
-                        <li class="step step-primary"></li>
-                    {/each}
-                </ul>
                 <div class="flex flex-col directions_list md:w-3/5 h-fit  max-h-[calc(40vh)] md:max-h-[calc(64vh)] overflow-y-auto border border-primary rounded-md cursor-pointer py-5">
                     {#each recipe.directions as curr, i}
                     <div class="flex justify-between items-center mr-2">
