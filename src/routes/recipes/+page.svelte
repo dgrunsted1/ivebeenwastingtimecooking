@@ -564,7 +564,7 @@
         </div>
     </div>
     <div class="flex md:hidden flex-row md:flex-col mx-1 space-x-1 md:space-x-0 md:space-y-2">
-        <div class="carousel carousel-center space-x-1 border border-primary rounded-md p-1 h-8 w-full">
+        <div class="carousel carousel-center space-x-1 border border-primary rounded-md p-1 min-h-8 w-full">
             <!-- <button id="thumb_up" class="btn btn-xs p-1 made flex content-center category bg-transparent border-none" onclick={select_cat}><ThumbUp color={(selected_cats.cats.includes("thumb_up")) ? "fill-primary" : "fill-neutral"}/></button>
             <button id="heart" class="btn btn-xs p-1 made flex content-center category  bg-transparent border-none" onclick={select_cat}><Heart color={(selected_cats.cats.includes("heart")) ? "fill-primary" : "fill-neutral"}/></button> -->
             {#each display_categories as cat}
