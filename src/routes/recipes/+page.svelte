@@ -426,7 +426,7 @@
   <h4>See what others are cooking</h4>
   <div class="flex w-full justify-center flex-col md:mt-2 space-y-1 md:space-y-2">
     <div class="hidden md:flex flex-row md:flex-col w-full">
-        <div class="carousel carousel-center rounded-box space-x-1 border border-primary rounded-md p-1 mx-2">
+        <div class="carousel carousel-center space-x-1 border border-primary rounded-md p-1 mx-2 min-h-9">
             <!-- <button id="thumb_up" class="btn btn-xs p-1 made flex content-center category bg-transparent border-none" onclick={select_cat}><ThumbUp color={(selected_cats.cats.includes("thumb_up")) ? "fill-primary" : "fill-neutral"}/></button>
             <button id="heart" class="btn btn-xs p-1 made flex content-center category  bg-transparent border-none" onclick={select_cat}><Heart color={(selected_cats.cats.includes("heart")) ? "fill-primary" : "fill-neutral"}/></button> -->
             {#each display_categories as cat}
@@ -467,48 +467,63 @@
                   </div>
                 </div>
             <ul class="flex flex-col w-full space-y-2 md:space-y-4 h-[calc(100svh-130px)] md:h-[calc(100svh-160px)] overflow-y-auto">
-              {#each data as item}
-                    <!-- svelte-ignore a11y_no_static_element_interactions-->
-                  <div class="card card-side bg-base-200 h-24 md:h-28 card-bordered border-primary cursor-pointer mx-1" onkeydown={window.location = `/cook_recipe/${item.url_id}/${item.servings}`} onclick={window.location = `/cook_recipe/${item.url_id}/${item.servings}`}>
-                      <figure class="w-1/4 bg-cover bg-no-repeat bg-center" style="background-image: url('{item.image}')"></figure>
-                      <div class="card-body h-full flex flex-row p-1 w-3/4 justify-between">
-                          <div class="flex flex-col justify-between p-1 md:p-3 w-full">
-                              <h2 id={item.id} class="card-title text-sm text-ellipsis overflow-hidden">{item.title}</h2>
-                              <div class="flex w-full items-center">
-                                  <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit px-1 text-nowrap text-center basis-12 grow rounded-tl rounded-bl">
-                                      {#if isNaN(item.servings)}
-                                          {item.servings}
-                                      {:else}
-                                          {item.servings} servings
-                                      {/if}
-                                  </div>
-                                  <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit px-1 text-nowrap text-center basis-12 grow">
-                                      {#if item.time}
-                                          {item.time}
-                                      {:else}
-                                          no time
-                                      {/if}
-                                  </div>
-                                  <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit px-1 text-nowrap text-center basis-12 grow">
-                                      {item.expand.ingr_list.length} ingredients
-                                  </div>
-                                  <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit px-1 text-nowrap text-center basis-12 grow rounded-tr rounded-br">
-                                    {item.directions.length} steps
-                                </div>
-                                  {#if !$currentUser || $currentUser.id != item.user}
-                                    <button id={item.id} class="btn btn-primary btn-xs w-6 ml-2 p-0" onclick={stopPropagation(add_recipe)} onkeydown={stopPropagation(add_recipe)}>
-                                        {#if just_copied == item.id}
-                                            <CheckMark color=""/>
-                                        {:else}
-                                            <Plus/>
+                <!-- {#if false} -->
+                {#if data.length}
+                    {#each data as item}
+                            <!-- svelte-ignore a11y_no_static_element_interactions-->
+                        <div class="card card-side bg-base-200 h-24 md:h-28 card-bordered border-primary cursor-pointer mx-1" onkeydown={window.location = `/cook_recipe/${item.url_id}/${item.servings}`} onclick={window.location = `/cook_recipe/${item.url_id}/${item.servings}`}>
+                            <figure class="w-1/4 bg-cover bg-no-repeat bg-center" style="background-image: url('{item.image}')"></figure>
+                            <div class="card-body h-full flex flex-row p-1 w-3/4 justify-between">
+                                <div class="flex flex-col justify-between p-1 md:p-3 w-full">
+                                    <h2 id={item.id} class="card-title text-sm text-ellipsis overflow-hidden">{item.title}</h2>
+                                    <div class="flex w-full items-center">
+                                        <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit px-1 text-nowrap text-center basis-12 grow rounded-tl rounded-bl">
+                                            {#if isNaN(item.servings)}
+                                                {item.servings}
+                                            {:else}
+                                                {item.servings} servings
+                                            {/if}
+                                        </div>
+                                        <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit px-1 text-nowrap text-center basis-12 grow">
+                                            {#if item.time}
+                                                {item.time}
+                                            {:else}
+                                                no time
+                                            {/if}
+                                        </div>
+                                        <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit px-1 text-nowrap text-center basis-12 grow">
+                                            {item.expand.ingr_list.length} ingredients
+                                        </div>
+                                        <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit px-1 text-nowrap text-center basis-12 grow rounded-tr rounded-br">
+                                            {item.directions.length} steps
+                                        </div>
+                                        {#if !$currentUser || $currentUser.id != item.user}
+                                            <button id={item.id} class="btn btn-primary btn-xs w-6 ml-2 p-0" onclick={stopPropagation(add_recipe)} onkeydown={stopPropagation(add_recipe)}>
+                                                {#if just_copied == item.id}
+                                                    <CheckMark color=""/>
+                                                {:else}
+                                                    <Plus/>
+                                                {/if}
+                                            </button>
                                         {/if}
-                                    </button>
-                                  {/if}
-                              </div>
-                          </div>
-                      </div>
-                  </div>
-              {/each}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {/each}
+                {:else}
+                    {#each Array(7) as _, i}
+                        <div class="card card-side bg-base-200 h-24 md:h-28 card-bordered border-primary cursor-pointer mx-1" onkeydown={window.location = `/cook_recipe/${item.url_id}/${item.servings}`} onclick={window.location = `/cook_recipe/${item.url_id}/${item.servings}`}>
+                            <div class="flex items-center gap-4 w-full m-5">
+                                <div class="skeleton h-20 w-20 shrink-0 rounded-full"></div>
+                                <div class="flex flex-col gap-4 w-full">
+                                <div class="skeleton h-4 w-full"></div>
+                                <div class="skeleton h-4 w-full"></div>
+                                </div>
+                            </div>
+                        </div>
+                    {/each}
+                {/if}
               <div class="flex w-full h-full justify-center">
                 <span class="{has_more ? "" : "hidden"} loading loading-bars loading-lg mx-7 self-center"></span>
               </div>
@@ -544,7 +559,7 @@
         </div>
     </div>
     <div class="flex md:hidden flex-row md:flex-col mx-1 space-x-1 md:space-x-0 md:space-y-2">
-        <div class="carousel carousel-center rounded-box space-x-1 border border-primary rounded-md p-1">
+        <div class="carousel carousel-center space-x-1 border border-primary rounded-md p-1 h-8 w-full">
             <!-- <button id="thumb_up" class="btn btn-xs p-1 made flex content-center category bg-transparent border-none" onclick={select_cat}><ThumbUp color={(selected_cats.cats.includes("thumb_up")) ? "fill-primary" : "fill-neutral"}/></button>
             <button id="heart" class="btn btn-xs p-1 made flex content-center category  bg-transparent border-none" onclick={select_cat}><Heart color={(selected_cats.cats.includes("heart")) ? "fill-primary" : "fill-neutral"}/></button> -->
             {#each display_categories as cat}
