@@ -441,6 +441,11 @@
             {#each display_countries as country}
                 <button id="country" class="btn btn-xs {selected_countries.includes(country)?'btn-primary text-black':'bg-base-300 text-neutral'} country" onclick={select_cat}>{country}</button> 
             {/each}
+            {#if !categories.length && !cuisines.length && !countries.length && !authors.length}
+                {#each Array(40) as _, i}
+                    <button id="country" class="btn btn-xs"><div class="skeleton h-2 w-12"></div></button> 
+                {/each}
+            {/if}
         </div>
     </div>
     <div class="flex w-full justify-center">
@@ -512,13 +517,13 @@
                         </div>
                     {/each}
                 {:else}
-                    {#each Array(7) as _, i}
+                    {#each Array(10) as _, i}
                         <div class="card card-side bg-base-200 h-24 md:h-28 card-bordered border-primary cursor-pointer mx-1" onkeydown={window.location = `/cook_recipe/${item.url_id}/${item.servings}`} onclick={window.location = `/cook_recipe/${item.url_id}/${item.servings}`}>
                             <div class="flex items-center gap-4 w-full m-5">
-                                <div class="skeleton h-20 w-20 shrink-0 rounded-full"></div>
-                                <div class="flex flex-col gap-4 w-full">
-                                <div class="skeleton h-4 w-full"></div>
-                                <div class="skeleton h-4 w-full"></div>
+                                <div class="skeleton h-20 md:h-24 w-1/4 shrink-0 rounded-full"></div>
+                                <div class="flex flex-col gap-4 w-3/4">
+                                    <div class="skeleton h-4 w-full"></div>
+                                    <div class="skeleton h-4 w-full"></div>
                                 </div>
                             </div>
                         </div>
@@ -574,6 +579,11 @@
             {#each display_countries as country}
                 <button id="country" class="btn btn-xs {selected_countries.includes(country)?'btn-primary text-black':'bg-base-300 text-neutral'} country" onclick={select_cat}>{country}</button> 
             {/each}
+            {#if !categories.length && !cuisines.length && !countries.length && !authors.length}
+                {#each Array(7) as _, i}
+                    <button id="country" class="btn btn-xs"><div class="skeleton h-2 w-12"></div></button> 
+                {/each}
+            {/if}
         </div>
     </div>
   </div>
