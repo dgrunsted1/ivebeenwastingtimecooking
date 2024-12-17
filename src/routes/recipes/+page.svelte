@@ -1,14 +1,11 @@
 <script>
-  import { run, stopPropagation } from 'svelte/legacy';
-
+  
 	import {onMount} from "svelte";
     import { pb, currentUser } from '/src/lib/pocketbase.js';
     import InfiniteScroll from "/src/lib/components/infinite_scroll.svelte";
     import Clear from "/src/lib/icons/Clear.svelte";
-    import {sort_recipes} from "/src/lib/sort.js";
-    import Plus from "/src/lib/icons/Plus.svelte";
-    import CheckMark from "/src/lib/icons/CheckMark.svelte";
     import Alerts from "../../lib/components/alerts.svelte";
+    import RecipeCard from "../../lib/components/recipe_card.svelte";
 
 
 	
@@ -362,49 +359,49 @@
         }, 2000);
     }
 
-    async function add_recipe(e){
+    // async function add_recipe(e){
         
-        if (!$currentUser){
-            if (window.confirm("you must login to add this recipe to your list. Do you want to sign in?")) {
-                window.open(`/login`, "Thanks for Visiting!");
-            }
-        } else if (!$currentUser.verified){
-            show_alert("Please verify your email to add recipes", "error", "Please verify your email");
-            return;
-        } else {
-            const recipe_to_add = data.filter((curr) => curr.id == e.currentTarget.id)[0];
+    //     if (!$currentUser){
+    //         if (window.confirm("you must login to add this recipe to your list. Do you want to sign in?")) {
+    //             window.open(`/login`, "Thanks for Visiting!");
+    //         }
+    //     } else if (!$currentUser.verified){
+    //         show_alert("Please verify your email to add recipes", "error", "Please verify your email");
+    //         return;
+    //     } else {
+    //         const recipe_to_add = data.filter((curr) => curr.id == e.currentTarget.id)[0];
             
-            const recipe_in = {
-                "title": recipe_to_add.title,
-                "description": recipe_to_add.description,
-                "url": recipe_to_add.url,
-                "author": recipe_to_add.author,
-                "time": recipe_to_add.time,
-                "directions": recipe_to_add.directions,
-                "user": $currentUser.id,
-                "image": recipe_to_add.image,
-                "servings": recipe_to_add.servings,
-                "cuisine": recipe_to_add.cuisine,
-                "country": recipe_to_add.country,
-                "notes": recipe_to_add.notes,
-                "ingr_list": recipe_to_add.ingr_list,
-                "category": recipe_to_add.category,
-                "url_id": recipe_to_add.url_id,
-                "made": false,
-                "favorite": false,
-                "time_new": recipe_to_add.time_new,
-                "ingr_num": recipe_to_add.ingr_num
-            };
+    //         const recipe_in = {
+    //             "title": recipe_to_add.title,
+    //             "description": recipe_to_add.description,
+    //             "url": recipe_to_add.url,
+    //             "author": recipe_to_add.author,
+    //             "time": recipe_to_add.time,
+    //             "directions": recipe_to_add.directions,
+    //             "user": $currentUser.id,
+    //             "image": recipe_to_add.image,
+    //             "servings": recipe_to_add.servings,
+    //             "cuisine": recipe_to_add.cuisine,
+    //             "country": recipe_to_add.country,
+    //             "notes": recipe_to_add.notes,
+    //             "ingr_list": recipe_to_add.ingr_list,
+    //             "category": recipe_to_add.category,
+    //             "url_id": recipe_to_add.url_id,
+    //             "made": false,
+    //             "favorite": false,
+    //             "time_new": recipe_to_add.time_new,
+    //             "ingr_num": recipe_to_add.ingr_num
+    //         };
             
-            let recipe_result = await pb.collection('recipes').create(recipe_in);
+    //         let recipe_result = await pb.collection('recipes').create(recipe_in);
             
-            just_copied = recipe_to_add.id;
-            clearTimeout(delay_timer);
-            delay_timer = setTimeout(function() {
-                just_copied = false;
-            }, 2000);
-        }
-    }
+    //         just_copied = recipe_to_add.id;
+    //         clearTimeout(delay_timer);
+    //         delay_timer = setTimeout(function() {
+    //             just_copied = false;
+    //         }, 2000);
+    //     }
+    // }
 
     function show_alert(msg, type, title){
         
@@ -475,46 +472,7 @@
                 <!-- {#if false} -->
                 {#if data.length}
                     {#each data as item}
-                            <!-- svelte-ignore a11y_no_static_element_interactions-->
-                        <div class="card card-side bg-base-200 h-24 md:h-28 card-bordered border-primary cursor-pointer mx-1" onkeydown={window.location = `/cook_recipe/${item.url_id}/${item.servings}`} onclick={window.location = `/cook_recipe/${item.url_id}/${item.servings}`}>
-                            <figure class="w-1/4 bg-cover bg-no-repeat bg-center" style="background-image: url('{item.image}')"></figure>
-                            <div class="card-body h-full flex flex-row p-1 w-3/4 justify-between">
-                                <div class="flex flex-col justify-between p-1 md:p-3 w-full">
-                                    <h2 id={item.id} class="card-title text-sm text-ellipsis overflow-hidden">{item.title}</h2>
-                                    <div class="flex w-full items-center">
-                                        <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit px-1 text-nowrap text-center basis-12 grow rounded-tl rounded-bl">
-                                            {#if isNaN(item.servings)}
-                                                {item.servings}
-                                            {:else}
-                                                {item.servings} servings
-                                            {/if}
-                                        </div>
-                                        <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit px-1 text-nowrap text-center basis-12 grow">
-                                            {#if item.time}
-                                                {item.time}
-                                            {:else}
-                                                no time
-                                            {/if}
-                                        </div>
-                                        <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit px-1 text-nowrap text-center basis-12 grow">
-                                            {item.expand.ingr_list.length} ingredients
-                                        </div>
-                                        <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit px-1 text-nowrap text-center basis-12 grow rounded-tr rounded-br">
-                                            {item.directions.length} steps
-                                        </div>
-                                        {#if !$currentUser || $currentUser.id != item.user}
-                                            <button id={item.id} class="btn btn-primary btn-xs w-6 ml-2 p-0" onclick={stopPropagation(add_recipe)} onkeydown={stopPropagation(add_recipe)}>
-                                                {#if just_copied == item.id}
-                                                    <CheckMark color=""/>
-                                                {:else}
-                                                    <Plus/>
-                                                {/if}
-                                            </button>
-                                        {/if}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <RecipeCard recipe={item}/>
                     {/each}
                 {:else}
                     {#each Array(10) as _, i}
