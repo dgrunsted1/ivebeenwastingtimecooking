@@ -19,31 +19,12 @@
 
     let dispatch = createEventDispatcher();
     let just_copied = $state(false);
-    let fave_btn = $state(false);
-    let check_box = $state(false);
-    let add_btn = $state(false);
-    let delete_btn = $state(false);
-    let thumb_btn = $state(false);
-    let cook_page_link = $state("");
-
-    onMount(async () => {
-        // console.log($page.url.pathname);
-        if (type == "today"){
-            cook_page_link = `/cook_recipe/${recipe.url_id}/${servings}`
-            fave_btn = true;
-            check_box = true;
-        } else if (type == "recipes"){
-            cook_page_link = `/cook_recipe/${recipe.url_id}/${servings}`
-            add_btn = true;
-        } else if (type == "menu"){
-            fave_btn = true;
-            check_box = true;
-            delete_btn = true;
-            thumb_btn = true;
-        } else if (type == "menu_component") {
-
-        }
-    });
+    let fave_btn = $derived(type == "today" || type == "menu");
+    let check_box = $derived(type == "today" || type == "menu");
+    let add_btn = $derived(type == "recipes");
+    let delete_btn = $derived(type == "menu");
+    let thumb_btn = $derived(type == "menu");
+    let cook_page_link = `/cook_recipe/${recipe.url_id}/${servings}`;
 
     const card_click = (e) => {
         e.stopPropagation();
