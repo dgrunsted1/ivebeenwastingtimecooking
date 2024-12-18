@@ -6,10 +6,13 @@
     import Plus from "/src/lib/icons/Plus.svelte";
     import CheckMark from "/src/lib/icons/CheckMark.svelte";
     import Heart from "/src/lib/icons/Heart.svelte";
+    import DeleteIcon from "/src/lib/icons/DeleteIcon.svelte";
+    import ThumbUp from "/src/lib/icons/ThumbUp.svelte";
+
 
     let { 
         recipe = $bindable(),
-        made = $bindable(),
+        checked = $bindable(),
         servings = $bindable()
     } = $props();
 
@@ -18,14 +21,22 @@
     let fave_btn = $state(false);
     let check_box = $state(false);
     let add_btn = $state(false);
+    let delete_btn = $state(false);
+    let thumb_btn = $state(false);
     let cook_page_link = $state("");
 
     onMount(async () => {
+        // console.log($page.url.pathname);
         if ($page.url.pathname == "/today"){
             fave_btn = true;
             check_box = true;
         } else if ($page.url.pathname == "/recipes"){
             add_btn = true;
+        } else if ($page.url.pathname == "/menu"){
+            fave_btn = true;
+            check_box = true;
+            delete_btn = true;
+            thumb_btn = true;
         }
     });
 
@@ -79,13 +90,22 @@
 
     const toggle_made = (e) => {
         e.stopPropagation();
-        dispatch("toggle_made", {id: e.srcElement.id})
+        dispatch("toggle_check_box", {id: recipe.id})
     }
 
     const toggle_favorite = (e) => {
         e.stopPropagation();
-        // update_fave_queue(e);
-        dispatch("toggle_favorite", {id: e.srcElement.id})
+        dispatch("toggle_heart", {id: recipe.id})
+    }
+
+    const toggle_thumb = (e) => {
+        e.stopPropagation();
+        dispatch("toggle_thumb", {id: recipe.id})
+    }
+
+    const delete_recipe = (e) => {
+        e.stopPropagation();
+        dispatch("delete_recipe", {id: recipe.id})
     }
 
 </script>
@@ -93,36 +113,36 @@
     <!-- svelte-ignore a11y_no_static_element_interactions-->
     <div class="card card-side bg-base-200 h-24 md:h-28 card-bordered border-primary cursor-pointer mx-1" onkeydown={card_click} onclick={card_click}>
         <figure class="w-1/4 bg-cover bg-no-repeat bg-center" style="background-image: url('{recipe.image}')"></figure>
-        <div class="card-body h-full flex flex-row p-1 w-3/4 justify-between">
+        <div class="card-body h-full flex flex-row p-1 w-1/2 justify-between">
             <div class="flex flex-col justify-between p-1 md:p-3 w-full">
                 <h2 id={recipe.id} class="card-title text-sm text-ellipsis overflow-hidden">{recipe.title}</h2>
                 <div class="flex w-full recipes-center">
-                    <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit px-1 text-nowrap text-center basis-12 grow rounded-tl rounded-bl">
+                    <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow rounded-tl rounded-bl">
                         {#if isNaN(recipe.servings)}
-                            {recipe.servings}
+                            {servings}
                         {:else}
-                            {recipe.servings} servings
+                            {servings} servings
                         {/if}
                     </div>
-                    <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit px-1 text-nowrap text-center basis-12 grow">
+                    <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow">
                         {#if recipe.time}
                             {recipe.time}
                         {:else}
                             no time
                         {/if}
                     </div>
-                    <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit px-1 text-nowrap text-center basis-12 grow">
+                    <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow">
                         {recipe.expand.ingr_list.length} ingredients
                     </div>
-                    <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit px-1 text-nowrap text-center basis-12 grow rounded-tr rounded-br">
+                    <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow rounded-tr rounded-br">
                         {recipe.directions.length} steps
                     </div>
                 </div>
             </div>
         </div>
-        <div class="card-actions flex flex-row justify-evenly items-center content-center space-y-2">
-            {#if !$currentUser || $currentUser.id != recipe.user}
-                <button id={recipe.id} class="btn btn-primary btn-xs w-6 ml-2 p-0" onclick={add_recipe} onkeydown={add_recipe}>
+        <div class="card-actions flex flex-col justify-evenly items-end items-center py-1 pr-1 max-w-1/4">
+            {#if add_btn && (!$currentUser || $currentUser.id != recipe.user)}
+                <button id={recipe.id} class="btn btn-primary btn-xs h-8 m-1 md:m-3" onclick={add_recipe} onkeydown={add_recipe}>
                     {#if just_copied == recipe.id}
                         <CheckMark color=""/>
                     {:else}
@@ -130,7 +150,17 @@
                     {/if}
                 </button>
             {/if}
-            {#if check_box}<input type="checkbox" class="checkbox checkbox-primary checkbox-lg p-1" id={recipe.id} bind:checked={made} onclick={toggle_made}>{/if}
-            {#if fave_btn}<button id={recipe.id} class="btn btn-xs p-1 favorite flex content-center" onclick={toggle_favorite}><Heart color={(recipe.favorite) ? "fill-primary" : "fill-neutral"}/></button>{/if}
+            {#if fave_btn || thumb_btn}
+                <div class="flex flex-w-fit space-x-1">
+                    {#if fave_btn}<button class="btn btn-xs p-1 favorite flex content-center" onclick={toggle_favorite}><Heart color={(recipe.favorite) ? "fill-primary" : "fill-neutral"}/></button>{/if}
+                    {#if thumb_btn}<button class="btn btn-xs  p-1 made flex content-center" onclick={toggle_thumb}><ThumbUp color={(recipe.made) ? "fill-primary" : "fill-neutral"}/></button>{/if}
+                </div>
+            {/if}
+            {#if delete_btn || check_box}
+                <div class="flex w-fit space-x-2">
+                    {#if check_box}<input type="checkbox" class="checkbox checkbox-primary checkbox-lg p-1" bind:checked={checked} onclick={toggle_made}>{/if}
+                    {#if delete_btn}<button class="btn btn-sm p-1 btn-accent {recipe.id} " onclick={delete_recipe}><DeleteIcon/></button>{/if}
+                </div>
+            {/if}
         </div>
     </div>

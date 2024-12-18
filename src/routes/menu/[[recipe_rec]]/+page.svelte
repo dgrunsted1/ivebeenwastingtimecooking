@@ -103,9 +103,13 @@
         {#if (user_recipes && user_recipes.length > 0) || loading}
             <div id="content" class="flex flex-col md:flex-row   mt-0 md:space-x-3 md:w-full">
                 <div id="left_column" class="md:w-1/2">
-                    <RecipeList recipes={user_recipes} 
-                        on:update_edit={update_edit} on:reset_mode={reset_mode} 
-                        on:check_item={check_item} on:update_recipe={update_recipe}/>
+                    <RecipeList 
+                        recipes={user_recipes} 
+                        menu_recipes={menu_recipes}
+                        on:update_edit={update_edit} 
+                        on:reset_mode={reset_mode} 
+                        on:check_item={check_item} 
+                        on:update_recipe={update_recipe}/>
                 </div>
                 <!-- --------------
                 MOBILE ONLY SECTION

@@ -1,5 +1,5 @@
-<!-- @migration-task Error while migrating Svelte code: Can't migrate code with afterUpdate. Please migrate by hand. -->
 <script>
+    import RecipeCard from "./recipe_card.svelte";
     import { createEventDispatcher } from 'svelte';
     import { pb } from '/src/lib/pocketbase';
     import DeleteIcon from "/src/lib/icons/DeleteIcon.svelte";
@@ -11,7 +11,10 @@
     import { sort_recipes } from '/src/lib/sort.js';
 
     const dispatch = createEventDispatcher();
-    let { recipes = $bindable() } = $props();
+    let { 
+        recipes = $bindable(),
+        menu_recipes = $bindable()
+    } = $props();
     const get_categories = () => {
         let out = {cuisines:[], countries:[], cats:[]};
         for (let i = 0; i < recipes.length; i++){
@@ -47,12 +50,15 @@
 
     async function delete_recipe(e){
         e.stopPropagation();
-        let delete_recipe = confirm("Are you sure you want to delete this recipe?");
-        if (delete_recipe){
-            await pb.collection('recipes').delete(e.srcElement.id);
-            let tmp = []
-            for (let recipe of recipes){
-                if (recipe.id != e.srcElement.id) tmp.push(recipe);
+        let tmp = []
+        for (let recipe of recipes){
+            if (recipe.id == e.detail.id) {
+                let delete_recipe = confirm(`Are you sure you want to delete your recipe "${recipe.title}"?`);
+                if (delete_recipe){
+                    await pb.collection('recipes').delete(e.detail.id);
+                }
+            } else {
+                tmp.push(recipe);
             }
             recipes = tmp;
         }
@@ -232,35 +238,41 @@
     }
 
     async function update_fav(e){
-        e.stopPropagation();
         let val;
         
         for (let i = 0; i < recipes.length; i++){
-            if (recipes[i].id == e.srcElement.id){
+            if (recipes[i].id == e.detail.id){
                 val = !recipes[i].favorite;
                 break;
             }
         }
-        const result = await update_fav_made(e.srcElement.id, "favorite", val);
+        const result = await update_fav_made(e.detail.id, "favorite", val);
         dispatch("update_recipe", {recipe: result});
     }
 
     async function update_made(e){
-        e.stopPropagation();
         let val;
         for (let i = 0; i < recipes.length; i++){
-            if (recipes[i].id == e.srcElement.id){
+            if (recipes[i].id == e.detail.id){
                 val = !recipes[i].made;
                 break;
             }
         }
-        const result = await update_fav_made(e.srcElement.id, "made", val);
+        const result = await update_fav_made(e.detail.id, "made", val);
         dispatch("update_recipe", {recipe: result});
     }
 
     function check_item(e){
-        const index = e.currentTarget.id;
-        dispatch("check_item", {index: index});
+        dispatch("check_item", {index: e.detail.id});
+    }
+
+    function is_checked(id){
+        const items = menu_recipes.filter((item) => item.id == id);
+        if (items.length > 0){
+            return true;
+        } else {
+            return false;
+        }
     }
 </script>
 <div class="hidden md:flex flex-col w-full">
@@ -304,44 +316,14 @@
 <div id="recipes" class="h-[calc(100svh-160px)] md:h-[calc(100svh-135px)] overflow-y-auto space-y-2 rounded-md md:border-none py-2">
     {#if display_recipes && display_recipes.length}
         {#each display_recipes as curr, i}
-            <!-- svelte-ignore a11y_no_static_element_interactions-->
-            <div class="card card-side bg-base-200 h-24 card-bordered cursor-pointer border-primary" onclick={view} onkeydown={view}>
-                <figure class="w-1/4 bg-cover bg-no-repeat bg-center" style="background-image: url('{display_recipes[i].image}')"></figure>
-                <div class="card-body h-full flex flex-row p-1 w-3/4 justify-between">
-                    <div class="flex flex-col justify-between p-1 w-[70%]">
-                        <h2 id={display_recipes[i].id} class="card-title text-sm text-ellipsis overflow-hidden">{display_recipes[i].title}</h2>
-                        <div class="flex w-full">
-                            <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit px-1 text-nowrap text-center basis-12 grow rounded-tl rounded-bl">
-                                {#if isNaN(display_recipes[i].servings)}
-                                    {display_recipes[i].servings}
-                                {:else}
-                                    {display_recipes[i].servings} servings
-                                {/if}
-                            </div>
-                            <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit px-1 text-nowrap text-center basis-12 grow">
-                                {#if display_recipes[i].time}
-                                    {display_recipes[i].time}
-                                {:else}
-                                    no time
-                                {/if}
-                            </div>
-                            <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit px-1 text-nowrap text-center basis-12 grow rounded-tr rounded-br">
-                                {display_recipes[i].expand.ingr_list.length} ingredients
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-actions flex flex-col justify-evenly items-end items-center  py-1">
-                        <div class="flex w-fit space-x-1">
-                            <button id={display_recipes[i].id} class="btn btn-xs  p-1 made flex content-center" onclick={(e) => {update_made(e)}}><ThumbUp color={(display_recipes[i].made) ? "fill-primary" : "fill-neutral"}/></button>
-                            <button id={display_recipes[i].id} class="btn btn-xs p-1 favorite flex content-center" onclick={(e) => {update_fav(e, "favorite")}}><Heart color={(display_recipes[i].favorite) ? "fill-primary" : "fill-neutral"}/></button>
-                        </div>
-                        <div class="flex w-fit space-x-2">
-                            <input type="checkbox" onclick={check_item} class="checkbox checkbox-primary checkbox-lg p-1" id={display_recipes[i].id} checked={display_recipes[i].checked}>
-                            <button class="btn btn-sm p-1 btn-accent {display_recipes[i].id} " onclick={delete_recipe} id={display_recipes[i].id}><DeleteIcon/></button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <RecipeCard 
+            recipe={display_recipes[i]} 
+            checked={is_checked(display_recipes[i].id)} 
+            bind:servings={display_recipes[i].servings} 
+            on:toggle_check_box={check_item} 
+            on:toggle_heart={update_fav}
+            on:delete_recipe={delete_recipe}
+            on:toggle_thumb={update_made}/>
         {/each}
         <div class="flex justify-center m-3">
             <a class="btn btn-primary btn-xs" href="/add_recipe">Add New Recipes</a>

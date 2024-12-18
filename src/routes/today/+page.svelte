@@ -208,7 +208,7 @@
                                         {/each}
                                     {/each}
                                 {/if}
-                                <RecipeCard bind:recipe={todays_menu.expand.recipes[i]} bind:made={todays_menu.made[curr.id]} on:toggle_made={toggle_made} on:toggle_favorite={update_fave_queue} bind:servings={todays_menu.servings[curr.id]}/>
+                                <RecipeCard bind:recipe={todays_menu.expand.recipes[i]} bind:checked={todays_menu.made[curr.id]} on:toggle_check_box={toggle_made} on:toggle_heart={update_fave_queue} bind:servings={todays_menu.servings[curr.id]}/>
                             {/if}
                         {/each}
                     {:else}
