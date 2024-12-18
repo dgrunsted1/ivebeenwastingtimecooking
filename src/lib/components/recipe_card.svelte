@@ -13,7 +13,8 @@
     let { 
         recipe = $bindable(),
         checked = $bindable(),
-        servings = $bindable()
+        servings = $bindable(),
+        type = $bindable()
     } = $props();
 
     let dispatch = createEventDispatcher();
@@ -27,21 +28,26 @@
 
     onMount(async () => {
         // console.log($page.url.pathname);
-        if ($page.url.pathname == "/today"){
+        if (type == "today"){
+            cook_page_link = `/cook_recipe/${recipe.url_id}/${servings}`
             fave_btn = true;
             check_box = true;
-        } else if ($page.url.pathname == "/recipes"){
+        } else if (type == "recipes"){
+            cook_page_link = `/cook_recipe/${recipe.url_id}/${servings}`
             add_btn = true;
-        } else if ($page.url.pathname == "/menu"){
+        } else if (type == "menu"){
             fave_btn = true;
             check_box = true;
             delete_btn = true;
             thumb_btn = true;
+        } else if (type == "menu_component") {
+
         }
     });
 
-    const card_click = () => {
-        window.location = cook_page_link;
+    const card_click = (e) => {
+        e.stopPropagation();
+        dispatch("card_click", {id: recipe.id})
     }
 
     async function add_recipe(e){

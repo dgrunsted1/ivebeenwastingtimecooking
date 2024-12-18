@@ -167,6 +167,12 @@
     const handle_check_item = async (e) => {
         check_grocery_item(e.detail.id, e.detail.value);
     }
+
+    const cook_recipe = (e) => {
+        console.log("here")
+        let recipe = todays_menu.expand.recipes.filter(recipe => recipe.id == e.detail.id)[0];
+        window.location = `/cook_recipe/${recipe.url_id}/${todays_menu.servings[recipe.id]}`
+    }
 </script>
 
 <svelte:head>
@@ -208,7 +214,15 @@
                                         {/each}
                                     {/each}
                                 {/if}
-                                <RecipeCard bind:recipe={todays_menu.expand.recipes[i]} bind:checked={todays_menu.made[curr.id]} on:toggle_check_box={toggle_made} on:toggle_heart={update_fave_queue} bind:servings={todays_menu.servings[curr.id]}/>
+                                <RecipeCard
+                                    bind:recipe={todays_menu.expand.recipes[i]}
+                                    bind:checked={todays_menu.made[curr.id]}
+                                    bind:servings={todays_menu.servings[curr.id]}
+                                    type="today"
+                                    on:toggle_check_box={toggle_made}
+                                    on:toggle_heart={update_fave_queue}
+                                    on:card_click={cook_recipe}
+                                />
                             {/if}
                         {/each}
                     {:else}

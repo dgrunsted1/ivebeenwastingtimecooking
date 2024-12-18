@@ -7,6 +7,7 @@
     import { get_servings, get_total_time } from '/src/lib/recipe_util.js';
     import { createEventDispatcher } from 'svelte';
     import Plus from "/src/lib/icons/Plus.svelte";
+    import RecipeCard from './recipe_card.svelte';
 
 
 
@@ -267,50 +268,15 @@
     </div>
     
     {#if tab == "recipe_list"}
-        <div class="h-[calc(100svh-210px)] md:h-[calc(100svh-160px)] overflow-y-auto border border-primary rounded-md md:border-none flex flex-col">
+        <div class="h-[calc(100svh-210px)] md:h-[calc(100svh-160px)] overflow-y-auto border border-primary rounded-md md:border-none flex flex-col space-y-2">
             {#if menu.length}    
                 {#each menu as recipe}
                     {#if !recipe.is_sub_recipe}
-                        <div class="img_serv_container card card-bordered card-side flex flex-row w-auto place-items-stretch my-3.5 mx-3 bg-base-200 border-primary">
-                            <figure class="w-2/5">
-                                <img class="object-cover h-full" src={recipe.image} alt={recipe.title}/>
-                            </figure>
-                            <div class="servings_time_container flex flex-col w-3/5 ml-2.5 space-y-1 my-2">
-                                <p class="title text-xs bold md:text-xl">{recipe.title}</p>
-                                <p class="time text-xs">{recipe.time}</p>
-                                <div class="servings_container text-xs">
-                                    servings:<input type="text" class="servings input input-bordered input-xs px-1 mr-1 w-8" 
-                                                id={recipe.id} value={mults[recipe.id]} 
-                                                oninput={update_mult}>
-                                </div>
-                                <!-- <p class="description text-xs">{recipe.description}</p> -->
-                                {#if sub_recipes && sub_recipes[recipe.id] && $page.url.pathname == "/menu"}
-                                    <div class="flex flex-col space-y-2">
-                                        {#each sub_recipes[recipe.id] as curr}
-                                            <button class="btn btn-xs btn-primary px-0 w-6 h-fit" onclick={show_subrecipe_selector}><Plus/></button>
-                                            <div class="hidden flex flex-row items-center space-x-1 w-full">
-                                                <select value={curr.ingr_id} class="flex select select-xs w-20">
-                                                    <option value={null}>ingredient</option>
-                                                    {#each recipe.expand.ingr_list as item}
-                                                        
-                                                        <option class="" value={item.id}>{item.ingredient}</option>
-                                                    {/each}
-                                                </select>
-                                                <div class="text-xs">to swap for a</div>
-                                                <select value={curr.recipe_id} class="flex select select-xs w-20">
-                                                    <option value={null}>recipe</option>
-                                                    {#each menu as recipe_swap}
-                                                        {#if recipe.id != recipe_swap.id}
-                                                            <option value={recipe_swap.id}>{recipe_swap.title}</option>
-                                                        {/if}
-                                                    {/each}
-                                                </select>
-                                            </div>
-                                        {/each}
-                                    </div>
-                                {/if}
-                            </div>
-                        </div>  
+                        <RecipeCard
+                            recipe={recipe} 
+                            servings={mults[recipe.id]}
+                            type="menu_component"  
+                        />
                         {#if recipe.sub_recipe_data}
                             <div class="collapse bg-base-200 my-3.5 mx-5 w-auto">
                                 <input type="checkbox" /> 

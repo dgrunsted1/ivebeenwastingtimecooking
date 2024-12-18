@@ -359,49 +359,10 @@
         }, 2000);
     }
 
-    // async function add_recipe(e){
-        
-    //     if (!$currentUser){
-    //         if (window.confirm("you must login to add this recipe to your list. Do you want to sign in?")) {
-    //             window.open(`/login`, "Thanks for Visiting!");
-    //         }
-    //     } else if (!$currentUser.verified){
-    //         show_alert("Please verify your email to add recipes", "error", "Please verify your email");
-    //         return;
-    //     } else {
-    //         const recipe_to_add = data.filter((curr) => curr.id == e.currentTarget.id)[0];
-            
-    //         const recipe_in = {
-    //             "title": recipe_to_add.title,
-    //             "description": recipe_to_add.description,
-    //             "url": recipe_to_add.url,
-    //             "author": recipe_to_add.author,
-    //             "time": recipe_to_add.time,
-    //             "directions": recipe_to_add.directions,
-    //             "user": $currentUser.id,
-    //             "image": recipe_to_add.image,
-    //             "servings": recipe_to_add.servings,
-    //             "cuisine": recipe_to_add.cuisine,
-    //             "country": recipe_to_add.country,
-    //             "notes": recipe_to_add.notes,
-    //             "ingr_list": recipe_to_add.ingr_list,
-    //             "category": recipe_to_add.category,
-    //             "url_id": recipe_to_add.url_id,
-    //             "made": false,
-    //             "favorite": false,
-    //             "time_new": recipe_to_add.time_new,
-    //             "ingr_num": recipe_to_add.ingr_num
-    //         };
-            
-    //         let recipe_result = await pb.collection('recipes').create(recipe_in);
-            
-    //         just_copied = recipe_to_add.id;
-    //         clearTimeout(delay_timer);
-    //         delay_timer = setTimeout(function() {
-    //             just_copied = false;
-    //         }, 2000);
-    //     }
-    // }
+    const cook_recipe = (e) => {
+        let recipe = data.filter(recipe => recipe.id == e.detail.id)[0];
+        window.location = `/cook_recipe/${recipe.url_id}/${recipe.servings}`
+    }
 
     function show_alert(msg, type, title){
         
@@ -472,7 +433,11 @@
                 <!-- {#if false} -->
                 {#if data.length}
                     {#each data as item}
-                        <RecipeCard recipe={item}/>
+                        <RecipeCard 
+                            recipe={item}
+                            type="recipes"
+                            on:card_click={cook_recipe}
+                        />
                     {/each}
                 {:else}
                     {#each Array(10) as _, i}

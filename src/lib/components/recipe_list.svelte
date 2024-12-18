@@ -38,14 +38,12 @@
     let loading = $state(true);
 
     function view(e) {
-        if (e.target.tagName != "INPUT" && e.target.tagName != "BUTTON") {
-            let index = e.currentTarget.getElementsByTagName("h2")[0].id;
+            let index = e.detail.id;
             for (let i = 0; i < display_recipes.length; i++){
                 if (display_recipes[i].id == index){
                     dispatch(`update_edit`, {index: index});
                 }
             }
-        }
     }
 
     async function delete_recipe(e){
@@ -319,11 +317,14 @@
         <RecipeCard 
             recipe={display_recipes[i]} 
             checked={is_checked(display_recipes[i].id)} 
-            bind:servings={display_recipes[i].servings} 
+            servings={display_recipes[i].servings}
+            type="menu"
             on:toggle_check_box={check_item} 
             on:toggle_heart={update_fav}
             on:delete_recipe={delete_recipe}
-            on:toggle_thumb={update_made}/>
+            on:toggle_thumb={update_made}
+            on:card_click={view}
+        />
         {/each}
         <div class="flex justify-center m-3">
             <a class="btn btn-primary btn-xs" href="/add_recipe">Add New Recipes</a>
