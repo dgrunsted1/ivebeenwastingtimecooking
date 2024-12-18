@@ -1,21 +1,40 @@
 <script>
     import { pb, currentUser } from '/src/lib/pocketbase.js';
+    import { createEventDispatcher,onMount } from 'svelte';
+    import { page } from '$app/stores';
+
     import Plus from "/src/lib/icons/Plus.svelte";
     import CheckMark from "/src/lib/icons/CheckMark.svelte";
+    import Heart from "/src/lib/icons/Heart.svelte";
 
     let { 
-        recipe = $bindable()
+        recipe = $bindable(),
+        made = $bindable(),
+        servings = $bindable()
     } = $props();
 
+    let dispatch = createEventDispatcher();
     let just_copied = $state(false);
+    let fave_btn = $state(false);
+    let check_box = $state(false);
+    let add_btn = $state(false);
+    let cook_page_link = $state("");
+
+    onMount(async () => {
+        if ($page.url.pathname == "/today"){
+            fave_btn = true;
+            check_box = true;
+        } else if ($page.url.pathname == "/recipes"){
+            add_btn = true;
+        }
+    });
 
     const card_click = () => {
-        window.location = `/cook_recipe/${recipe.url_id}/${recipe.servings}`
+        window.location = cook_page_link;
     }
 
     async function add_recipe(e){
         e.stopPropagation();
-        console.log($currentUser);
         if (!$currentUser){
             if (window.confirm("you must login to add this recipe to your list. Do you want to sign in?")) {
                 window.open(`/login`, "Thanks for Visiting!");
@@ -58,6 +77,17 @@
         }
     }
 
+    const toggle_made = (e) => {
+        e.stopPropagation();
+        dispatch("toggle_made", {id: e.srcElement.id})
+    }
+
+    const toggle_favorite = (e) => {
+        e.stopPropagation();
+        // update_fave_queue(e);
+        dispatch("toggle_favorite", {id: e.srcElement.id})
+    }
+
 </script>
 
     <!-- svelte-ignore a11y_no_static_element_interactions-->
@@ -87,16 +117,20 @@
                     <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit px-1 text-nowrap text-center basis-12 grow rounded-tr rounded-br">
                         {recipe.directions.length} steps
                     </div>
-                    {#if !$currentUser || $currentUser.id != recipe.user}
-                        <button id={recipe.id} class="btn btn-primary btn-xs w-6 ml-2 p-0" onclick={add_recipe} onkeydown={add_recipe}>
-                            {#if just_copied == recipe.id}
-                                <CheckMark color=""/>
-                            {:else}
-                                <Plus/>
-                            {/if}
-                        </button>
-                    {/if}
                 </div>
             </div>
+        </div>
+        <div class="card-actions flex flex-row justify-evenly items-center content-center space-y-2">
+            {#if !$currentUser || $currentUser.id != recipe.user}
+                <button id={recipe.id} class="btn btn-primary btn-xs w-6 ml-2 p-0" onclick={add_recipe} onkeydown={add_recipe}>
+                    {#if just_copied == recipe.id}
+                        <CheckMark color=""/>
+                    {:else}
+                        <Plus/>
+                    {/if}
+                </button>
+            {/if}
+            {#if check_box}<input type="checkbox" class="checkbox checkbox-primary checkbox-lg p-1" id={recipe.id} bind:checked={made} onclick={toggle_made}>{/if}
+            {#if fave_btn}<button id={recipe.id} class="btn btn-xs p-1 favorite flex content-center" onclick={toggle_favorite}><Heart color={(recipe.favorite) ? "fill-primary" : "fill-neutral"}/></button>{/if}
         </div>
     </div>

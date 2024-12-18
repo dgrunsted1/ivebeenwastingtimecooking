@@ -9,11 +9,13 @@
     import Heart from "/src/lib/icons/Heart.svelte";
     import SubTask from "/src/lib/icons/subtask.svelte";
     import { update_fave } from '/src/lib/save_recipe.js';
+    import RecipeCard from "../../lib/components/recipe_card.svelte";
+
 
 
     let todays_menu = $state({});
     let grocery_list = $state([]);
-    let grocery_list_id = "";
+    let grocery_list_id = $state("");
     let grocery_list_status = $state("saved");
     let mode = "menu";
     let loading = $state(true);
@@ -118,8 +120,6 @@
                 break;
             }
         }
-        // await update_grocery_list(e.detail.grocery_list, grocery_list_id);
-        // grocery_list = e.detail.grocery_list;
         grocery_list_status = "saved";
     }
 
@@ -129,7 +129,7 @@
     }
 
     async function toggle_made(e){
-        const id = e.srcElement.id;
+        const id = e.detail.id;
         if (todays_menu.made){
             todays_menu.made[id] = !todays_menu.made[id];
         } else {
@@ -140,20 +140,17 @@
         update_made(todays_menu.made, todays_menu.id, $currentUser.id);
     }
 
-    function update_fave_queue(e){
-        update_fave_list.push(e.srcElement.id);
-        clearTimeout(delay_timer);
-        delay_timer = setTimeout(async () => {
-            let id_update_list = [];
-            for (let i = 0; i < todays_menu.expand.recipes.length; i++){
-                if (update_fave_list.includes(todays_menu.expand.recipes[i].id)){
-                    id_update_list.push({id: todays_menu.expand.recipes[i].id, favorite: todays_menu.expand.recipes[i].favorite});
-                }
+    async function update_fave_queue(e){
+        const id = e.detail.id;
+        console.log(id)
+        let favorite_val = false;
+        for (let i = 0; i < todays_menu.expand.recipes.length; i++){
+            if (todays_menu.expand.recipes[i].id == id){
+                todays_menu.expand.recipes[i].favorite = !todays_menu.expand.recipes[i].favorite;
+                favorite_val = todays_menu.expand.recipes[i].favorite;
             }
-            await update_fave(id_update_list);
-            update_fave_list = [];
-
-        }, 2000);
+        }
+        await update_fave([{id: id, favorite: favorite_val}]);
     }
 
     function switch_tab(e){
@@ -186,7 +183,7 @@
         </div>
         <div id="content" class="flex flex-col md:flex-row md:space-x-3 md:mx-2">
             <div id="left_column" class="{tab == "recipe_list" ? "" : "hidden md:flex"}  md:w-1/2">
-                <div id="recipes" class="h-[calc(100svh-100px)] md:h-[calc(100svh-75px)] overflow-y-auto w-full">
+                <div id="recipes" class="h-[calc(100svh-100px)] md:h-[calc(100svh-75px)] overflow-y-auto w-full space-y-2">
                     {#if todays_menu.expand}
                         {#each todays_menu.expand.recipes as curr, i}
                             {#if !sub_recipe_ids.includes(curr.id)}
@@ -211,20 +208,7 @@
                                         {/each}
                                     {/each}
                                 {/if}
-                                <div class="card card-bordered sm:card-side bg-base-200 border-primary max-h-24 my-1.5 mx-1 cursor-pointer" onclick={window.location = `/cook_recipe/${curr.url_id}/${todays_menu.servings[curr.id]}`} onkeydown={window.location = `/cook_recipe/${curr.url_id}/${todays_menu.servings[curr.id]}`}>
-                                    <figure class="md:w-3/5 "><img src={curr.image} alt={curr.title}/></figure>
-                                    <div class="card-body max-h-full flex flex-row p-2 items-center w-full">
-                                        <p id={i} class="w-1/2 text-xs">{curr.title}</p>
-                                        <div class="card-actions flex flex-row justify-evenly items-center">
-                                                <!-- {#if recipes_ready.includes(curr.id)} -->
-                                                    <input type="checkbox" class="checkbox checkbox-primary checkbox-lg p-1" id={curr.id} bind:checked={todays_menu.made[curr.id]} onclick={stopPropagation(toggle_made)}>
-                                                <!-- {:else}
-                                                    not ready
-                                                {/if} -->
-                                            <button id={curr.id} class="btn btn-xs p-1 favorite flex content-center" onclick={stopPropagation((e)=>{curr.favorite = !curr.favorite; update_fave_queue(e);})}><Heart color={(curr.favorite) ? "fill-primary" : "fill-neutral"}/></button>
-                                        </div>
-                                    </div>
-                                </div>
+                                <RecipeCard bind:recipe={todays_menu.expand.recipes[i]} bind:made={todays_menu.made[curr.id]} on:toggle_made={toggle_made} on:toggle_favorite={update_fave_queue} bind:servings={todays_menu.servings[curr.id]}/>
                             {/if}
                         {/each}
                     {:else}
