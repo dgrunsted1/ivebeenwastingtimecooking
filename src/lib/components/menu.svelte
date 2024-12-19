@@ -28,6 +28,7 @@
         menu_title = $bindable(),
         total_servings = $bindable()
     } = $props();
+
     let tab = $state("recipe_list");
     let grocery_list = $derived(get_grocery_list(menu, mults, sub_recipes));
     // let num_servings = $derived(get_servings(menu, sub_recipes, mults));
@@ -222,8 +223,7 @@
     }
 
     function remove_from_menu(e){
-        console.log("remove from menu");
-        dispatch('remove_from_menu', {id: e.detail.id});
+        dispatch('remove_from_menu', {index: e.detail.id});
     }
 
 </script>

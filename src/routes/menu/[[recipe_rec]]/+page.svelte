@@ -66,11 +66,11 @@
     
 
     function check_item(e){
-        console.log("check_item");
         for (let recipe of user_recipes){
             if (recipe.id == e.detail.index){
                 recipe.checked = !recipe.checked;
-                mults[recipe.id] = recipe.servings;
+                if (recipe.checked) mults[recipe.id] = recipe.servings;
+                else delete mults[recipe.id];
             }
         }
     }
@@ -116,6 +116,8 @@
                 <!-- --------------
                 MOBILE ONLY SECTION
                 -------------- -->
+                <!-- svelte-ignore a11y_click_events_have_key_events -->
+                <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
                 <details class="md:hidden collapse bg-base-200 md:bg-base-100 collapse-arrow mt-1 w-full md:w-1/2" onclick={() => {window.scrollBy({ top: 700, left: 0, behavior: "smooth"});}}>
                     <summary class="collapse-title text-xl font-medium">
                         {#if menu_recipes.length > 0}
@@ -152,7 +154,16 @@
                 -------------- -->
                 <div id="right_column" class="hidden md:flex md:w-1/2">
                     {#if menu_recipes.length}
-                        <Menu title="New Menu" menu={menu_recipes} {mults} {page} on:update_mult={update_mult} {menu_title} {total_servings}/>
+                        <Menu 
+                            title="New Menu" 
+                            menu={menu_recipes} 
+                            {mults}
+                            {menu_title} 
+                            {total_servings}
+                            on:update_mult={update_mult}
+                            on:update_title={update_title}
+                            on:remove_from_menu={check_item}
+                        />
                     {:else}
                         <div class="flex h-full justify-center w-full items-center">
                             <div class="flex flex-col justify-center content-center h-fit p-16 rounded-md shadow-md md:text-xl max-w-5xl">
