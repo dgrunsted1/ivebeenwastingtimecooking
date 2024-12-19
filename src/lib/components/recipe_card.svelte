@@ -22,9 +22,9 @@
     let fave_btn = $derived(type == "today" || type == "menu");
     let check_box = $derived(type == "today" || type == "menu");
     let add_btn = $derived(type == "recipes");
-    let delete_btn = $derived(type == "menu" || type == "menu_component");
+    let delete_btn = $derived(type == "menu" || (type == "menu_component" && $page.url.pathname == "/menu"));
     let thumb_btn = $derived(type == "menu");
-    let cook_page_link = `/cook_recipe/${recipe.url_id}/${servings}`;
+    let edit_serv = $state(false);
 
     const card_click = (e) => {
         e.stopPropagation();
@@ -95,6 +95,12 @@
         dispatch("delete_recipe", {id: recipe.id})
     }
 
+    const edit_servings = (e) => {
+        e.stopPropagation();
+        console.log(recipe.servings);
+        console.log(e.currentTarget)
+        edit_serv = true;
+    }
 </script>
 
     <!-- svelte-ignore a11y_no_static_element_interactions-->
@@ -104,11 +110,15 @@
             <div class="flex flex-col justify-between p-1 md:p-3 w-full">
                 <h2 id={recipe.id} class="card-title text-sm text-ellipsis overflow-hidden">{recipe.title}</h2>
                 <div class="flex w-full recipes-center">
-                    <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow rounded-tl rounded-bl">
-                        {#if isNaN(recipe.servings)}
-                            {servings}
+                    <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow rounded-tl rounded-bl" onclick={edit_servings}>
+                        {#if !edit_serv}
+                            {#if isNaN(recipe.servings)}
+                                {servings}
+                            {:else}
+                                {servings} servings
+                            {/if}
                         {:else}
-                            {servings} servings
+
                         {/if}
                     </div>
                     <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow">
