@@ -22,7 +22,7 @@
     let fave_btn = $derived(type == "today" || type == "menu");
     let check_box = $derived(type == "today" || type == "menu");
     let add_btn = $derived(type == "recipes");
-    let delete_btn = $derived(type == "menu");
+    let delete_btn = $derived(type == "menu" || type == "menu_component");
     let thumb_btn = $derived(type == "menu");
     let cook_page_link = `/cook_recipe/${recipe.url_id}/${servings}`;
 

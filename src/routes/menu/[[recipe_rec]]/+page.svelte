@@ -66,6 +66,7 @@
     
 
     function check_item(e){
+        console.log("check_item");
         for (let recipe of user_recipes){
             if (recipe.id == e.detail.index){
                 recipe.checked = !recipe.checked;
@@ -109,7 +110,8 @@
                         on:update_edit={update_edit} 
                         on:reset_mode={reset_mode} 
                         on:check_item={check_item} 
-                        on:update_recipe={update_recipe}/>
+                        on:update_recipe={update_recipe}
+                    />
                 </div>
                 <!-- --------------
                 MOBILE ONLY SECTION
@@ -128,7 +130,16 @@
                     </summary>
                     <div id="right_column" class="collapse-content w-full">
                         {#if menu_recipes.length}
-                            <Menu title="New Menu" menu={menu_recipes} {mults} {page} on:update_mult={update_mult} on:update_title={update_title} {menu_title} {total_servings}/>
+                            <Menu 
+                                title="New Menu" 
+                                menu={menu_recipes} 
+                                {mults} 
+                                {menu_title} 
+                                {total_servings}
+                                on:update_mult={update_mult} 
+                                on:update_title={update_title}
+                                on:remove_from_menu={check_item}
+                            />
                         {:else}
                             <div class="flex flex-col justify-center items-center space-y-5 mx-2 md:mx-auto p-5 rounded-md shadow-md  md:text-xl max-w-5xl">
                                 <p>select recipes to add to your menu</p>

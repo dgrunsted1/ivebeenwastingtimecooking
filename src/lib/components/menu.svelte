@@ -186,6 +186,7 @@
         await set_todays_menu();
         set_todays_menu_load = false;
     }
+    
     async function set_todays_menu(){
         const resultList = await pb.collection('menus').getList(1, 1, {
             filter: `user = '${$currentUser.id}' && today = True`,
@@ -218,6 +219,11 @@
     function show_subrecipe_selector(e){
         e.currentTarget.classList.add("hidden");
         e.currentTarget.nextElementSibling.classList.remove("hidden");
+    }
+
+    function remove_from_menu(e){
+        console.log("remove from menu");
+        dispatch('remove_from_menu', {id: e.detail.id});
     }
 
 </script>
@@ -275,7 +281,8 @@
                         <RecipeCard
                             recipe={recipe} 
                             servings={mults[recipe.id]}
-                            type="menu_component"  
+                            type="menu_component"
+                            on:delete_recipe={remove_from_menu} 
                         />
                         {#if recipe.sub_recipe_data}
                             <div class="collapse bg-base-200 my-3.5 mx-5 w-auto">
