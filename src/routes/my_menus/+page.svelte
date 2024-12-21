@@ -8,6 +8,7 @@
     import DeleteIcon from "/src/lib/icons/DeleteIcon.svelte";
     import Clear from "/src/lib/icons/Clear.svelte";
     import { get_servings } from '/src/lib/recipe_util.js';
+    import { update_menu_mults } from '/src/lib/menu_utils.js';
 
 
     
@@ -37,9 +38,6 @@
         user_menus = result_list.items;
         loading = false;
     });
-
-    // $effect(() => {
-    // });
 
     function show_menu_modal(e){
         const is_mobile = (window.getComputedStyle(document.getElementById("desktop_menu")).display == "none") ? true : false;
@@ -321,8 +319,13 @@
         return 0;
     }
 
-    function update_mult(e){
+    async function update_mult(e){
+        console.log("update mult", e.detail.id, e.detail.mult);
+        $state.snapshot(modal_menu.servings)
         modal_menu.servings[e.detail.id] = e.detail.mult;
+        $state.snapshot(modal_menu.servings);
+        modal_menu.servings = await update_menu_mults(modal_menu.id, modal_menu.servings);
+        console.log("done");
     }
 </script>
 
@@ -371,6 +374,7 @@
                 </div>
             {:else}
                 {#each user_menus as curr, i}
+                    <!-- svelte-ignore a11y_no_static_element_interactions-->
                     <div id={user_menus[i].id} class="card md:card-side card-bordered border-primary bg-base-200 h-24 my-1.5 mx-1 cursor-pointer" onclick={show_menu_modal} onkeypress={show_menu_modal}>
                         <figure class="md:w-2/3">
                             {#each user_menus[i].expand.recipes as recipe, j}
@@ -430,7 +434,16 @@
             {#if modal_menu.id}
                 <form method="dialog" class="modal-box max-w-full md:w-2/3 p-1">
                     <button class="btn btn-xs p-2 flex content-center fixed top-1 right-1">x</button>
-                    <Menu title={modal_menu.title} menu={modal_menu.expand.recipes} mults={modal_menu.servings} sub_recipes={modal_menu.sub_recipes} id={modal_menu.id} menu_title={modal_menu.title} {total_servings} on:update_mult={update_mult}/>
+                    <Menu 
+                        title={modal_menu.title} 
+                        menu={modal_menu.expand.recipes} 
+                        mults={modal_menu.servings} 
+                        sub_recipes={modal_menu.sub_recipes} 
+                        id={modal_menu.id} 
+                        menu_title={modal_menu.title} 
+                        {total_servings} 
+                        on:update_mult={update_mult}
+                    />
                 </form>
                 <form method="dialog" class="modal-backdrop">
                     <button>close</button>
@@ -448,7 +461,16 @@
     </div>
     <div id="desktop_menu" class="hidden md:flex w-1/2">
         {#if modal_menu.id}
-            <Menu title={modal_menu.title} menu={modal_menu.expand.recipes} mults={modal_menu.servings} menu_title={modal_menu.title} sub_recipes={modal_menu.sub_recipes} id={modal_menu.id} {total_servings} on:update_mult={update_mult}/>
+            <Menu 
+                title={modal_menu.title} 
+                menu={modal_menu.expand.recipes} 
+                mults={modal_menu.servings} 
+                menu_title={modal_menu.title} 
+                sub_recipes={modal_menu.sub_recipes} 
+                id={modal_menu.id} 
+                {total_servings} 
+                on:update_mult={update_mult}
+            />
         {/if}
     </div>
 </div>

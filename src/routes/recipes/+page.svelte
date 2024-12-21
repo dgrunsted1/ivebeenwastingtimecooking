@@ -436,6 +436,7 @@
                         <RecipeCard 
                             recipe={item}
                             type="recipes"
+                            servings={item.servings}
                             on:card_click={cook_recipe}
                         />
                     {/each}

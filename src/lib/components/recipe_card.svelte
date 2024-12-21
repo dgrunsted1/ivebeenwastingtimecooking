@@ -24,7 +24,7 @@
     let add_btn = $derived(type == "recipes");
     let delete_btn = $derived(type == "menu" || (type == "menu_component" && $page.url.pathname == "/menu"));
     let thumb_btn = $derived(type == "menu");
-    let edit_serv = $state(false);
+    let edit_serv = $state(type == "menu_component");
 
     const card_click = (e) => {
         e.stopPropagation();
@@ -97,9 +97,9 @@
 
     const edit_servings = (e) => {
         e.stopPropagation();
-        console.log(recipe.servings);
-        console.log(e.currentTarget)
-        edit_serv = true;
+        // console.log(e.currentTarget.value)
+        // console.log("edit_servings", {id: recipe.id, servings: e.currentTarget.value});
+        dispatch("edit_servings", {id: recipe.id, val: e.currentTarget.value});
     }
 </script>
 
@@ -109,25 +109,36 @@
         <div class="card-body h-full flex flex-row p-1 w-1/2 justify-between">
             <div class="flex flex-col justify-between p-1 md:p-3 w-full">
                 <h2 id={recipe.id} class="card-title text-sm text-ellipsis overflow-hidden">{recipe.title}</h2>
+                {#if edit_serv}
+                    <div class="flex items-center space-x-1">
+                        <input type="text" name="servings" class="input input-xs input-bordered input-primary w-12 text-center" value={servings} onblur={edit_servings}/><label for="servings" class="text-sm ">servings</label>
+                    </div>
+                {/if}
                 <div class="flex w-full recipes-center">
-                    <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow rounded-tl rounded-bl" onclick={edit_servings}>
-                        {#if !edit_serv}
+                    {#if !edit_serv}
+                        <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow rounded-tl rounded-bl">
                             {#if isNaN(recipe.servings)}
                                 {servings}
                             {:else}
                                 {servings} servings
                             {/if}
-                        {:else}
-
-                        {/if}
-                    </div>
-                    <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow">
-                        {#if recipe.time}
-                            {recipe.time}
-                        {:else}
-                            no time
-                        {/if}
-                    </div>
+                        </div>
+                        <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow">
+                            {#if recipe.time}
+                                {recipe.time}
+                            {:else}
+                                no time
+                            {/if}
+                        </div>
+                    {:else}
+                        <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow rounded-tl rounded-bl">
+                            {#if recipe.time}
+                                {recipe.time}
+                            {:else}
+                                no time
+                            {/if}
+                        </div>
+                    {/if}
                     <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow">
                         {recipe.expand.ingr_list.length} ingredients
                     </div>

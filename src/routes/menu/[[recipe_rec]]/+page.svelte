@@ -60,7 +60,9 @@
     }
 
     function update_mult(e){
+        console.log(e.detail);
         mults[e.detail.id] = e.detail.mult;
+        $state.snapshot(mults);
     }
 
     
@@ -135,7 +137,7 @@
                             <Menu 
                                 title="New Menu" 
                                 menu={menu_recipes} 
-                                {mults} 
+                                bind:mults={mults} 
                                 {menu_title} 
                                 {total_servings}
                                 on:update_mult={update_mult} 
@@ -157,7 +159,7 @@
                         <Menu 
                             title="New Menu" 
                             menu={menu_recipes} 
-                            {mults}
+                            bind:mults={mults}
                             {menu_title} 
                             {total_servings}
                             on:update_mult={update_mult}

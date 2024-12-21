@@ -214,7 +214,8 @@
     }
 
     function update_mult(e){
-        dispatch('update_mult', {id: e.srcElement.id, mult: e.srcElement.value});
+        // console.log('update_mult', {id: e.detail.id, mult: e.detail.val})
+        dispatch('update_mult', {id: e.detail.id, mult: e.detail.val});
     }
 
     function show_subrecipe_selector(e){
@@ -283,6 +284,7 @@
                             servings={mults[recipe.id]}
                             type="menu_component"
                             on:delete_recipe={remove_from_menu} 
+                            on:edit_servings={update_mult} 
                         />
                         {#if recipe.sub_recipe_data}
                             <div class="collapse bg-base-200 my-3.5 mx-5 w-auto">
