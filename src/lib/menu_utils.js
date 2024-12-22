@@ -15,10 +15,8 @@ export const get_parent_recipe = function(recipe_id, menu, sub_recipes){
 }
 
 export const update_menu_mults = async function(menu_id, mults){
-    // console.log(menu_id, mults);
     const result = await pb.collection('menus').update(menu_id, {
-        mults: mults
+        servings: mults
     });
-    // console.log(result.servings);
     return result.servings;
 }

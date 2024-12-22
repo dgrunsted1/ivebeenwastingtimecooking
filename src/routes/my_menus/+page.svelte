@@ -10,7 +10,6 @@
     import { get_servings } from '/src/lib/recipe_util.js';
     import { update_menu_mults } from '/src/lib/menu_utils.js';
 
-
     
     let user_menus = $state([]);
     
@@ -19,7 +18,7 @@
     let loading = $state(true);
     
     let sort_val = $state("Most Recent");
-    let total_servings = $state(0);
+    let total_servings = $derived((!modal_menu.expand) ? 0 : get_servings(modal_menu.expand.recipes, {}, modal_menu.servings));
     let delay_timer;
     let sort_opts = ["Least Recipes", "Most Recipes", "Least Ingredients", "Most Ingredients", "Least Servings", "Most Servings", "Least Time", "Most Time", "Most Recent", "Least Recent"];
     let search_val = $state("");
@@ -45,7 +44,7 @@
         for (let i = 0; i < user_menus.length; i++){
             if (user_menus[i].id == id){
                 modal_menu = user_menus[i];
-                total_servings = get_servings(modal_menu.expand.recipes, {}, modal_menu.servings);
+                // total_servings = get_servings(modal_menu.expand.recipes, {}, modal_menu.servings);
             }
         }
         if (is_mobile) my_modal_2.showModal();
@@ -320,12 +319,9 @@
     }
 
     async function update_mult(e){
-        console.log("update mult", e.detail.id, e.detail.mult);
-        $state.snapshot(modal_menu.servings)
-        modal_menu.servings[e.detail.id] = e.detail.mult;
-        $state.snapshot(modal_menu.servings);
-        modal_menu.servings = await update_menu_mults(modal_menu.id, modal_menu.servings);
-        console.log("done");
+        const newServings = { ...modal_menu.servings };
+        newServings[e.detail.id] = e.detail.mult;
+        modal_menu.servings = await update_menu_mults(modal_menu.id, newServings);
     }
 </script>
 
@@ -390,7 +386,7 @@
                                 <div class="flex flex-row justify-evenly w-full">
                                     <p class="text-center text-[10px] xl:text-[12px] border border-primary px-1 text-ellipsis whitespace-nowrap text-nowrap overflow-hidden rounded-tl rounded-bl">{user_menus[i].expand.recipes.length} recipes</p>
                                     <p class="text-center text-[10px] xl:text-[12px] border border-primary px-1 text-ellipsis whitespace-nowrap text-nowrap overflow-hidden">{get_grocery_list(user_menus[i], user_menus[i].servings, user_menus[i].sub_recipes).length} ingredients</p>
-                                    <p class="text-center text-[10px] xl:text-[12px] border border-primary px-1 text-ellipsis whitespace-nowrap text-nowrap overflow-hidden">{get_servings(user_menus[i].expand.recipes, user_menus[i].sub_recipes)} servings</p>
+                                    <p class="text-center text-[10px] xl:text-[12px] border border-primary px-1 text-ellipsis whitespace-nowrap text-nowrap overflow-hidden">{get_servings(user_menus[i].expand.recipes, user_menus[i].sub_recipes, user_menus[i].servings)} servings</p>
                                     <p class="text-center text-[10px] xl:text-[12px] border border-primary px-1 text-ellipsis whitespace-nowrap text-nowrap overflow-hidden rounded-tr rounded-br">{get_total_time(user_menus[i].expand.recipes).display}</p>
                                 </div>
                             </div>
@@ -437,7 +433,7 @@
                     <Menu 
                         title={modal_menu.title} 
                         menu={modal_menu.expand.recipes} 
-                        mults={modal_menu.servings} 
+                        bind:mults={modal_menu.servings} 
                         sub_recipes={modal_menu.sub_recipes} 
                         id={modal_menu.id} 
                         menu_title={modal_menu.title} 
@@ -464,11 +460,11 @@
             <Menu 
                 title={modal_menu.title} 
                 menu={modal_menu.expand.recipes} 
-                mults={modal_menu.servings} 
+                bind:mults={modal_menu.servings} 
                 menu_title={modal_menu.title} 
                 sub_recipes={modal_menu.sub_recipes} 
-                id={modal_menu.id} 
-                {total_servings} 
+                id={modal_menu.id}
+                {total_servings}
                 on:update_mult={update_mult}
             />
         {/if}

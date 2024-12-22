@@ -8,8 +8,7 @@
     import { createEventDispatcher } from 'svelte';
     import Plus from "/src/lib/icons/Plus.svelte";
     import RecipeCard from './recipe_card.svelte';
-
-
+    import { update_menu_mults } from '/src/lib/menu_utils.js';
 
     /**
      * @typedef {Object} Props
@@ -31,7 +30,6 @@
 
     let tab = $state("recipe_list");
     let grocery_list = $derived(get_grocery_list(menu, mults, sub_recipes));
-    // let num_servings = $derived(get_servings(menu, sub_recipes, mults));
     let total_time = $derived(get_total_time(menu));
     const dispatch = createEventDispatcher();
     let overflow_len = ``;
@@ -209,12 +207,7 @@
         const menu_log_result = await pb.collection('menu_log').create(menu_log_data);
     }
 
-    function close_modal(){
-        dispatch('close_modal');
-    }
-
     function update_mult(e){
-        // console.log('update_mult', {id: e.detail.id, mult: e.detail.val})
         dispatch('update_mult', {id: e.detail.id, mult: e.detail.val});
     }
 
