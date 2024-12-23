@@ -268,7 +268,7 @@
     </div>
     
     {#if tab == "recipe_list"}
-        <div class="h-[calc(100svh-210px)] md:h-[calc(100svh-160px)] overflow-y-auto border border-primary rounded-md md:border-none flex flex-col space-y-2">
+        <div class="h-[calc(100svh-210px)] md:h-[calc(100svh-160px)] overflow-y-auto border border-primary rounded-md md:border-none flex flex-col space-y-2 py-1">
             {#if menu.length}    
                 {#each menu as recipe}
                     {#if !recipe.is_sub_recipe}
