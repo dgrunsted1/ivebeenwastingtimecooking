@@ -396,9 +396,11 @@
                 {#each user_menus as curr, i}
                     <!-- svelte-ignore a11y_no_static_element_interactions-->
                     <div id={user_menus[i].id} class="card md:card-side card-bordered border-primary bg-base-200 h-24 my-1.5 mx-1 cursor-pointer" onclick={show_menu_modal} onkeypress={show_menu_modal}>
-                        <figure class="md:w-2/3">
-                            {#each user_menus[i].expand.recipes as recipe, j}
-                                    <img class="w-16 md:w-20" src={user_menus[i].expand.recipes[j].image} alt={user_menus[i].expand.recipes[j].title}/>
+                        <figure class="h-24 w-full md:w-2/3 flex overflow-hidden">
+                            {#each user_menus[i].expand.recipes.slice(0,6) as recipe, j}
+                                {#if user_menus[i].expand.recipes[j].image}
+                                    <img class="h-24 flex-1 min-w-0 object-cover" src={user_menus[i].expand.recipes[j].image} alt={user_menus[i].expand.recipes[j].title}/>
+                                    {/if}
                             {/each}
                         </figure>
                         <div class="card-body flex flex-row justify-evenly content-center p-1 w-full">
