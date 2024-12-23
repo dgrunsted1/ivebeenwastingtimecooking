@@ -268,7 +268,7 @@
                 </div>    
             </div>
         </div>
-        <div class="ingr_directions_container flex flex-col md:flex-row m-1 items-center">
+        <div class="ingr_directions_container flex flex-col md:flex-row justify-center w-full">
             <div id="ingredient_list" class="flex flex-col h-fit w-full md:w-2/5 m-2 max-h-[calc(40vh)] md:max-h-[calc(64vh)] overflow-y-auto border border-primary rounded-md py-5 md:py-4">
                 {#each recipe.expand.ingr_list as ingr}
                     {#if ingr}
@@ -284,27 +284,25 @@
                 {/each}
             </div>
         
-            <div class="flex space-x-1">
-                <div class="flex flex-col directions_list md:w-3/5 h-fit  max-h-[calc(40vh)] md:max-h-[calc(64vh)] overflow-y-auto border border-primary rounded-md cursor-pointer py-5">
-                    {#each recipe.directions as curr, i}
-                    <div class="flex justify-between items-center mr-2">
-                        <button class="step flex items-center justify-left gap-x-1 md:gap-x-3 md:mx-2 p-1 w-fit" onclick={(e) => {e.currentTarget.classList.toggle('blur'); }} onkeydown={(e) => {e.currentTarget.classList.toggle('blur'); }}>
-                            <label for="directions" class="flex md:text-right text-xs md:text-sm whitespace-nowrap">Step {i+1}</label>
-                            <p class="directions flex m-1 p-1 text-sm border-l border-neutral md:pl-3 {timers[i] && timers[i].sec ? "w-64 md:w-full" : ""}">{curr}</p>
-                        </button>
-                        {#if timers[i] && timers[i].show}
-                            <div class="my-1 flex md:w-1/5 max-w-[150px]">
-                                <Timer countdown={timers[i].sec}/>
-                            </div>
-                        {:else if timers[i] && timers[i].sec}
-                            <button id={i} class="btn btn-xs md:btn-sm btn-primary my-1" onclick={(e)=>{timers[e.currentTarget.id].show = true}}>{formatTime(timers[i].sec)}</button>
-                        {/if}
-                    </div>
-                        {#if recipe.directions[recipe.directions.length-1] != curr}
-                                <div class="divider my-px md:my-1 "></div>
-                        {/if}
-                    {/each}
+            <div class="flex flex-col directions_list md:w-3/5 h-fit  max-h-[calc(40vh)] md:max-h-[calc(64vh)] overflow-y-auto border border-primary rounded-md cursor-pointer py-5">
+                {#each recipe.directions as curr, i}
+                <div class="flex justify-between items-center mr-2">
+                    <button class="step flex items-center justify-left gap-x-1 md:gap-x-3 md:mx-2 p-1 w-fit" onclick={(e) => {e.currentTarget.classList.toggle('blur'); }} onkeydown={(e) => {e.currentTarget.classList.toggle('blur'); }}>
+                        <label for="directions" class="flex md:text-right text-xs md:text-sm whitespace-nowrap">Step {i+1}</label>
+                        <p class="directions flex m-1 p-1 text-sm border-l border-neutral md:pl-3 {timers[i] && timers[i].sec ? "w-64 md:w-full" : ""}">{curr}</p>
+                    </button>
+                    {#if timers[i] && timers[i].show}
+                        <div class="my-1 flex md:w-1/5 max-w-[150px]">
+                            <Timer countdown={timers[i].sec}/>
+                        </div>
+                    {:else if timers[i] && timers[i].sec}
+                        <button id={i} class="btn btn-xs md:btn-sm btn-primary my-1" onclick={(e)=>{timers[e.currentTarget.id].show = true}}>{formatTime(timers[i].sec)}</button>
+                    {/if}
                 </div>
+                    {#if recipe.directions[recipe.directions.length-1] != curr}
+                            <div class="divider my-px md:my-1 "></div>
+                    {/if}
+                {/each}
             </div>
         </div>
         <div class="notes_container form-control m-2 md:mt-5 md:mx-5 space-y-2 flex items-center">
