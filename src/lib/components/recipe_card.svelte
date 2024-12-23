@@ -22,7 +22,7 @@
     let fave_btn = $derived(type == "today" || type == "menu");
     let check_box = $derived(type == "today" || type == "menu");
     let add_btn = $derived(type == "recipes");
-    let delete_btn = $derived(type == "menu" || (type == "menu_component" && $page.url.pathname == "/menu"));
+    let delete_btn = $derived(type == "menu" || (type == "menu_component" && $page.url.pathname != "/profile"));
     let thumb_btn = $derived(type == "menu");
     let edit_serv = $state(type == "menu_component");
 
@@ -97,8 +97,6 @@
 
     const edit_servings = (e) => {
         e.stopPropagation();
-        // console.log(e.currentTarget.value)
-        // console.log("edit_servings", {id: recipe.id, servings: e.currentTarget.value});
         dispatch("edit_servings", {id: recipe.id, val: e.currentTarget.value});
     }
 </script>

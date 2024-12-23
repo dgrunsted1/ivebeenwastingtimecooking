@@ -323,6 +323,30 @@
         newServings[e.detail.id] = e.detail.mult;
         modal_menu.servings = await update_menu_mults(modal_menu.id, newServings);
     }
+
+    async function remove_from_menu(e){
+        e.stopPropagation();
+        let tmp = []
+        let delete_msg = "";
+        for (let recipe of modal_menu.expand.recipes){
+            if (recipe.id == e.detail.index) {
+                delete_msg = `Are you sure you want to remove "${recipe.title}" from "${modal_menu.title}"?`;
+            } else {
+                tmp.push(recipe);
+            }
+        }
+
+        let delete_recipe = confirm(delete_msg);
+        if (delete_recipe){
+            const result = await pb.collection('menus').update(modal_menu.id, {"recipes-": e.detail.index}, {expand: `recipes,recipes.ingr_list`});
+            for (let i = 0; i < user_menus.length; i++){
+                if (user_menus[i].id == modal_menu.id){
+                    user_menus[i] = result;
+                    modal_menu = user_menus[i];
+                }
+            }
+        }
+    }
 </script>
 
 <svelte:head>
@@ -379,11 +403,11 @@
                         </figure>
                         <div class="card-body flex flex-row justify-evenly content-center p-1 w-full">
                             <div class="flex flex-col w-full justify-between content-center h-full">
-                                <div class="flex flex-row justify-center text-xs md:text-md">
-                                    <p class="text-center">{user_menus[i].title}</p>
-                                    <p class="text-center md:w-20">{format_date(user_menus[i].created)}</p>
+                                <div class="flex flex-row justify-evenly text-xs md:text-md items-center h-full space-x-2 md:space-x-5">
+                                    <div class="text-center max-h-4 md:max-h-16 line-clamp-1 md:line-clamp-4">{user_menus[i].title}</div>
+                                    <div class="text-center md:w-20">{format_date(user_menus[i].created)}</div>
                                 </div>
-                                <div class="flex flex-row justify-evenly w-full">
+                                <div class="flex flex-row justify-evenly max-w-full">
                                     <p class="text-center text-[10px] xl:text-[12px] border border-primary px-1 text-ellipsis whitespace-nowrap text-nowrap overflow-hidden rounded-tl rounded-bl">{user_menus[i].expand.recipes.length} recipes</p>
                                     <p class="text-center text-[10px] xl:text-[12px] border border-primary px-1 text-ellipsis whitespace-nowrap text-nowrap overflow-hidden">{get_grocery_list(user_menus[i], user_menus[i].servings, user_menus[i].sub_recipes).length} ingredients</p>
                                     <p class="text-center text-[10px] xl:text-[12px] border border-primary px-1 text-ellipsis whitespace-nowrap text-nowrap overflow-hidden">{get_servings(user_menus[i].expand.recipes, user_menus[i].sub_recipes, user_menus[i].servings)} servings</p>
@@ -432,13 +456,14 @@
                     <button class="btn btn-xs p-2 flex content-center fixed top-1 right-1">x</button>
                     <Menu 
                         title={modal_menu.title} 
-                        menu={modal_menu.expand.recipes} 
+                        bind:menu={modal_menu.expand.recipes} 
                         bind:mults={modal_menu.servings} 
                         sub_recipes={modal_menu.sub_recipes} 
                         id={modal_menu.id} 
                         menu_title={modal_menu.title} 
                         {total_servings} 
                         on:update_mult={update_mult}
+                        on:remove_from_menu={remove_from_menu}
                     />
                 </form>
                 <form method="dialog" class="modal-backdrop">
@@ -459,13 +484,14 @@
         {#if modal_menu.id}
             <Menu 
                 title={modal_menu.title} 
-                menu={modal_menu.expand.recipes} 
+                bind:menu={modal_menu.expand.recipes} 
                 bind:mults={modal_menu.servings} 
                 menu_title={modal_menu.title} 
                 sub_recipes={modal_menu.sub_recipes} 
                 id={modal_menu.id}
                 {total_servings}
                 on:update_mult={update_mult}
+                on:remove_from_menu={remove_from_menu}
             />
         {/if}
     </div>
