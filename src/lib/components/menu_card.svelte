@@ -19,7 +19,6 @@
 
     const card_click = (e) => {
         e.stopPropagation();
-        console.log("card_click", menu.id)
         dispatch("card_click", {id: menu.id})
     }
 </script>
