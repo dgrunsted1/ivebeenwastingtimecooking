@@ -5,10 +5,10 @@
     import { onMount } from 'svelte';
     import Menu from "/src/lib/components/menu.svelte";
     import { get_grocery_list, trim_verbs } from '/src/lib/merge_ingredients.js';
-    import DeleteIcon from "/src/lib/icons/DeleteIcon.svelte";
     import Clear from "/src/lib/icons/Clear.svelte";
     import { get_servings } from '/src/lib/recipe_util.js';
-    import { update_menu_mults } from '/src/lib/menu_utils.js';
+    import { update_menu_mults, get_total_time } from '/src/lib/menu_utils.js';
+    import MenuCard from "/src/lib/components/menu_card.svelte";
 
     
     let user_menus = $state([]);
@@ -40,7 +40,7 @@
 
     function show_menu_modal(e){
         const is_mobile = (window.getComputedStyle(document.getElementById("desktop_menu")).display == "none") ? true : false;
-        let id = e.currentTarget.id;
+        let id = e.detail.id;
         for (let i = 0; i < user_menus.length; i++){
             if (user_menus[i].id == id){
                 modal_menu = user_menus[i];
@@ -50,37 +50,16 @@
         if (is_mobile) my_modal_2.showModal();
     }
 
-    function get_total_time(recipes){
-        let total_time = 0;
-        let mins = 0;
-        for (let i = 0; i < recipes.length; i++){
-            let min_result = recipes[i].time.match(/(\d+) [mins|minutes]/);
-            if (min_result){
-                mins += parseInt(min_result[1]);
-            }
-
-            let hr_result = recipes[i].time.match(/(\d+) [hrs|hours|hour|hr]/);
-            if (hr_result){
-                mins += parseInt(hr_result[1]) * 60;
-            }
-        }
-        let total_mins = mins;
-        let hours = parseInt(mins/60);
-        mins = mins % 60;
-        total_time = hours + " hrs " + mins + " mins";
-        return {display: total_time, val: total_mins};
-    }
-
     async function delete_menu(e){
         let tmp_menus = [];
         let menu;
         for (let i = 0; i < user_menus.length; i++){
-            if (user_menus[i].id != e.srcElement.id) tmp_menus.push(user_menus[i]);
+            if (user_menus[i].id != e.detail.id) tmp_menus.push(user_menus[i]);
             else menu = user_menus[i];
         }
         if (menu && confirm(`Are you sure you want to delete your "${menu.title}" menu?`)) {
             const resultList = await pb.collection('grocery_lists').getList(1, 50, {
-                filter: `menu = "${e.srcElement.id}"`,
+                filter: `menu = "${e.detail.id}"`,
             });
             if (resultList.items.length > 0){
                 for (let i = 0; i < resultList.items.length; i++){
@@ -88,44 +67,18 @@
                 }
             }
             const resultListLog = await pb.collection('menu_log').getList(1, 50, {
-                filter: `menu = "${e.srcElement.id}"`,
+                filter: `menu = "${e.detail.id}"`,
             });
             if (resultListLog.items.length > 0){
                 for (let i = 0; i < resultListLog.items.length; i++){
                     await pb.collection('menu_log').update(resultListLog.items[i].id, { "menu": null });
                 }
             }
-            await pb.collection('menus').delete(e.srcElement.id);
+            await pb.collection('menus').delete(e.detail.id);
             user_menus = tmp_menus;
         }
     }
-
-    function format_date(in_date){
-        const day_names = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-        let output = "";
-        let menu_date = new Date(in_date);
-        let menu_day = menu_date.getDate();
-        let menu_month = menu_date.getMonth();
-        let menu_year = menu_date.getFullYear();
-        let today = new Date();
-        if (menu_year == today.getFullYear()){
-            if (menu_month == today.getMonth()){
-                if (menu_day == today.getDate()){
-                    output = "Today";
-                } else if (today.getDate() - menu_day < 7){
-                    output = day_names[menu_date.getDay()];
-                } else {
-                    output = menu_date.toLocaleDateString(undefined, {month: 'short', day: 'numeric' });
-                }
-            } else {
-                output = menu_date.toLocaleDateString(undefined, {month: 'short', day: 'numeric' });
-            } 
-        } else {
-            output = menu_date.toLocaleDateString(undefined, {year: '2-digit', month: 'short', day: 'numeric' });
-        }
-        return output;
-    }
-
+    
     async function search(){
         no_results_found = false;
         loading = true;
@@ -394,8 +347,13 @@
                 </div>
             {:else}
                 {#each user_menus as curr, i}
+                    <MenuCard
+                        menu={curr}
+                        on:delete_menu={delete_menu}
+                        on:card_click={show_menu_modal}
+                    />
                     <!-- svelte-ignore a11y_no_static_element_interactions-->
-                    <div id={user_menus[i].id} class="card md:card-side card-bordered border-primary bg-base-200 h-24 my-1.5 mx-1 cursor-pointer" onclick={show_menu_modal} onkeypress={show_menu_modal}>
+                    <!-- <div id={user_menus[i].id} class="card md:card-side card-bordered border-primary bg-base-200 h-24 my-1.5 mx-1 cursor-pointer" onclick={show_menu_modal} onkeypress={show_menu_modal}>
                         <figure class="h-24 w-full md:w-2/3 flex overflow-hidden">
                             {#each user_menus[i].expand.recipes.slice(0,6) as recipe, j}
                                 {#if user_menus[i].expand.recipes[j].image}
@@ -420,7 +378,7 @@
                                 <button id={user_menus[i].id} class="btn btn-sm p-1 btn-accent"  onclick={stopPropagation(delete_menu)}><DeleteIcon/></button>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                 {/each}
             {/if}
         </div>
