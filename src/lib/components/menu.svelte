@@ -263,6 +263,7 @@
     </div>
     <div class="flex justify-around m-1 items-center">
         <p class="text-xs">{menu.length} recipes</p>
+        <p class="text-xs">{grocery_list.length} items</p>
         <p class="text-xs">{total_servings} servings</p>
         <p class="text-xs">{total_time}</p>
     </div>
@@ -306,6 +307,9 @@
             {/if}
         </div>
     {:else if tab == "grocery_list"}
-        <GroceryList status="none" {grocery_list}/>
+        <GroceryList 
+            status="none" 
+            {grocery_list}
+        />
     {/if}
 </div>

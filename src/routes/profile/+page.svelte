@@ -216,7 +216,13 @@
                     <div class="flex h-[500px] items-center"><span class="loading loading-bars loading-lg"></span></div>
                 {:else}
                     {#if menu_rec.length}
-                        <Menu title={menu_title} menu={menu_rec} mults={rec_mults} {page} on:update_mult={update_mult} on:update_title={update_title} {total_servings}/>
+                        <Menu 
+                            menu_title={menu_title} 
+                            menu={menu_rec} 
+                            mults={rec_mults} 
+                            on:update_mult={update_mult} 
+                            on:update_title={update_title} 
+                            {total_servings}/>
                     {/if}
                 {/if}
             </div>

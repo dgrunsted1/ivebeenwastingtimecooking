@@ -11,12 +11,16 @@
 
 
 
-    let { grocery_list = $bindable([]), status = $bindable(), grocery_list_id } = $props();
+    let { 
+        grocery_list = $bindable([]), 
+        status = $bindable(), 
+        grocery_list_id 
+    } = $props();
     let edit = $state(false);
     
     let dispatch = createEventDispatcher();
     let delay_timer;
-    let view_size_mobile = $state(`h-[calc(100svh-235px)]`);
+    let view_size_mobile = $state(`h-[calc(100svh-210px)]`);
     let view_size_desktop = $state(`md:h-[calc(100svh-160px)]`);
     let just_copied = $state(false);
     let new_item = $state({qty: null, unit: "", name: ""});
@@ -205,13 +209,12 @@
         </div>
     </div>
     <div id="header" class="flex md:hidden {($page.url.pathname == "/today") ? `justify-between` : `justify-evenly`} items-center mt-0">
-        {#if grocery_list.length > 0}
+        {#if grocery_list.length > 0 && status != "none"}
             <div>
-                {#if status != "none" && $page.url.pathname == "/today"}<div id="update_status" class="text-xs">{status}</div>{/if}
+                {#if $page.url.pathname == "/today"}<div id="update_status" class="text-xs">{status}</div>{/if}
                 <div id="count" class="text-xs">{grocery_list.reduce((count, item) => count + (item.checked ? 0 : 1), 0)}/{grocery_list.length} Items</div>
             </div>
             <div class="flex items-center space-x-4 mx-1 my-2">
-                {#if status != "none"}
                     <div class="dropdown dropdown-top">
                         <label tabindex="-1" for="save_menu" class="btn btn-primary btn-sm md:btn-sm">options</label>
                         <ul tabindex="-1" name="save_menu" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-max bg-primary">
@@ -226,15 +229,14 @@
                             </button></li>
                         </ul>
                     </div>
-                {/if}
-                <button id="copy" class="btn btn-sm btn-primary cursor-copy" onclick={copy_to_clipboard}>
-                    {#if just_copied}
-                        <CheckMark color=""/>
-                    {:else}
-                        copy
-                    {/if}
-                </button>
-                {#if status != "none"}<button id="add" class="btn btn-sm btn-primary" onclick={add_item_modal}><Plus/></button>{/if}
+                    <button id="copy" class="btn btn-sm btn-primary cursor-copy" onclick={copy_to_clipboard}>
+                        {#if just_copied}
+                            <CheckMark color=""/>
+                        {:else}
+                            copy
+                        {/if}
+                    </button>
+                    <button id="add" class="btn btn-sm btn-primary" onclick={add_item_modal}><Plus/></button>
             </div>
         {/if}
     </div>
