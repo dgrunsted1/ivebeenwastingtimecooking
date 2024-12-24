@@ -21,7 +21,7 @@
     let dispatch = createEventDispatcher();
     let delay_timer;
     let view_size_mobile = $state(`h-[calc(100svh-210px)]`);
-    let view_size_desktop = $state(`md:h-[calc(100svh-160px)]`);
+    let view_size_desktop = $state(`md:h-[calc(100svh-210px)]`);
     let just_copied = $state(false);
     let new_item = $state({qty: null, unit: "", name: ""});
     
@@ -29,7 +29,7 @@
     onMount(async () => {
         if ($page.url.pathname == "/today"){
             view_size_mobile = `h-[calc(100svh-150px)]`;
-            view_size_desktop = `md:h-[calc(100svh-120px)]`;
+            view_size_desktop = `md:h-[calc(100svh-105px)]`;
         }
     });
 
