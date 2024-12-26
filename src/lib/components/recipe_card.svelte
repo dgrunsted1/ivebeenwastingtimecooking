@@ -105,11 +105,11 @@
     <div class="card card-side bg-base-200 h-24 md:h-28 card-bordered border-primary cursor-pointer mx-1" onkeydown={card_click} onclick={card_click}>
         <figure class="w-1/4 bg-cover bg-no-repeat bg-center" style="background-image: url('{recipe.image}')"></figure>
         <div class="card-body h-full flex flex-row p-1 w-1/2 justify-between">
-            <div class="flex flex-col justify-between p-1 md:p-3 w-full">
-                <h2 id={recipe.id} class="card-title text-sm text-ellipsis overflow-hidden">{recipe.title}</h2>
+            <div class="flex flex-col justify-between md:p-3 w-full">
+                <h2 id={recipe.id} class="card-title text-sm text-ellipsis overflow-hidden line-clamp-2">{recipe.title}</h2>
                 {#if edit_serv}
                     <div class="flex items-center space-x-1">
-                        <input type="text" name="servings" class="input input-xs input-bordered input-primary w-12 text-center" value={servings} onblur={edit_servings}/><label for="servings" class="text-sm ">servings</label>
+                        <input type="text" name="servings" class="input input-xs input-bordered input-primary w-12 text-center p-0" value={servings} onblur={edit_servings}/><label for="servings" class="text-sm ">servings</label>
                     </div>
                 {/if}
                 <div class="flex w-full recipes-center">

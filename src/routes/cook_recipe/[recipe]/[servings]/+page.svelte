@@ -268,7 +268,7 @@
                 </div>    
             </div>
         </div>
-        <div class="ingr_directions_container flex flex-col md:flex-row justify-center w-full">
+        <div class="ingr_directions_container flex flex-col md:flex-row justify-center w-full items-center">
             <div id="ingredient_list" class="flex flex-col h-fit w-full md:w-2/5 m-2 max-h-[calc(40vh)] md:max-h-[calc(64vh)] overflow-y-auto border border-primary rounded-md py-5 md:py-4">
                 {#each recipe.expand.ingr_list as ingr}
                     {#if ingr}

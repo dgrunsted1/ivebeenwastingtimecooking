@@ -138,7 +138,7 @@
                                 title="New Menu" 
                                 menu={menu_recipes} 
                                 bind:mults={mults} 
-                                {menu_title} 
+                                bind:menu_title={menu_title} 
                                 {total_servings}
                                 on:update_mult={update_mult} 
                                 on:update_title={update_title}
@@ -160,7 +160,7 @@
                             title="New Menu" 
                             menu={menu_recipes} 
                             bind:mults={mults}
-                            {menu_title} 
+                            bind:menu_title={menu_title} 
                             {total_servings}
                             on:update_mult={update_mult}
                             on:update_title={update_title}

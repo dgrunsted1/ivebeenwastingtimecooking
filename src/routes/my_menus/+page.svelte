@@ -402,7 +402,7 @@
                         bind:mults={modal_menu.servings} 
                         sub_recipes={modal_menu.sub_recipes} 
                         id={modal_menu.id} 
-                        menu_title={modal_menu.title} 
+                        bind:menu_title={modal_menu.title} 
                         {total_servings} 
                         on:update_mult={update_mult}
                         on:remove_from_menu={remove_from_menu}
@@ -429,7 +429,7 @@
                 title={modal_menu.title} 
                 bind:menu={modal_menu.expand.recipes} 
                 bind:mults={modal_menu.servings} 
-                menu_title={modal_menu.title} 
+                bind:menu_title={modal_menu.title} 
                 sub_recipes={modal_menu.sub_recipes} 
                 id={modal_menu.id}
                 {total_servings}

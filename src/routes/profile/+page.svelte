@@ -217,7 +217,7 @@
                 {:else}
                     {#if menu_rec.length}
                         <Menu 
-                            menu_title={menu_title} 
+                            bind:menu_title={menu_title} 
                             menu={menu_rec} 
                             mults={rec_mults} 
                             on:update_mult={update_mult} 
