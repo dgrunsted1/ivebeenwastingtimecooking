@@ -45,9 +45,10 @@
     });
 
     $effect(() => {
-        if (!menu_title || menu_title == "New Menu" || !title_lock){
+        if (!menu_title.length || menu_title == "New Menu"){
             let title = (menu.length < 2) ? "New Menu" : generate_menu_title();
-            dispatch("update_title", {title: title});
+            if (title == menu_title) return;
+            dispatch("update_title", {title: title, id: id});
         }
     });
 
@@ -220,11 +221,16 @@
         dispatch('remove_from_menu', {index: e.detail.id});
     }
 
+    function update_title(e){
+        e.stopPropagation();
+        title_lock = true;
+        dispatch('update_title', {title: e.currentTarget.value, id: id});
+    }
 </script>
 
 <div id="menu" class="h-3/4 md:h-full w-full cursor-default">
     <div class="flex items-center p-3 justify-between">
-        <input type="text" class="input input-bordered border-primary input-xs w-2/3" value={menu_title} oninput={() => {title_lock = true}}/>
+        <input type="text" class="input input-bordered border-primary input-xs w-2/3" value={menu_title} onblur={update_title}/>
         {#if $page.url.pathname == "/menu" || $page.url.pathname == "/profile"}
             <div class="dropdown dropdown-end">
                 <label tabindex="-1" for="save_menu" class="btn m-1 btn-primary btn-xs md:btn-sm">save menu</label>

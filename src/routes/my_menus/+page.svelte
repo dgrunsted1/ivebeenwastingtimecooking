@@ -78,7 +78,7 @@
             user_menus = tmp_menus;
         }
     }
-    
+
     async function search(){
         no_results_found = false;
         loading = true;
@@ -300,6 +300,15 @@
             }
         }
     }
+
+    async function update_title(e){
+        const result = await pb.collection('menus').update(e.detail.id, {"title": e.detail.title}, {expand: `recipes,recipes.ingr_list`});
+        for (let i = 0; i < user_menus.length; i++){
+            if (user_menus[i].id == result.id){
+                user_menus[i] = result;
+            }
+        }
+    }
 </script>
 
 <svelte:head>
@@ -352,33 +361,6 @@
                         on:delete_menu={delete_menu}
                         on:card_click={show_menu_modal}
                     />
-                    <!-- svelte-ignore a11y_no_static_element_interactions-->
-                    <!-- <div id={user_menus[i].id} class="card md:card-side card-bordered border-primary bg-base-200 h-24 my-1.5 mx-1 cursor-pointer" onclick={show_menu_modal} onkeypress={show_menu_modal}>
-                        <figure class="h-24 w-full md:w-2/3 flex overflow-hidden">
-                            {#each user_menus[i].expand.recipes.slice(0,6) as recipe, j}
-                                {#if user_menus[i].expand.recipes[j].image}
-                                    <img class="h-24 flex-1 min-w-0 object-cover" src={user_menus[i].expand.recipes[j].image} alt={user_menus[i].expand.recipes[j].title}/>
-                                    {/if}
-                            {/each}
-                        </figure>
-                        <div class="card-body flex flex-row justify-evenly content-center p-1 w-full">
-                            <div class="flex flex-col w-full justify-between content-center h-full">
-                                <div class="flex flex-row justify-evenly text-xs md:text-md items-center h-full space-x-2 md:space-x-5">
-                                    <div class="text-center max-h-4 md:max-h-16 line-clamp-1 md:line-clamp-4">{user_menus[i].title}</div>
-                                    <div class="text-center md:w-20">{format_date(user_menus[i].created)}</div>
-                                </div>
-                                <div class="flex flex-row justify-evenly max-w-full">
-                                    <p class="text-center text-[10px] xl:text-[12px] border border-primary px-1 text-ellipsis whitespace-nowrap text-nowrap overflow-hidden rounded-tl rounded-bl">{user_menus[i].expand.recipes.length} recipes</p>
-                                    <p class="text-center text-[10px] xl:text-[12px] border border-primary px-1 text-ellipsis whitespace-nowrap text-nowrap overflow-hidden">{get_grocery_list(user_menus[i], user_menus[i].servings, user_menus[i].sub_recipes).length} ingredients</p>
-                                    <p class="text-center text-[10px] xl:text-[12px] border border-primary px-1 text-ellipsis whitespace-nowrap text-nowrap overflow-hidden">{get_servings(user_menus[i].expand.recipes, user_menus[i].sub_recipes, user_menus[i].servings)} servings</p>
-                                    <p class="text-center text-[10px] xl:text-[12px] border border-primary px-1 text-ellipsis whitespace-nowrap text-nowrap overflow-hidden rounded-tr rounded-br">{get_total_time(user_menus[i].expand.recipes).display}</p>
-                                </div>
-                            </div>
-                            <div class="flex conten-center items-center">
-                                <button id={user_menus[i].id} class="btn btn-sm p-1 btn-accent"  onclick={stopPropagation(delete_menu)}><DeleteIcon/></button>
-                            </div>
-                        </div>
-                    </div> -->
                 {/each}
             {/if}
         </div>
@@ -424,6 +406,7 @@
                         {total_servings} 
                         on:update_mult={update_mult}
                         on:remove_from_menu={remove_from_menu}
+                        on:update_title={update_title}
                     />
                 </form>
                 <form method="dialog" class="modal-backdrop">
@@ -452,6 +435,7 @@
                 {total_servings}
                 on:update_mult={update_mult}
                 on:remove_from_menu={remove_from_menu}
+                on:update_title={update_title}
             />
         {/if}
     </div>
