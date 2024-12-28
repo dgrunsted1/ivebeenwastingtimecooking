@@ -43,8 +43,8 @@
     let selected_authors = $state([]);
   
 
-    let loading = $state(true);
-  
+    let loading = $state(false);
+    let refresh_loading = $state(true);
     let recipes_have_more = $state(true);
   
     let ingr_has_more = $state(true);
@@ -226,12 +226,12 @@
         display_cuisines = cuisines.map(c => c.id);
         authors = await pb.collection('authors').getFullList({sort: `+id`});
         display_authors = authors.map(a => a.id);
-        loading = false;
+        refresh_loading = false;
 	});
 
   async function select_cat(e){
     // TODO
-    loading = true;
+    refresh_loading = true;
     toggle_cat(e.currentTarget.id, e.currentTarget.innerHTML);
     page = 1; 
     
@@ -242,7 +242,7 @@
     if (!selected_cuisines.length) display_cuisines = await update_display_cuisines();
     if (!selected_countries.length) display_countries = await update_display_countries();
     if (!selected_authors.length) display_authors = await update_display_authors();
-    loading = false;
+    refresh_loading = false;
     if (!newBatch.length){
         no_results = true;
     } else {
@@ -334,7 +334,7 @@
   }
 
     async function update_sort(e){
-        loading = true;
+        refresh_loading = true;
         document.activeElement.blur();
         sort_val = e.currentTarget.innerHTML;
         newBatch = [];
@@ -343,11 +343,11 @@
         newBatch = [];
         data = [];
         await fetchData();
-        loading = false;
+        refresh_loading = false;
     }
 
     async function update_search(e){
-        loading = true;
+        refresh_loading = true;
         search_val = e.detail.val;
         clearTimeout(delay_timer);
         delay_timer = setTimeout(async () => {
@@ -356,7 +356,7 @@
             newBatch = [];
             data = [];
             await fetchData();
-            loading = false;
+            refresh_loading = false;
             document.activeElement.blur();
         }, 250);
     }
@@ -425,8 +425,7 @@
                   </div>
                 </div>
             <ul class="flex flex-col w-full space-y-2 md:space-y-4 h-[calc(100svh-130px)] md:h-[calc(100svh-160px)] overflow-y-auto">
-                <!-- {#if false} -->
-                {#if data.length && !loading}
+                {#if data.length && !refresh_loading}
                     {#each data as item}
                         <RecipeCard 
                             recipe={item}
@@ -435,6 +434,13 @@
                             on:card_click={cook_recipe}
                         />
                     {/each}
+                    <div class="flex w-full h-full justify-center">
+                        <span class="{has_more ? "" : "hidden"} loading loading-bars loading-lg mx-7 self-center"></span>
+                      </div>
+                {:else if data.length == 0 && !refresh_loading}
+                    <div class="{no_results ? "" : "hidden"} w-full flex justify-center items-center h-full">
+                        no results
+                    </div>
                 {:else}
                     {#each Array(10) as _, i}
                         <div class="card card-side bg-base-200 h-24 md:h-28 card-bordered border-primary cursor-pointer mx-1">
@@ -448,12 +454,6 @@
                         </div>
                     {/each}
                 {/if}
-              <div class="flex w-full h-full justify-center">
-                <span class="{has_more ? "" : "hidden"} loading loading-bars loading-lg mx-7 self-center"></span>
-              </div>
-              <div class="{no_results ? "" : "hidden"} w-full flex justify-center items-center h-full">
-                    no results
-                </div>
               <InfiniteScroll
               hasMore={has_more}
               threshold={100}
