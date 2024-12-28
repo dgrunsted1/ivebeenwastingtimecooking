@@ -238,16 +238,20 @@
     newBatch = [];
     data = [];
     await fetchData();
-    if (!selected_categories.length) display_categories = await update_display_categories();
-    if (!selected_cuisines.length) display_cuisines = await update_display_cuisines();
-    if (!selected_countries.length) display_countries = await update_display_countries();
-    if (!selected_authors.length) display_authors = await update_display_authors();
+    await  update_display_cats();
     refresh_loading = false;
     if (!newBatch.length){
         no_results = true;
     } else {
         no_results = false;
     }
+  }
+
+  async function update_display_cats(){
+    if (!selected_categories.length) display_categories = await update_display_categories();
+    if (!selected_cuisines.length) display_cuisines = await update_display_cuisines();
+    if (!selected_countries.length) display_countries = await update_display_countries();
+    if (!selected_authors.length) display_authors = await update_display_authors();
   }
 
 
@@ -357,6 +361,7 @@
             data = [];
             await fetchData();
             refresh_loading = false;
+            await  update_display_cats();
             document.activeElement.blur();
         }, 250);
     }
