@@ -1,3 +1,6 @@
+import { get_servings } from '/src/lib/recipe_util.js';
+import { get_grocery_list, trim_verbs } from '/src/lib/merge_ingredients.js';
+
 export const sort_recipes = function(sort_val, display_recipes){
     
     
@@ -64,6 +67,9 @@ function compare_time_amounts_dsc(a, b){
 }
 
 function get_total_time(recipe){
+    if (!recipe.time){
+        return {display: "0", val: 0};
+    }
     let total_time = 0;
     let mins = 0;
     let min_result = recipe.time.match(/(\d+) [mins|minutes]/);
@@ -143,4 +149,152 @@ export const database_sort_recipes = async function(sort_val, display_recipes){
         default:
             return display_recipes;
     }
+}
+
+
+
+
+
+
+
+
+export const sort_menus = (user_menus, sort_val) => {
+    console.log("user_menus", user_menus);
+    console.log("sort_menus", sort_val);
+    switch (sort_val) {
+        case "Least Recipes":
+            user_menus = user_menus.sort(compare_recipe_amounts_asc);
+            break;
+        case "Most Recipes":
+            user_menus = user_menus.sort(compare_recipe_amounts_dsc);
+            break;
+        case "Least Ingredients":
+            user_menus = user_menus.sort(compare_menu_ingr_amounts_asc);
+            break;
+        case "Most Ingredients":
+            user_menus = user_menus.sort(compare_menu_ingr_amounts_dsc);
+            break;
+        case "Least Time":
+            user_menus = user_menus.sort(compare_menu_time_amounts_asc);        
+            break;
+        case "Most Time":
+            user_menus = user_menus.sort(compare_menu_time_amounts_dsc);
+            break;
+        case "Least Servings":
+            user_menus = user_menus.sort(compare_menu_serving_amounts_asc);
+            break;
+        case "Most Servings":
+            user_menus = user_menus.sort(compare_menu_serving_amounts_dsc);
+            break;
+        case "Least Recent":
+            user_menus = user_menus.sort(compare_menu_recent_asc);
+            break;
+        case "Most Recent":
+            user_menus = user_menus.sort(compare_menu_recent_dsc);
+            break;
+        default:
+            break;
+    }
+
+    return user_menus;
+}
+
+function compare_recipe_amounts_asc(a, b){
+    if ( a.expand.recipes.length < b.expand.recipes.length ){
+        return -1;
+    }
+    if ( a.expand.recipes.length > b.expand.recipes.length ){
+        return 1;
+    }
+    return 0;
+}
+
+function compare_recipe_amounts_dsc(a, b){
+    if ( a.expand.recipes.length > b.expand.recipes.length ){
+        return -1;
+    }
+    if ( a.expand.recipes.length < b.expand.recipes.length ){
+        return 1;
+    }
+    return 0;
+}
+
+function compare_menu_ingr_amounts_asc(a, b){
+    if ( get_grocery_list(a.expand.recipes, a.servings, a.sub_recipes).length < get_grocery_list(b.expand.recipes, b.servings, b.sub_recipes).length ){
+        return -1;
+    }
+    if ( get_grocery_list(a.expand.recipes, a.servings, a.sub_recipes).length > get_grocery_list(b.expand.recipes, b.servings, b.sub_recipes).length ){
+        return 1;
+    }
+    return 0;
+}
+
+function compare_menu_ingr_amounts_dsc(a, b){
+    if ( get_grocery_list(a.expand.recipes, a.servings, a.sub_recipes).length > get_grocery_list(b.expand.recipes, b.servings, b.sub_recipes).length ){
+        return -1;
+    }
+    if ( get_grocery_list(a.expand.recipes, a.servings, a.sub_recipes).length < get_grocery_list(b.expand.recipes, b.servings, b.sub_recipes).length ){
+        return 1;
+    }
+    return 0;
+}
+
+function compare_menu_serving_amounts_asc(a, b){
+    if ( get_servings(a.expand.recipes) < get_servings(b.expand.recipes) ){
+        return -1;
+    }
+    if ( get_servings(a.expand.recipes) > get_servings(b.expand.recipes) ){
+        return 1;
+    }
+    return 0;
+}
+
+function compare_menu_serving_amounts_dsc(a, b){
+    if ( get_servings(a.expand.recipes) > get_servings(b.expand.recipes) ){
+        return -1;
+    }
+    if ( get_servings(a.expand.recipes) < get_servings(b.expand.recipes) ){
+        return 1;
+    }
+    return 0;
+}
+
+function compare_menu_time_amounts_asc(a, b){
+    if ( get_total_time(a.expand.recipes).val < get_total_time(b.expand.recipes).val ){
+        return -1;
+    }
+    if ( get_total_time(a.expand.recipes).val > get_total_time(b.expand.recipes).val ){
+        return 1;
+    }
+    return 0;
+}
+
+function compare_menu_time_amounts_dsc(a, b){
+    if ( get_total_time(a.expand.recipes).val > get_total_time(b.expand.recipes).val ){
+        return -1;
+    }
+    if ( get_total_time(a.expand.recipes).val < get_total_time(b.expand.recipes).val ){
+        return 1;
+    }
+    return 0;
+}
+
+function compare_menu_recent_asc(a, b){
+    if ( a.created < b.created ){
+        return -1;
+    }
+    if ( a.created > b.created ){
+        return 1;
+    }
+    return 0;
+}
+
+function compare_menu_recent_dsc(a, b){
+    if ( a.created > b.created ){
+        return -1;
+    }
+    if ( a.created < b.created ){
+        return 1;
+    }
+    return 0;
 }

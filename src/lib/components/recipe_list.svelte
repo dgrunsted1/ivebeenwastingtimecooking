@@ -1,5 +1,6 @@
 <script>
     import RecipeCard from "./recipe_card.svelte";
+    import SearchInput from "./search.svelte";
     import { createEventDispatcher } from 'svelte';
     import { pb } from '/src/lib/pocketbase';
     import DeleteIcon from "/src/lib/icons/DeleteIcon.svelte";
@@ -198,7 +199,6 @@
         let delay_time = (e.srcElement.tagName != "INPUT") ? 0 : 1000;
         clearTimeout(delay_timer);
         delay_timer = setTimeout(() => {
-            document.getElementById("menu_loading").classList.remove('hidden');
 
             if (e.srcElement.tagName != "INPUT"){
                 let classes = Array.from(e.srcElement.classList);
@@ -217,7 +217,6 @@
             }
 
             dispatch(`reset_mode`);
-            document.getElementById("menu_loading").classList.add('hidden');
         }, delay_time);
     }
 
@@ -272,6 +271,10 @@
             return false;
         }
     }
+
+    function update_search(e) {
+        search_val = e.detail.val;
+    }
 </script>
 <div class="hidden md:flex flex-col w-full">
     <div class="w-full carousel carousel-center rounded-box space-x-1 border border-primary rounded-md p-1">
@@ -288,17 +291,9 @@
         {/each}
     </div>
     <div class="form-control flex flex-row justify-between w-full items-center">
-        <div clas="flex flex-row content-center items-center">
-            <label class="input input-bordered input-sm input-primary flex items-center gap-2 pr-2">
-                <input type="text" class="input h-full p-0" placeholder="Search" bind:value={search_val}/>
-                <button class="w-5" onclick={()=>{search_val = ""}} onkeydown={()=>{search_val = ""}}>
-                    {#if search_val}
-                        <Clear size="w-4 h-4"/>
-                    {/if}
-                </button>
-            </label>
-            <span id="menu_loading" class="hidden loading loading-dots loading-lg align-middle"></span>
-        </div>
+        <SearchInput 
+            on:update_search={update_search}
+        />
         <p class="mx-5 text-xs md:text-sm">{display_recipes ? display_recipes.length+" Recipes" : ""}</p>
         <div class="dropdown dropdown-top md:dropdown-bottom dropdown-end">
             <label tabindex="-1" for="sort" class="btn m-1 btn-primary btn-xs md:btn-sm">{sort_val}</label>
@@ -342,17 +337,9 @@
 
 <div class="flex flex-col md:hidden">
     <div class="form-control flex flex-row justify-between w-full items-center">
-        <div class="flex w-fit space-x-2 my-1">
-            <label class="input input-bordered input-xs input-primary flex items-center gap-2 pr-0">
-                <input type="text" class="input h-full p-0 w-28" placeholder="Search" bind:value={search_val}/>
-                <button class="w-5" onclick={()=>{search_val = ""}}>
-                    {#if search_val}
-                        <Clear size="w-3 h-3"/>
-                    {/if}
-                </button>
-            </label>
-            <span id="menu_loading" class="hidden loading loading-dots loading-sm md:loading-lg align-middle"></span>
-        </div>
+        <SearchInput 
+            on:update_search={update_search}
+        />
 
         <p class="mx-5 text-xs md:text-sm">{display_recipes ? display_recipes.length+" Recipes" : ""}</p>
         <div class="dropdown dropdown-top md:dropdown-bottom dropdown-end">

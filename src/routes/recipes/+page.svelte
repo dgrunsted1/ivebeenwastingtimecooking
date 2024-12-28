@@ -6,6 +6,7 @@
     import Clear from "/src/lib/icons/Clear.svelte";
     import Alerts from "../../lib/components/alerts.svelte";
     import RecipeCard from "../../lib/components/recipe_card.svelte";
+    import SearchInput from "../../lib/components/search.svelte";
 
 
 	
@@ -334,7 +335,8 @@
 
     async function update_sort(e){
         loading = true;
-        sort_val = e.srcElement.innerHTML;
+        document.activeElement.blur();
+        sort_val = e.currentTarget.innerHTML;
         newBatch = [];
         page = 1; 
         
@@ -342,13 +344,13 @@
         data = [];
         await fetchData();
         loading = false;
-        document.activeElement.blur();
     }
 
     async function update_search(e){
+        loading = true;
+        search_val = e.detail.val;
         clearTimeout(delay_timer);
         delay_timer = setTimeout(async () => {
-            loading = true;
             page = 1; 
             
             newBatch = [];
@@ -356,7 +358,7 @@
             await fetchData();
             loading = false;
             document.activeElement.blur();
-        }, 2000);
+        }, 250);
     }
 
     const cook_recipe = (e) => {
@@ -409,16 +411,9 @@
     <div class="flex w-full justify-center">
         <div class="flex flex-col w-full md:max-w-[1000px] space-y-1 md:space-y-2 content-center">
             <div class="hidden md:flex justify-between items-center mx-1">
-                <div class="form-control md:w-auto md:max-w-xs">
-                    <label class="input input-bordered input-sm input-primary flex items-center gap-2 pr-0">
-                        <input type="text" class="input h-full p-0 w-28" placeholder="Search" onkeyup={update_search} bind:value={search_val}/>
-                        <button class="w-5" onclick={()=>{search_val = ""; update_search();}} onkeydown={()=>{search_val = ""; update_search();}}>
-                            {#if search_val}
-                                <Clear size="w-3 h-3"/>
-                            {/if}
-                        </button>
-                    </label>
-                </div>
+                <SearchInput 
+                    on:update_search={update_search}
+                />
                 <div class="mx-1 text-xs md:text-base">{(total_recipes_num > max_results) ? max_results : total_recipes_num} recipes</div>
                 <div class="dropdown dropdown-top md:dropdown-bottom dropdown-end">
                       <label tabindex="-1" for="sort" class="btn m-1 btn-primary btn-xs md:btn-sm">{sort_val}</label>
@@ -431,7 +426,7 @@
                 </div>
             <ul class="flex flex-col w-full space-y-2 md:space-y-4 h-[calc(100svh-130px)] md:h-[calc(100svh-160px)] overflow-y-auto">
                 <!-- {#if false} -->
-                {#if data.length}
+                {#if data.length && !loading}
                     {#each data as item}
                         <RecipeCard 
                             recipe={item}
@@ -465,16 +460,9 @@
               on:loadMore={load_more} />
           </ul>
           <div class="flex justify-between items-center mx-1 my-0 md:hidden">
-            <div class="form-control md:w-auto md:max-w-xs">
-                <label class="input input-bordered input-xs input-primary flex items-center gap-2 pr-0">
-                    <input type="text" class="input h-full p-0 w-28" placeholder="Search" onkeyup={update_search} bind:value={search_val}/>
-                    <button class="w-5" onclick={()=>{search_val = ""; update_search();}} onkeydown={()=>{search_val = ""; update_search();}}>
-                        {#if search_val}
-                            <Clear size="w-3 h-3"/>
-                        {/if}
-                    </button>
-                </label>
-            </div>
+            <SearchInput 
+                on:update_search={update_search}
+            />
             <div class="mx-1 text-xs md:text-base">{(total_recipes_num > max_results) ? max_results : total_recipes_num} recipes</div>
             <div class="dropdown dropdown-top md:dropdown-bottom dropdown-end">
                   <label tabindex="-1" for="sort_mobile" class="btn m-0 btn-primary btn-xs md:btn-sm">{sort_val}</label>

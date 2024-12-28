@@ -1,12 +1,10 @@
 <script>
-    import { stopPropagation } from 'svelte/legacy';
-
+    import SearchInput from "/src/lib/components/search.svelte";
     import { currentUser, pb } from '/src/lib/pocketbase.js';
     import { onMount } from 'svelte';
     import Menu from "/src/lib/components/menu.svelte";
-    import { get_grocery_list, trim_verbs } from '/src/lib/merge_ingredients.js';
-    import Clear from "/src/lib/icons/Clear.svelte";
     import { get_servings } from '/src/lib/recipe_util.js';
+    import { sort_menus } from '/src/lib/sort.js';
     import { update_menu_mults, get_total_time } from '/src/lib/menu_utils.js';
     import MenuCard from "/src/lib/components/menu_card.svelte";
 
@@ -24,7 +22,6 @@
     let search_val = $state("");
     
     let no_results_found = $state(false);
-    
 
     onMount(async () => {
         if (!$currentUser) window.location.href = "/login";
@@ -93,7 +90,8 @@
                     expand: `recipes,recipes.ingr_list`
                 });
                 user_menus = result_list.items;
-                sort_menus();
+                user_menus = sort_menus(user_menus, sort_val);
+                loading = false;
                 return;
             }
             const result_ingr = await pb.collection('ingredients').getList(1, 250, {
@@ -123,153 +121,16 @@
                 loading = false;
                 no_results_found = true;
                 user_menus = [];
+                loading = false;
                 return;
             }
             user_menus = result_menu.items;
-            sort_menus();
+            user_menus = sort_menus(user_menus, sort_val);
             loading = false;
         }, 1000);
     }
 
-    function sort_menus(){
-        loading = true;
-        switch (sort_val) {
-            case "Least Recipes":
-                user_menus = user_menus.sort(compare_recipe_amounts_asc);
-                break;
-            case "Most Recipes":
-                user_menus = user_menus.sort(compare_recipe_amounts_dsc);
-                break;
-            case "Least Ingredients":
-                user_menus = user_menus.sort(compare_ingr_amounts_asc);
-                break;
-            case "Most Ingredients":
-                user_menus = user_menus.sort(compare_ingr_amounts_dsc);
-                break;
-            case "Least Time":
-                user_menus = user_menus.sort(compare_time_amounts_asc);        
-                break;
-            case "Most Time":
-                user_menus = user_menus.sort(compare_time_amounts_dsc);
-                break;
-            case "Least Servings":
-                user_menus = user_menus.sort(compare_serving_amounts_asc);
-                break;
-            case "Most Servings":
-                user_menus = user_menus.sort(compare_serving_amounts_dsc);
-                break;
-            case "Least Recent":
-                user_menus = user_menus.sort(compare_recent_asc);
-                break;
-            case "Most Recent":
-                user_menus = user_menus.sort(compare_recent_dsc);
-                break;
-            default:
-                break;
-        }
-        document.activeElement.blur();
-        loading = false;
-    }
-
-    function compare_recipe_amounts_asc(a, b){
-        if ( a.expand.recipes.length < b.expand.recipes.length ){
-            return -1;
-        }
-        if ( a.expand.recipes.length > b.expand.recipes.length ){
-            return 1;
-        }
-        return 0;
-    }
-
-    function compare_recipe_amounts_dsc(a, b){
-        if ( a.expand.recipes.length > b.expand.recipes.length ){
-            return -1;
-        }
-        if ( a.expand.recipes.length < b.expand.recipes.length ){
-            return 1;
-        }
-        return 0;
-    }
-
-    function compare_ingr_amounts_asc(a, b){
-        if ( get_grocery_list(a.expand.recipes, a.servings, a.sub_recipes).length < get_grocery_list(b.expand.recipes, b.servings, b.sub_recipes).length ){
-            return -1;
-        }
-        if ( get_grocery_list(a.expand.recipes, a.servings, a.sub_recipes).length > get_grocery_list(b.expand.recipes, b.servings, b.sub_recipes).length ){
-            return 1;
-        }
-        return 0;
-    }
-
-    function compare_ingr_amounts_dsc(a, b){
-        if ( get_grocery_list(a.expand.recipes, a.servings, a.sub_recipes).length > get_grocery_list(b.expand.recipes, b.servings, b.sub_recipes).length ){
-            return -1;
-        }
-        if ( get_grocery_list(a.expand.recipes, a.servings, a.sub_recipes).length < get_grocery_list(b.expand.recipes, b.servings, b.sub_recipes).length ){
-            return 1;
-        }
-        return 0;
-    }
-
-    function compare_serving_amounts_asc(a, b){
-        if ( get_servings(a.expand.recipes) < get_servings(b.expand.recipes) ){
-            return -1;
-        }
-        if ( get_servings(a.expand.recipes) > get_servings(b.expand.recipes) ){
-            return 1;
-        }
-        return 0;
-    }
-
-    function compare_serving_amounts_dsc(a, b){
-        if ( get_servings(a.expand.recipes) > get_servings(b.expand.recipes) ){
-            return -1;
-        }
-        if ( get_servings(a.expand.recipes) < get_servings(b.expand.recipes) ){
-            return 1;
-        }
-        return 0;
-    }
-
-    function compare_time_amounts_asc(a, b){
-        if ( get_total_time(a.expand.recipes).val < get_total_time(b.expand.recipes).val ){
-            return -1;
-        }
-        if ( get_total_time(a.expand.recipes).val > get_total_time(b.expand.recipes).val ){
-            return 1;
-        }
-        return 0;
-    }
-
-    function compare_time_amounts_dsc(a, b){
-        if ( get_total_time(a.expand.recipes).val > get_total_time(b.expand.recipes).val ){
-            return -1;
-        }
-        if ( get_total_time(a.expand.recipes).val < get_total_time(b.expand.recipes).val ){
-            return 1;
-        }
-        return 0;
-    }
-
-    function compare_recent_asc(a, b){
-        if ( a.created < b.created ){
-            return -1;
-        }
-        if ( a.created > b.created ){
-            return 1;
-        }
-        return 0;
-    }
-
-    function compare_recent_dsc(a, b){
-        if ( a.created > b.created ){
-            return -1;
-        }
-        if ( a.created < b.created ){
-            return 1;
-        }
-        return 0;
-    }
+    
 
     async function update_mult(e){
         const newServings = { ...modal_menu.servings };
@@ -309,6 +170,19 @@
             }
         }
     }
+
+    async function update_search(e) {
+        search_val = e.detail.val;
+        await search();
+    }
+
+    async function update_sort(e){
+        loading = true;
+        sort_val = e.currentTarget.id; 
+        document.activeElement.blur();
+        user_menus = sort_menus(user_menus, sort_val); 
+        loading = false;
+    }
 </script>
 
 <svelte:head>
@@ -323,23 +197,16 @@
     <div class="flex flex-col w-full md:w-1/2">
         <div class="hidden md:flex justify-between mx-4">
             <div class="flex w-fit space-x-6 items-center">
-                <div class="form-control w-full max-w-xs">
-                    <label class="input input-bordered input-sm input-primary flex items-center gap-2 pr-2">
-                        <input type="text" class="input h-full p-0 w-28" placeholder="Search" onkeyup={search} bind:value={search_val}/>
-                        <button class="w-5" onclick={()=>{search_val = ""; search();}} onkeydown={()=>{search_val = ""; search();}}>
-                            {#if search_val}
-                                <Clear size="w-4 h-4"/>
-                            {/if}
-                        </button>
-                    </label>
-                </div>
+                <SearchInput 
+                    on:update_search={update_search}
+                />
                 <div class="w-full flex space-x-1 text-xs"><div id="user_menus_length">{user_menus.length}</div><div>Menus</div></div>
             </div>
             <div class="dropdown dropdown-top md:dropdown-bottom dropdown-end">
                 <label tabindex="-1" for="sort" class="btn m-1 btn-primary btn-xs md:btn-sm">{sort_val}</label>
                 <ul tabindex="-1" name="sort" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-max bg-primary">
                     {#each sort_opts as opt}
-                        <li class="btn btn-xs {opt == sort_val ? 'btn-neutral': 'btn-primary'}"><button onclick={() => {sort_val = opt; document.activeElement.blur(); sort_menus()}}>{opt}</button></li>
+                        <li class="btn btn-xs {opt == sort_val ? 'btn-neutral': 'btn-primary'}"><button id={opt} onclick={update_sort}>{opt}</button></li>
                     {/each}
                 </ul>
             </div>
@@ -357,7 +224,7 @@
             {:else}
                 {#each user_menus as curr, i}
                     <MenuCard
-                        menu={curr}
+                        bind:menu={user_menus[i]}
                         on:delete_menu={delete_menu}
                         on:card_click={show_menu_modal}
                     />
@@ -366,16 +233,9 @@
         </div>
         <div class="flex md:hidden justify-between">
             <div class="flex w-fit space-x-6 items-center">
-                <div class="form-control w-full max-w-xs">
-                    <label class="input input-bordered input-xs input-primary flex items-center gap-2 pr-0">
-                        <input type="text" class="input h-full p-0 w-28" placeholder="Search" onkeyup={search} bind:value={search_val}/>
-                        <button class="w-5" onclick={()=>{search_val = ""; search();}}>
-                            {#if search_val}
-                                <Clear size="w-3 h-3"/>
-                            {/if}
-                        </button>
-                    </label>
-                </div>
+                <SearchInput 
+                    on:update_search={update_search}
+                />
                 <div class="w-full flex space-x-1 text-xs"><div id="user_menus_length">{user_menus.length}</div><div>Menus</div></div>
             </div>
             
@@ -386,7 +246,7 @@
                         {#if opt == sort_val}
                         <li class="btn btn-xs btn-secondary"><div>{opt}</div></li>
                         {:else}
-                        <li class="btn btn-xs btn-primary"><button onclick={(e) => {sort_val = e.currentTarget.innerHTML; sort_menus();}}>{opt}</button></li>
+                        <li class="btn btn-xs btn-primary"><button id={opt} onclick={update_sort}>{opt}</button></li>
                         {/if}
                     {/each}
                 </ul>
