@@ -12,3 +12,19 @@ export const signOut = function() {
     pb.authStore.clear();
     window.location.href = "/";
 }
+
+export const auth_refresh = async function() {
+    try {
+        const result = await pb.collection('users').authRefresh();
+        console.log(result);
+        return {error: false, msg: "logged in"};
+    }catch(err){
+        console.log(err);
+        await pb.collection('errors').create({
+            message: err.message,
+            function: "auth_refresh",
+            url: window.location.href
+        });
+        return {error: true, msg: err.message};
+    }
+}
