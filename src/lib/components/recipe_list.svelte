@@ -2,11 +2,10 @@
     import RecipeCard from "./recipe_card.svelte";
     import SearchInput from "./search.svelte";
     import { pb } from '/src/lib/pocketbase';
-    import ThumbUp from "/src/lib/icons/ThumbUp.svelte";
-    import Heart from "/src/lib/icons/Heart.svelte";
     import { update_fav_made } from '/src/lib/save_recipe.js';
     import { sort_recipes } from '/src/lib/sort.js';
     import Sort from "../../lib/components/sort.svelte";
+    import CatCarousel from "../../lib/components/cat_carousel.svelte";
 
     let { 
         recipes = $bindable(),
@@ -283,19 +282,21 @@
     }
 </script>
 <div class="hidden md:flex flex-col w-full">
-    <div class="w-full carousel carousel-center rounded-box space-x-1 border border-primary rounded-md p-1">
-        <button id="thumb_up" class="btn btn-xs p-1 made flex content-center category bg-transparent border-none" onclick={select_cat}><ThumbUp color={(selected_cats.cats.includes("thumb_up")) ? "fill-primary" : "fill-neutral"}/></button>
-        <button id="heart" class="btn btn-xs p-1 made flex content-center category  bg-transparent border-none" onclick={select_cat}><Heart color={(selected_cats.cats.includes("heart")) ? "fill-primary" : "fill-neutral"}/></button>
-        {#each display_cats.cats as cat}
-            <button id="category" class="btn btn-xs {selected_cats.cats.includes(cat)?'btn-primary text-black':'bg-base-300 text-neutral'} category" onclick={select_cat}>{cat}</button> 
-        {/each}
-        {#each display_cats.cuisines as cuisine}
-            <button id="cuisine" class="btn btn-xs {selected_cats.cuisines.includes(cuisine)?'btn-primary text-black':'bg-base-300 text-neutral'} cuisine" onclick={select_cat}>{cuisine}</button> 
-        {/each}
-        {#each display_cats.countries as country}
-            <button id="country" class="btn btn-xs {selected_cats.countries.includes(country)?'btn-primary text-black':'bg-base-300 text-neutral'} country" onclick={select_cat}>{country}</button> 
-        {/each}
-    </div>
+    <CatCarousel
+        display_categories={display_cats.cats}
+        display_cuisines={display_cats.cuisines}
+        display_countries={display_cats.countries}
+        selected_categories={selected_cats.cats}
+        selected_cuisines={selected_cats.cuisines}
+        selected_countries={selected_cats.countries}
+        categories={categories.cats}
+        cuisines={categories.cuisines}
+        countries={categories.countries}
+        {select_cat}
+        enable_thumb={true}
+        enable_heart={true}
+        cnt={0}
+    />
     <div class="form-control flex flex-row justify-between w-full items-center">
         <SearchInput 
             {update_search}
@@ -351,17 +352,19 @@
             type="recipe" 
         />
     </div>
-    <div class="w-full carousel carousel-center rounded-box space-x-1 border border-primary rounded-md p-1">
-        <button id="thumb_up" class="btn  bg-transparent border-none btn-xs category" onclick={select_cat}><ThumbUp color={selected_cats.cats.includes("thumb_up")?'fill-primary':'fill-neutral'}/></button> 
-        <button id="heart" class="btn btn-xs category  bg-transparent border-none" onclick={select_cat}><Heart color={selected_cats.cats.includes("heart")?'fill-primary':'fill-neutral'}/></button> 
-        {#each display_cats.cats as cat}
-            <button id="category" class="btn btn-xs {selected_cats.cats.includes(cat)?'btn-primary text-black':'bg-base-300 text-neutral'} category" onclick={select_cat}>{cat}</button> 
-        {/each}
-        {#each display_cats.cuisines as cuisine}
-            <button id="cuisine" class="btn btn-xs {selected_cats.cuisines.includes(cuisine)?'btn-primary text-black':'bg-base-300 text-neutral'} cuisine" onclick={select_cat}>{cuisine}</button> 
-        {/each}
-        {#each display_cats.countries as country}
-            <button id="country" class="btn btn-xs {selected_cats.countries.includes(country)?'btn-primary text-black':'bg-base-300 text-neutral'} country" onclick={select_cat}>{country}</button> 
-        {/each}
-    </div>
+    <CatCarousel
+        display_categories={display_cats.cats}
+        display_cuisines={display_cats.cuisines}
+        display_countries={display_cats.countries}
+        selected_categories={selected_cats.cats}
+        selected_cuisines={selected_cats.cuisines}
+        selected_countries={selected_cats.countries}
+        categories={categories.cats}
+        cuisines={categories.cuisines}
+        countries={categories.countries}
+        {select_cat}
+        enable_thumb={true}
+        enable_heart={true}
+        cnt={0}
+    />
 </div>

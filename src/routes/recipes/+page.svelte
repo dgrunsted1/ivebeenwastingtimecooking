@@ -7,6 +7,8 @@
     import RecipeCard from "../../lib/components/recipe_card.svelte";
     import SearchInput from "../../lib/components/search.svelte";
     import Sort from "../../lib/components/sort.svelte";
+    import SkeletonCard from "../../lib/components/skeleton_card.svelte";
+    import CatCarousel from "../../lib/components/cat_carousel.svelte";
 
 
 	
@@ -390,27 +392,24 @@
   <h4>See what others are cooking</h4>
   <div class="flex w-full justify-center flex-col md:mt-2 space-y-1 md:space-y-2">
     <div class="hidden md:flex flex-row md:flex-col w-full">
-        <div class="carousel carousel-center space-x-1 border border-primary rounded-md p-1 mx-2 min-h-9">
-            <!-- <button id="thumb_up" class="btn btn-xs p-1 made flex content-center category bg-transparent border-none" onclick={select_cat}><ThumbUp color={(selected_cats.cats.includes("thumb_up")) ? "fill-primary" : "fill-neutral"}/></button>
-            <button id="heart" class="btn btn-xs p-1 made flex content-center category  bg-transparent border-none" onclick={select_cat}><Heart color={(selected_cats.cats.includes("heart")) ? "fill-primary" : "fill-neutral"}/></button> -->
-            {#each display_categories as cat}
-                <button id="category" class="btn btn-xs {selected_categories.includes(cat)?'btn-primary text-black':'bg-base-300 text-neutral'} category" onclick={select_cat}>{cat}</button> 
-            {/each}
-            {#each display_cuisines as cuisine}
-                <button id="cuisine" class="btn btn-xs {selected_cuisines.includes(cuisine)?'btn-primary text-black':'bg-base-300 text-neutral'} cuisine" onclick={select_cat}>{cuisine}</button> 
-            {/each}
-            {#each display_authors as author}
-                <button id="author" class="btn btn-xs {selected_authors.includes(author)?'btn-primary text-black':'bg-base-300 text-neutral'} cuisine" onclick={select_cat}>{author}</button> 
-            {/each}
-            {#each display_countries as country}
-                <button id="country" class="btn btn-xs {selected_countries.includes(country)?'btn-primary text-black':'bg-base-300 text-neutral'} country" onclick={select_cat}>{country}</button> 
-            {/each}
-            {#if !categories.length && !cuisines.length && !countries.length && !authors.length}
-                {#each Array(40) as _, i}
-                    <div id="country" class="btn btn-xs"><div class="skeleton h-2 w-12"></div></div> 
-                {/each}
-            {/if}
-        </div>
+        <CatCarousel
+            {display_categories}
+            {display_cuisines}
+            {display_countries}
+            {display_authors}
+            {selected_categories}
+            {selected_cuisines}
+            {selected_countries}
+            {selected_authors}
+            {categories}
+            {cuisines}
+            {countries}
+            {authors}
+            {select_cat}
+            enable_thumb={false}
+            enable_heart={false}
+            cnt={40}
+        />
     </div>
     <div class="flex w-full justify-center">
         <div class="flex flex-col w-full md:max-w-[1000px] space-y-1 md:space-y-2 content-center">
@@ -425,78 +424,67 @@
                     type="recipe" 
                 />
                 </div>
-            <ul class="flex flex-col w-full space-y-2 md:space-y-4 h-[calc(100svh-130px)] md:h-[calc(100svh-160px)] overflow-y-auto">
-                {#if data.length && !refresh_loading}
-                    {#each data as item}
-                        <RecipeCard 
-                            recipe={item}
-                            type="recipes"
-                            servings={item.servings}
-                            card_click={cook_recipe}
-                        />
-                    {/each}
-                    <div class="flex w-full h-full justify-center">
-                        <span class="{has_more ? "" : "hidden"} loading loading-bars loading-lg mx-7 self-center"></span>
-                      </div>
-                {:else if data.length == 0 && !refresh_loading}
-                    <div class="{no_results ? "" : "hidden"} w-full flex justify-center items-center h-full">
-                        no results
-                    </div>
-                {:else}
-                    {#each Array(10) as _, i}
-                        <div class="card card-side bg-base-200 h-24 md:h-28 card-bordered border-primary cursor-pointer mx-1">
-                            <div class="flex items-center gap-4 w-full m-5">
-                                <div class="skeleton h-20 md:h-24 w-1/4 shrink-0 rounded-full"></div>
-                                <div class="flex flex-col gap-4 w-3/4">
-                                    <div class="skeleton h-4 w-full"></div>
-                                    <div class="skeleton h-4 w-full"></div>
-                                </div>
-                            </div>
+                <ul class="flex flex-col w-full space-y-2 md:space-y-4 h-[calc(100svh-130px)] md:h-[calc(100svh-160px)] overflow-y-auto">
+                    {#if data.length && !refresh_loading}
+                        {#each data as item}
+                            <RecipeCard 
+                                recipe={item}
+                                type="recipes"
+                                servings={item.servings}
+                                card_click={cook_recipe}
+                            />
+                        {/each}
+                        <div class="flex w-full h-full justify-center">
+                            <span class="{has_more ? "" : "hidden"} loading loading-bars loading-lg mx-7 self-center"></span>
                         </div>
-                    {/each}
-                {/if}
-              <InfiniteScroll
-                {has_more}
-                threshold={100}
-                {load_more} 
-              />
-          </ul>
-          <div class="flex justify-between items-center mx-1 my-0 md:hidden">
-            <SearchInput 
-                {update_search}
-            />
-            <div class="mx-1 text-xs md:text-base">{(total_recipes_num > max_results) ? max_results : total_recipes_num} recipes</div>
-                <Sort
-                    {sort_val}
-                    {update_sort}
-                    type="recipe"
+                    {:else if data.length == 0 && !refresh_loading}
+                        <div class="{no_results ? "" : "hidden"} w-full flex justify-center items-center h-full">
+                            no results
+                        </div>
+                    {:else}
+                        <SkeletonCard 
+                            cnt={10} 
+                        />
+                    {/if}
+                <InfiniteScroll
+                    {has_more}
+                    threshold={100}
+                    {load_more} 
                 />
+            </ul>
+            <div class="flex justify-between items-center mx-1 my-0 md:hidden">
+                <SearchInput 
+                    {update_search}
+                />
+                <div class="mx-1 text-xs md:text-base">{(total_recipes_num > max_results) ? max_results : total_recipes_num} recipes</div>
+                    <Sort
+                        {sort_val}
+                        {update_sort}
+                        type="recipe"
+                    />
+                </div>
             </div>
         </div>
-    </div>
-    <div class="flex md:hidden flex-row md:flex-col mx-1 space-x-1 md:space-x-0 md:space-y-2">
-        <div class="carousel carousel-center space-x-1 border border-primary rounded-md p-1 min-h-8 w-full">
-            <!-- <button id="thumb_up" class="btn btn-xs p-1 made flex content-center category bg-transparent border-none" onclick={select_cat}><ThumbUp color={(selected_cats.cats.includes("thumb_up")) ? "fill-primary" : "fill-neutral"}/></button>
-            <button id="heart" class="btn btn-xs p-1 made flex content-center category  bg-transparent border-none" onclick={select_cat}><Heart color={(selected_cats.cats.includes("heart")) ? "fill-primary" : "fill-neutral"}/></button> -->
-            {#each display_categories as cat}
-                <button id="category" class="btn btn-xs {selected_categories.includes(cat)?'btn-primary text-black':'bg-base-300 text-neutral'} category" onclick={select_cat}>{cat}</button> 
-            {/each}
-            {#each display_cuisines as cuisine}
-                <button id="cuisine" class="btn btn-xs {selected_cuisines.includes(cuisine)?'btn-primary text-black':'bg-base-300 text-neutral'} cuisine" onclick={select_cat}>{cuisine}</button> 
-            {/each}
-            {#each display_authors as author}
-                <button id="cuisine" class="btn btn-xs {selected_authors.includes(author)?'btn-primary text-black':'bg-base-300 text-neutral'} cuisine" onclick={select_cat}>{author}</button> 
-            {/each}
-            {#each display_countries as country}
-                <button id="country" class="btn btn-xs {selected_countries.includes(country)?'btn-primary text-black':'bg-base-300 text-neutral'} country" onclick={select_cat}>{country}</button> 
-            {/each}
-            {#if !categories.length && !cuisines.length && !countries.length && !authors.length}
-                {#each Array(7) as _, i}
-                    <div id="country" class="btn btn-xs"><div class="skeleton h-2 w-12"></div></div> 
-                {/each}
-            {/if}
+        <div class="flex md:hidden flex-row md:flex-col mx-1 space-x-1 md:space-x-0 md:space-y-2">
+            <CatCarousel    
+                {display_categories}
+                {display_cuisines}
+                {display_countries}
+                {display_authors}
+                {selected_categories}
+                {selected_cuisines}
+                {selected_countries}
+                {selected_authors}
+                {categories}
+                {cuisines}
+                {countries}
+                {authors}
+                {select_cat}
+                enable_thumb={false}
+                enable_heart={false}
+                cnt={40}
+            />
             </div>
         </div>
-    </div>
-  <Alerts msg={alert.msg} type={alert.type} bind:show={alert.show} title={alert.title}/>
+    <Alerts msg={alert.msg} type={alert.type} bind:show={alert.show} title={alert.title}/>
 </main>
