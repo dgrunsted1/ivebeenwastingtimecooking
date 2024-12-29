@@ -3,10 +3,10 @@
 	import {onMount} from "svelte";
     import { pb, currentUser } from '/src/lib/pocketbase.js';
     import InfiniteScroll from "/src/lib/components/infinite_scroll.svelte";
-    import Clear from "/src/lib/icons/Clear.svelte";
     import Alerts from "../../lib/components/alerts.svelte";
     import RecipeCard from "../../lib/components/recipe_card.svelte";
     import SearchInput from "../../lib/components/search.svelte";
+    import Sort from "../../lib/components/sort.svelte";
 
 
 	
@@ -30,7 +30,6 @@
     let display_cuisines = $state([]);
     let authors = $state([]);
     let display_authors = $state([]);
-    let sort_opts = ["Least Ingredients", "Most Ingredients", "Least Servings", "Most Servings", "Least Time", "Most Time", "Most Recent", "Least Recent"];
     let delay_timer;
 
 
@@ -420,14 +419,11 @@
                     {update_search}
                 />
                 <div class="mx-1 text-xs md:text-base">{(total_recipes_num > max_results) ? max_results : total_recipes_num} recipes</div>
-                <div class="dropdown dropdown-top md:dropdown-bottom dropdown-end">
-                      <label tabindex="-1" for="sort" class="btn m-1 btn-primary btn-xs md:btn-sm">{sort_val}</label>
-                      <ul tabindex="-1" name="sort" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-max bg-primary">
-                          {#each sort_opts as opt}
-                              <li class="btn btn-xs {opt == sort_val ? 'btn-neutral': 'btn-primary'}"><button onclick={update_sort} onkeydown={update_sort}>{opt}</button></li>
-                          {/each}
-                      </ul>
-                  </div>
+                <Sort
+                    {sort_val}
+                    {update_sort} 
+                    type="recipe" 
+                />
                 </div>
             <ul class="flex flex-col w-full space-y-2 md:space-y-4 h-[calc(100svh-130px)] md:h-[calc(100svh-160px)] overflow-y-auto">
                 {#if data.length && !refresh_loading}
@@ -470,14 +466,11 @@
                 {update_search}
             />
             <div class="mx-1 text-xs md:text-base">{(total_recipes_num > max_results) ? max_results : total_recipes_num} recipes</div>
-            <div class="dropdown dropdown-top md:dropdown-bottom dropdown-end">
-                  <label tabindex="-1" for="sort_mobile" class="btn m-0 btn-primary btn-xs md:btn-sm">{sort_val}</label>
-                  <ul tabindex="-1" name="sort_mobile" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-max bg-primary">
-                      {#each sort_opts as opt}
-                          <li class="btn btn-xs {opt == sort_val ? 'btn-neutral': 'btn-primary'}"><button onclick={update_sort}>{opt}</button></li>
-                      {/each}
-                  </ul>
-              </div>
+                <Sort
+                    {sort_val}
+                    {update_sort}
+                    type="recipe"
+                />
             </div>
         </div>
     </div>
@@ -502,8 +495,8 @@
                     <div id="country" class="btn btn-xs"><div class="skeleton h-2 w-12"></div></div> 
                 {/each}
             {/if}
+            </div>
         </div>
     </div>
-  </div>
   <Alerts msg={alert.msg} type={alert.type} bind:show={alert.show} title={alert.title}/>
 </main>

@@ -6,6 +6,7 @@
     import Heart from "/src/lib/icons/Heart.svelte";
     import { update_fav_made } from '/src/lib/save_recipe.js';
     import { sort_recipes } from '/src/lib/sort.js';
+    import Sort from "../../lib/components/sort.svelte";
 
     let { 
         recipes = $bindable(),
@@ -34,7 +35,6 @@
 
     
     let display_cats = $derived(update_diplay_cats());
-    let sort_opts = ["Least Ingredients", "Most Ingredients", "Least Servings", "Most Servings", "Least Time", "Most Time", "Most Recent", "Least Recent"];
     let loading = $state(true);
 
     function view(e) {
@@ -274,6 +274,13 @@
     function update_search(e) {
         search_val = e.val;
     }
+
+    async function update_sort(e){
+        loading = true;
+        sort_val = e.currentTarget.innerHTML; 
+        document.activeElement.blur();
+        loading = false;
+    }
 </script>
 <div class="hidden md:flex flex-col w-full">
     <div class="w-full carousel carousel-center rounded-box space-x-1 border border-primary rounded-md p-1">
@@ -294,14 +301,11 @@
             {update_search}
         />
         <p class="mx-5 text-xs md:text-sm">{display_recipes ? display_recipes.length+" Recipes" : ""}</p>
-        <div class="dropdown dropdown-top md:dropdown-bottom dropdown-end">
-            <label tabindex="-1" for="sort" class="btn m-1 btn-primary btn-xs md:btn-sm">{sort_val}</label>
-            <ul tabindex="-1" name="sort" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-max bg-primary">
-                {#each sort_opts as opt}
-                    <li class="btn btn-xs {opt == sort_val ? 'btn-neutral': 'btn-primary'}"><button onclick={() => {sort_val = opt; document.activeElement.blur();}}>{opt}</button></li>
-                {/each}
-            </ul>
-        </div>
+        <Sort
+            {sort_val}
+            {update_sort} 
+            type="recipe" 
+        />
     </div>
 </div>
 
@@ -341,14 +345,11 @@
         />
 
         <p class="mx-5 text-xs md:text-sm">{display_recipes ? display_recipes.length+" Recipes" : ""}</p>
-        <div class="dropdown dropdown-top md:dropdown-bottom dropdown-end">
-            <label tabindex="-1" for="sort_mobile" class="btn m-1 btn-primary btn-xs p-1">{sort_val}</label>
-            <ul tabindex="-1" id="sort_mobile" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-max bg-primary">
-                {#each sort_opts as opt}
-                    <li class="btn btn-xs {opt == sort_val ? 'btn-neutral': 'btn-primary'}"><button tabindex="0" onclick={() => {sort_val = opt; document.activeElement.blur();}}>{opt}</button></li>
-                {/each}
-            </ul>
-        </div>
+        <Sort
+            {sort_val}
+            {update_sort} 
+            type="recipe" 
+        />
     </div>
     <div class="w-full carousel carousel-center rounded-box space-x-1 border border-primary rounded-md p-1">
         <button id="thumb_up" class="btn  bg-transparent border-none btn-xs category" onclick={select_cat}><ThumbUp color={selected_cats.cats.includes("thumb_up")?'fill-primary':'fill-neutral'}/></button> 

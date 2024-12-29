@@ -7,7 +7,7 @@
     import { sort_menus } from '/src/lib/sort.js';
     import { update_menu_mults, get_total_time } from '/src/lib/menu_utils.js';
     import MenuCard from "/src/lib/components/menu_card.svelte";
-
+    import Sort from "../../lib/components/sort.svelte";
     
     let user_menus = $state([]);
     
@@ -18,7 +18,6 @@
     let sort_val = $state("Most Recent");
     let total_servings = $derived((!modal_menu.expand) ? 0 : get_servings(modal_menu.expand.recipes, {}, modal_menu.servings));
     let delay_timer;
-    let sort_opts = ["Least Recipes", "Most Recipes", "Least Ingredients", "Most Ingredients", "Least Servings", "Most Servings", "Least Time", "Most Time", "Most Recent", "Least Recent"];
     let search_val = $state("");
     
     let no_results_found = $state(false);
@@ -178,7 +177,7 @@
 
     async function update_sort(e){
         loading = true;
-        sort_val = e.currentTarget.id; 
+        sort_val = e.currentTarget.innerHTML; 
         document.activeElement.blur();
         user_menus = sort_menus(user_menus, sort_val); 
         loading = false;
@@ -202,14 +201,11 @@
                 />
                 <div class="w-full flex space-x-1 text-xs"><div id="user_menus_length">{user_menus.length}</div><div>Menus</div></div>
             </div>
-            <div class="dropdown dropdown-top md:dropdown-bottom dropdown-end">
-                <label tabindex="-1" for="sort" class="btn m-1 btn-primary btn-xs md:btn-sm">{sort_val}</label>
-                <ul tabindex="-1" name="sort" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-max bg-primary">
-                    {#each sort_opts as opt}
-                        <li class="btn btn-xs {opt == sort_val ? 'btn-neutral': 'btn-primary'}"><button id={opt} onclick={update_sort}>{opt}</button></li>
-                    {/each}
-                </ul>
-            </div>
+            <Sort
+                {sort_val}
+                {update_sort},
+                type="menu"  
+            />
         </div>
     {#if user_menus.length > 0 || loading || no_results_found}
         <div id="menus" class="h-[calc(100svh-55px)] md:h-[calc(100svh-90px)] overflow-y-auto rounded-md md:border-none w-full">
@@ -239,18 +235,11 @@
                 <div class="w-full flex space-x-1 text-xs"><div id="user_menus_length">{user_menus.length}</div><div>Menus</div></div>
             </div>
             
-            <div class="dropdown dropdown-top dropdown-end">
-                <label tabindex="-1" for="sort" class="btn m-1 btn-primary btn-xs md:btn-sm">{sort_val}</label>
-                <ul tabindex="-1" name="sort" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-max bg-primary">
-                    {#each sort_opts as opt}
-                        {#if opt == sort_val}
-                        <li class="btn btn-xs btn-secondary"><div>{opt}</div></li>
-                        {:else}
-                        <li class="btn btn-xs btn-primary"><button id={opt} onclick={update_sort}>{opt}</button></li>
-                        {/if}
-                    {/each}
-                </ul>
-            </div>
+            <Sort
+                {sort_val}
+                {update_sort}
+                type="menu" 
+            />
         </div>
         <dialog id="my_modal_2" class="modal">
             {#if modal_menu.id}

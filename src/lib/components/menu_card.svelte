@@ -36,7 +36,7 @@
             <div class="flex flex-col w-full justify-between content-center h-full">
                 <div class="flex flex-row justify-evenly text-xs md:text-md items-center h-full space-x-2 md:space-x-5">
                     <div class="text-center max-h-4 md:max-h-16 line-clamp-1 md:line-clamp-4">{menu.title}</div>
-                    <div class="text-center md:w-20">{format_date(menu.created)}</div>
+                    <div class="text-center min-w-16 md:w-20 line-clamp-1">{format_date(menu.created)}</div>
                 </div>
                 <div class="flex flex-row justify-evenly max-w-full">
                     <p class="text-center text-[10px] xl:text-[12px] border border-primary px-1 text-ellipsis whitespace-nowrap text-nowrap overflow-hidden rounded-tl rounded-bl">{menu.expand.recipes.length} recipes</p>
