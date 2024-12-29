@@ -1,7 +1,7 @@
 <script>
   
 	import {onMount} from "svelte";
-    import { pb, currentUser } from '/src/lib/pocketbase.js';
+    import { pb, currentUser, auth_refresh } from '/src/lib/pocketbase.js';
     import InfiniteScroll from "/src/lib/components/infinite_scroll.svelte";
     import Alerts from "../../lib/components/alerts.svelte";
     import RecipeCard from "../../lib/components/recipe_card.svelte";
@@ -216,7 +216,12 @@
 	
 	onMount(async ()=> {
 		// load first batch onMount
-        if ($currentUser) await pb.collection('users').authRefresh();
+        if ($currentUser){
+            const result = await auth_refresh;
+            if (result.error){
+                show_error(e.message);
+            }
+        }
 		await fetchData();
         max_results = total_recipes_num;
         categories = await pb.collection('categories').getFullList({sort: `+id`});
@@ -370,6 +375,12 @@
     const cook_recipe = (e) => {
         let recipe = data.filter(recipe => recipe.id == e.id)[0];
         window.location = `/cook_recipe/${recipe.url_id}/${recipe.servings}`
+    }
+
+    function show_error(title){
+        alert.title = title;
+        alert.type = "error";
+        alert.show = true;
     }
 
     function show_alert(msg, type, title){

@@ -7,7 +7,7 @@
     import RecipeList from "/src/lib/components/recipe_list.svelte";
     import Menu from "/src/lib/components/menu.svelte";
     import { page } from '$app/stores';
-    import Alerts from "../../lib/components/alerts.svelte";
+    import Alerts from "/src/lib/components/alerts.svelte";
 
 
     let user_recipes = $state([]);
@@ -21,7 +21,7 @@
     let loading = $state(true);
     let total_servings = $derived(get_servings(menu_recipes, {}, mults));
     let menu_title = $state("New Menu");
-    
+    let alert = $state({show: false, msg: "", title: "", type: "warning"});
 
 
     onMount(async () => {
@@ -49,6 +49,12 @@
         }
         loading = false;
     });
+
+    function show_error(title){
+        alert.title = title;
+        alert.type = "error";
+        alert.show = true;
+    }
 
     function update_edit(e){
         if (e.index != -1) {

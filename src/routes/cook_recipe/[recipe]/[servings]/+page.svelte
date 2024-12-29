@@ -11,7 +11,7 @@
     import { update_image_upload, update_recipe_image } from '/src/lib/save_recipe.js';
     import EditRecipe from "/src/lib/components/edit_recipe.svelte";
     import Timer from "/src/lib/components/timer.svelte";
-    import Alerts from "../../lib/components/alerts.svelte";
+    import Alerts from "/src/lib/components/alerts.svelte";
 
     
     
@@ -30,6 +30,7 @@
     let delay_timer;
     let toast = $state({info: null, success: null, error: null});
     let timers = $state({});
+    let alert = $state({show: false, msg: "", title: "", type: "warning"});
 
 
     onMount(async () => {

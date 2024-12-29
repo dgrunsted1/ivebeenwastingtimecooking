@@ -1,6 +1,6 @@
 <script>
     import SearchInput from "/src/lib/components/search.svelte";
-    import { currentUser, pb } from '/src/lib/pocketbase.js';
+    import { currentUser, pb, auth_refresh } from '/src/lib/pocketbase.js';
     import { onMount } from 'svelte';
     import Menu from "/src/lib/components/menu.svelte";
     import { get_servings } from '/src/lib/recipe_util.js';
@@ -8,6 +8,7 @@
     import { update_menu_mults, get_total_time } from '/src/lib/menu_utils.js';
     import MenuCard from "/src/lib/components/menu_card.svelte";
     import Sort from "../../lib/components/sort.svelte";
+    import Alerts from "../../lib/components/alerts.svelte";
     
     let user_menus = $state([]);
     
@@ -21,10 +22,16 @@
     let search_val = $state("");
     
     let no_results_found = $state(false);
+    let alert = $state({show: false, msg: "", title: "", type: "warning"});
 
     onMount(async () => {
         if (!$currentUser) window.location.href = "/login";
-        else await pb.collection('users').authRefresh();
+        else{
+            const result = await auth_refresh;
+            if (result.error){
+                show_error(e.message);
+            }
+        }
         const result_list = await pb.collection('menus').getList(1, 250, {
             filter: `user="${$currentUser.id}" && recipes:length > 0`,
             expand: `recipes,recipes.ingr_list`,
@@ -34,6 +41,12 @@
         loading = false;
     });
 
+    function show_error(title){
+        alert.title = title;
+        alert.type = "error";
+        alert.show = true;
+    }
+    
     function show_menu_modal(e){
         const is_mobile = (window.getComputedStyle(document.getElementById("desktop_menu")).display == "none") ? true : false;
         let id = e.id;

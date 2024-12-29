@@ -45,6 +45,12 @@
         }
     });
 
+    function show_error(title){
+        alert.title = title;
+        alert.type = "error";
+        alert.show = true;
+    }
+    
     async function fetch_recipe(e){
         if (!$currentUser.verified){
             show_alert("Please verify your email to add recipes", "error", "Please verify your email");
