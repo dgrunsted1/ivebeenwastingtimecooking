@@ -1,5 +1,4 @@
 <script>
-    import { createEventDispatcher, onMount } from 'svelte';
     import { get_grocery_list } from '/src/lib/merge_ingredients.js';
     import { get_servings } from '/src/lib/recipe_util.js';
     import { get_total_time, format_date } from '/src/lib/menu_utils.js';
@@ -7,24 +6,25 @@
 
 
     let { 
-            menu = $bindable()
+            menu = $bindable(),
+            delete_menu,
+            card_click
         } = $props();
 
-    let dispatch = createEventDispatcher();
     
-    const delete_menu = (e) => {
+    const handle_delete = (e) => {
         e.stopPropagation();
-        dispatch("delete_menu", {id: menu.id})
+        delete_menu({id: menu.id});
     }
 
-    const card_click = (e) => {
+    const handle_click = (e) => {
         e.stopPropagation();
-        dispatch("card_click", {id: menu.id})
+        card_click({id: menu.id});
     }
 </script>
 {#if menu?.expand?.recipes}
     <!-- svelte-ignore a11y_no_static_element_interactions-->
-    <div id={menu.id} class="card md:card-side card-bordered border-primary bg-base-200 h-24 my-1.5 mx-1 cursor-pointer" onclick={card_click} onkeypress={card_click}>
+    <div id={menu.id} class="card md:card-side card-bordered border-primary bg-base-200 h-24 my-1.5 mx-1 cursor-pointer" onclick={handle_click} onkeypress={handle_click}>
         <figure class="h-24 w-full md:w-2/3 flex overflow-hidden">
             {#each menu.expand.recipes.slice(0,6) as recipe, j}
                 {#if menu.expand.recipes[j].image}
@@ -46,7 +46,7 @@
                 </div>
             </div>
             <div class="flex conten-center items-center">
-                <button id={menu.id} class="btn btn-sm p-1 btn-accent"  onclick={delete_menu}><DeleteIcon/></button>
+                <button id={menu.id} class="btn btn-sm p-1 btn-accent"  onclick={handle_delete}><DeleteIcon/></button>
             </div>
         </div>
     </div>

@@ -1,14 +1,12 @@
 <script>
-  import { run } from 'svelte/legacy';
-
-    import { onMount, onDestroy, createEventDispatcher } from "svelte";
+    import { onDestroy } from "svelte";
   
   /**
    * @typedef {Object} Props
    * @property {number} [threshold]
    * @property {boolean} [horizontal]
    * @property {any} elementScroll
-   * @property {boolean} [hasMore]
+   * @property {boolean} [has_more]
    */
 
   /** @type {Props} */
@@ -16,10 +14,10 @@
     threshold = 0,
     horizontal = false,
     elementScroll,
-    hasMore = true
+    has_more = true,
+    load_more
   } = $props();
   
-    const dispatch = createEventDispatcher();
     let isLoadMore = false;
     let component = $state();
   
@@ -32,8 +30,8 @@
         : e.target.scrollHeight - e.target.clientHeight - e.target.scrollTop;
   
       if (offset <= threshold) {
-        if (!isLoadMore && hasMore) {
-          dispatch("loadMore");
+        if (!isLoadMore && has_more) {
+          load_more();
         }
         isLoadMore = true;
       } else {

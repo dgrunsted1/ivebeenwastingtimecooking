@@ -1,13 +1,15 @@
 <script>
     import EditIcon from "/src/lib/icons/EditIcon.svelte";
-    import { createEventDispatcher,onMount } from 'svelte';
     import ThumbUp from "/src/lib/icons/ThumbUp.svelte";
     import Heart from "/src/lib/icons/Heart.svelte";
     import { update_fav_made } from '/src/lib/save_recipe.js';
 
 
-    let { recipe = $bindable() } = $props();
-    let dispatch = createEventDispatcher();
+    let { 
+        recipe = $bindable(),
+        update_recipe,
+        edit_recipe
+    } = $props();
 
 
     function get_local_time(utc_code){
@@ -18,21 +20,21 @@
     }
 
     function edit_groceries(){
-        dispatch("edit_recipe");
+        edit_recipe();
     }
 
     async function update_fav(e){
         e.stopPropagation();
         const val = !recipe.favorite;
         const result = await update_fav_made(recipe.id, "favorite", val);
-        dispatch("update_recipe", {recipe: result});
+        update_recipe({recipe: result});
     }
 
     async function update_made(e){
         e.stopPropagation();
         const val = !recipe.made;
         const result = await update_fav_made(recipe.id, "made", val);
-        dispatch("update_recipe", {recipe: result});
+        update_recipe({recipe: result});
     }
 </script>
 

@@ -352,7 +352,7 @@
 
     async function update_search(e){
         refresh_loading = true;
-        search_val = e.detail.val;
+        search_val = e.val;
         clearTimeout(delay_timer);
         delay_timer = setTimeout(async () => {
             page = 1; 
@@ -367,7 +367,7 @@
     }
 
     const cook_recipe = (e) => {
-        let recipe = data.filter(recipe => recipe.id == e.detail.id)[0];
+        let recipe = data.filter(recipe => recipe.id == e.id)[0];
         window.location = `/cook_recipe/${recipe.url_id}/${recipe.servings}`
     }
 
@@ -417,7 +417,7 @@
         <div class="flex flex-col w-full md:max-w-[1000px] space-y-1 md:space-y-2 content-center">
             <div class="hidden md:flex justify-between items-center mx-1">
                 <SearchInput 
-                    on:update_search={update_search}
+                    {update_search}
                 />
                 <div class="mx-1 text-xs md:text-base">{(total_recipes_num > max_results) ? max_results : total_recipes_num} recipes</div>
                 <div class="dropdown dropdown-top md:dropdown-bottom dropdown-end">
@@ -436,7 +436,7 @@
                             recipe={item}
                             type="recipes"
                             servings={item.servings}
-                            on:card_click={cook_recipe}
+                            card_click={cook_recipe}
                         />
                     {/each}
                     <div class="flex w-full h-full justify-center">
@@ -460,13 +460,14 @@
                     {/each}
                 {/if}
               <InfiniteScroll
-              hasMore={has_more}
-              threshold={100}
-              on:loadMore={load_more} />
+                {has_more}
+                threshold={100}
+                {load_more} 
+              />
           </ul>
           <div class="flex justify-between items-center mx-1 my-0 md:hidden">
             <SearchInput 
-                on:update_search={update_search}
+                {update_search}
             />
             <div class="mx-1 text-xs md:text-base">{(total_recipes_num > max_results) ? max_results : total_recipes_num} recipes</div>
             <div class="dropdown dropdown-top md:dropdown-bottom dropdown-end">

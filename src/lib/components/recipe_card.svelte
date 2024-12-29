@@ -1,8 +1,6 @@
 <script>
     import { pb, currentUser } from '/src/lib/pocketbase.js';
-    import { createEventDispatcher,onMount } from 'svelte';
     import { page } from '$app/stores';
-
     import Plus from "/src/lib/icons/Plus.svelte";
     import CheckMark from "/src/lib/icons/CheckMark.svelte";
     import Heart from "/src/lib/icons/Heart.svelte";
@@ -14,10 +12,15 @@
         recipe = $bindable(),
         checked = $bindable(),
         servings = $bindable(),
-        type = $bindable()
+        type = $bindable(),
+        toggle_check_box,
+        toggle_heart,
+        card_click,
+        delete_recipe,
+        toggle_thumb,
+        edit_servings
     } = $props();
 
-    let dispatch = createEventDispatcher();
     let just_copied = $state(false);
     let fave_btn = $derived(type == "today" || type == "menu");
     let check_box = $derived(type == "today" || type == "menu");
@@ -26,9 +29,9 @@
     let thumb_btn = $derived(type == "menu");
     let edit_serv = $state(type == "menu_component");
 
-    const card_click = (e) => {
+    const handle_click = (e) => {
         e.stopPropagation();
-        dispatch("card_click", {id: recipe.id})
+        card_click({id: recipe.id});
     }
 
     async function add_recipe(e){
@@ -77,39 +80,39 @@
 
     const toggle_made = (e) => {
         e.stopPropagation();
-        dispatch("toggle_check_box", {id: recipe.id})
+        toggle_check_box({id: recipe.id});
     }
 
     const toggle_favorite = (e) => {
         e.stopPropagation();
-        dispatch("toggle_heart", {id: recipe.id})
+        toggle_heart({id: recipe.id});
     }
 
-    const toggle_thumb = (e) => {
+    const handle_thumb = (e) => {
         e.stopPropagation();
-        dispatch("toggle_thumb", {id: recipe.id})
+        toggle_thumb({id: recipe.id});
     }
 
-    const delete_recipe = (e) => {
+    const handle_delete = (e) => {
         e.stopPropagation();
-        dispatch("delete_recipe", {id: recipe.id})
+        delete_recipe({id: recipe.id});
     }
 
-    const edit_servings = (e) => {
+    const handle_servings = (e) => {
         e.stopPropagation();
-        dispatch("edit_servings", {id: recipe.id, val: e.currentTarget.value});
+        edit_servings({id: recipe.id, val: e.currentTarget.value});
     }
 </script>
 
     <!-- svelte-ignore a11y_no_static_element_interactions-->
-    <div class="card card-side bg-base-200 h-24 md:h-28 card-bordered border-primary cursor-pointer mx-1" onkeydown={card_click} onclick={card_click}>
+    <div class="card card-side bg-base-200 h-24 md:h-28 card-bordered border-primary cursor-pointer mx-1" onkeydown={handle_click} onclick={handle_click}>
         <figure class="w-1/4 bg-cover bg-no-repeat bg-center" style="background-image: url('{recipe.image}')"></figure>
         <div class="card-body h-full flex flex-row p-1 w-1/2 justify-between">
             <div class="flex flex-col justify-between md:p-3 w-full">
                 <h2 id={recipe.id} class="card-title text-sm text-ellipsis overflow-hidden line-clamp-2">{recipe.title}</h2>
                 {#if edit_serv}
                     <div class="flex items-center space-x-1">
-                        <input type="text" name="servings" class="input input-xs input-bordered input-primary w-12 text-center p-0" value={servings} onblur={edit_servings}/><label for="servings" class="text-sm ">servings</label>
+                        <input type="text" name="servings" class="input input-xs input-bordered input-primary w-12 text-center p-0" value={servings} onblur={handle_servings}/><label for="servings" class="text-sm ">servings</label>
                     </div>
                 {/if}
                 <div class="flex w-full recipes-center">
@@ -159,13 +162,13 @@
             {#if fave_btn || thumb_btn}
                 <div class="flex flex-w-fit space-x-1">
                     {#if fave_btn}<button class="btn btn-xs p-1 favorite flex content-center" onclick={toggle_favorite}><Heart color={(recipe.favorite) ? "fill-primary" : "fill-neutral"}/></button>{/if}
-                    {#if thumb_btn}<button class="btn btn-xs  p-1 made flex content-center" onclick={toggle_thumb}><ThumbUp color={(recipe.made) ? "fill-primary" : "fill-neutral"}/></button>{/if}
+                    {#if thumb_btn}<button class="btn btn-xs  p-1 made flex content-center" onclick={handle_thumb}><ThumbUp color={(recipe.made) ? "fill-primary" : "fill-neutral"}/></button>{/if}
                 </div>
             {/if}
             {#if delete_btn || check_box}
                 <div class="flex w-fit space-x-2">
                     {#if check_box}<input type="checkbox" class="checkbox checkbox-primary checkbox-lg p-1" bind:checked={checked} onclick={toggle_made}>{/if}
-                    {#if delete_btn}<button class="btn btn-sm p-1 btn-accent {recipe.id} " onclick={delete_recipe}><DeleteIcon/></button>{/if}
+                    {#if delete_btn}<button class="btn btn-sm p-1 btn-accent {recipe.id} " onclick={handle_delete}><DeleteIcon/></button>{/if}
                 </div>
             {/if}
         </div>

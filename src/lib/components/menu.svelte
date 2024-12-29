@@ -1,14 +1,11 @@
 <script>
-    import { onMount, tick } from 'svelte';
+    import { onMount } from 'svelte';
     import GroceryList from "/src/lib/components/grocery_list.svelte";
     import { currentUser, pb } from '/src/lib/pocketbase';
     import { page } from '$app/stores';
     import { get_grocery_list } from '/src/lib/merge_ingredients.js';
-    import { get_servings, get_total_time } from '/src/lib/recipe_util.js';
-    import { createEventDispatcher } from 'svelte';
-    import Plus from "/src/lib/icons/Plus.svelte";
+    import { get_total_time } from '/src/lib/recipe_util.js';
     import RecipeCard from './recipe_card.svelte';
-    import { update_menu_mults } from '/src/lib/menu_utils.js';
 
     /**
      * @typedef {Object} Props
@@ -25,16 +22,17 @@
         mults = $bindable(),
         sub_recipes = $bindable(),
         menu_title = $bindable(),
-        total_servings = $bindable()
+        total_servings = $bindable(),
+        update_mult,
+        update_title,
+        remove_from_menu
     } = $props();
 
     let tab = $state("recipe_list");
     let grocery_list = $derived(get_grocery_list(menu, mults, sub_recipes));
     let total_time = $derived(get_total_time(menu));
-    const dispatch = createEventDispatcher();
     let overflow_len = ``;
     let basic_words = ['and', 'the', 'of', 'with', 'recipe'];
-    let delay_timer;
     let title_lock = $state(false);
     let save_menu_load = $state(false);
     let save_menu_today_load = $state(false);
@@ -48,7 +46,7 @@
         if (!menu_title.length || menu_title == "New Menu"){
             let title = (menu.length < 2) ? "New Menu" : generate_menu_title();
             if (title == menu_title) return;
-            dispatch("update_title", {title: title, id: id});
+            update_title({title: title, id: id});
         }
     });
 
@@ -208,8 +206,8 @@
         const menu_log_result = await pb.collection('menu_log').create(menu_log_data);
     }
 
-    function update_mult(e){
-        dispatch('update_mult', {id: e.detail.id, mult: e.detail.val});
+    function handle_mult(e){
+        update_mult({id: e.id, mult: e.val});
     }
 
     function show_subrecipe_selector(e){
@@ -217,20 +215,20 @@
         e.currentTarget.nextElementSibling.classList.remove("hidden");
     }
 
-    function remove_from_menu(e){
-        dispatch('remove_from_menu', {index: e.detail.id});
+    function handle_remove(e){
+        remove_from_menu({index: e.id});
     }
 
-    function update_title(e){
+    function handle_title(e){
         e.stopPropagation();
         title_lock = true;
-        dispatch('update_title', {title: e.currentTarget.value, id: id});
+        update_title({title: e.currentTarget.value, id: id});
     }
 </script>
 
 <div id="menu" class="h-3/4 md:h-full w-full cursor-default">
     <div class="flex items-center p-3 justify-between">
-        <input type="text" class="input input-bordered border-primary input-xs w-2/3" value={menu_title} onblur={update_title}/>
+        <input type="text" class="input input-bordered border-primary input-xs w-2/3" value={menu_title} onblur={handle_title}/>
         {#if $page.url.pathname == "/menu" || $page.url.pathname == "/profile"}
             <div class="dropdown dropdown-end">
                 <label tabindex="-1" for="save_menu" class="btn m-1 btn-primary btn-xs md:btn-sm">save menu</label>
@@ -283,8 +281,8 @@
                             recipe={recipe} 
                             servings={mults[recipe.id]}
                             type="menu_component"
-                            on:delete_recipe={remove_from_menu} 
-                            on:edit_servings={update_mult} 
+                            delete_recipe={handle_remove} 
+                            edit_servings={handle_mult} 
                         />
                         {#if recipe.sub_recipe_data}
                             <div class="collapse bg-base-200 my-3.5 mx-5 w-auto">

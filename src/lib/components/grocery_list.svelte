@@ -1,5 +1,5 @@
 <script>
-    import { createEventDispatcher, onMount, tick } from 'svelte';
+    import { onMount } from 'svelte';
     import DeleteIcon from "/src/lib/icons/DeleteIcon.svelte";
     import { page } from '$app/stores';
     import EditIcon from "/src/lib/icons/EditIcon.svelte";
@@ -14,11 +14,13 @@
     let { 
         grocery_list = $bindable([]), 
         status = $bindable(), 
-        grocery_list_id 
+        grocery_list_id,
+        update_grocery_item,
+        reset_grocery_list,
+        check_grocery_item
     } = $props();
     let edit = $state(false);
     
-    let dispatch = createEventDispatcher();
     let delay_timer;
     let view_size_mobile = $state(`h-[calc(100svh-210px)]`);
     let view_size_desktop = $state(`md:h-[calc(100svh-210px)]`);
@@ -82,21 +84,21 @@
     const check_item_handle = (e) => {
         let id = e.currentTarget.id;
         let value = e.currentTarget.checked;
-        dispatch("check_grocery_item", {id: id, value: value});
+        check_grocery_item({id: id, value: value});
     }
 
     const edit_item = (e) => {
         const id = e.currentTarget.parentNode.id;
         clearTimeout(delay_timer);
         delay_timer = setTimeout(function() {
-            dispatch("update_grocery_item", {id: id});
+            update_grocery_item({id: id});
         }, 500);
     }
 
     const reset_list = (e) => {
         let reset_list = confirm("Are you sure you want to reset your grocery list?");
         if (reset_list){
-            dispatch("reset_grocery_list");
+            reset_grocery_list();
         }
         e.srcElement.parentNode.parentNode.blur();
     }
@@ -104,7 +106,7 @@
     const uncheck_list = (e) => {
         for (let i = 0; i < grocery_list.length; i++){
             grocery_list[i].checked = false;
-            dispatch("check_grocery_item", {id: grocery_list[i].id, value: false})
+            check_grocery_item({id: grocery_list[i].id, value: false})
         }
         e.srcElement.parentNode.parentNode.blur();
     }

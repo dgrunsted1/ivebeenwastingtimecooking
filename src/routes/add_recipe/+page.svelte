@@ -117,7 +117,19 @@
             </form>
         </div>
     {:else}
-        <EditRecipe {recipe} index=0 save={true} show_alert={alert.show} {loading} on:update_recipe={() => {show_alert("Recipe Saved", "success", "Success")}}/>
+        <EditRecipe
+            {recipe}
+            index=0
+            save={true}
+            show_alert={alert.show}
+            {loading}
+            update_recipe={() => {show_alert("Recipe Saved", "success", "Success")}}
+        />
     {/if}
-    <Alerts msg={alert.msg} type={alert.type} bind:show={alert.show} title={alert.title}/>
+    <Alerts 
+        msg={alert.msg}
+        type={alert.type}
+        bind:show={alert.show}
+        title={alert.title}
+    />
 </div>

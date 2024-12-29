@@ -1,10 +1,8 @@
 <script>
-    import { createEventDispatcher, onDestroy, tick } from 'svelte';
+    import { onDestroy } from 'svelte';
     import { tweened } from 'svelte/motion';
     import { linear as easing } from 'svelte/easing';
-  
-    const dispatch = createEventDispatcher();
-  
+    
     let { countdown = $bindable() } = $props();
     let audio = $state();
   

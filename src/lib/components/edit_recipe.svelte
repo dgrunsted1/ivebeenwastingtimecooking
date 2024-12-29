@@ -2,7 +2,7 @@
     import { run, preventDefault } from 'svelte/legacy';
 
     import { currentUser, pb } from '/src/lib/pocketbase';
-    import { createEventDispatcher,onMount, tick } from 'svelte';
+    import { onMount } from 'svelte';
     import { page } from '$app/stores';
     import { save_recipe, update_image_upload } from '/src/lib/save_recipe.js';
     import { process_ingr, process_directions } from '/src/lib/process_recipe.js';
@@ -28,9 +28,10 @@
         index,
         save = $bindable(false),
         show_alert,
-        loading
+        loading,
+        update_recipe,
+        done_editing
     } = $props();
-    let dispatch = createEventDispatcher();
     let edited_recipe = $state(JSON.parse(JSON.stringify(recipe)));
     let categories = $state([]);
     
@@ -108,7 +109,7 @@
         reset_checks();
         document.getElementById("new_note").value = "";
         const recipe_result = await save_recipe(e, edited_recipe, $currentUser, document.getElementById("new_note").value);
-        dispatch("update_recipe", {recipe: recipe_result});
+        update_recipe({recipe: recipe_result});
     }
 
     function reset_checks(){
@@ -139,19 +140,6 @@
             }
         }
     }
-
-    function update_multiplier(e){
-        const servings_in_recipe = e.srcElement.parentElement.parentElement.getElementsByClassName("recipe_servings")[0].value;
-        let desired_servings = servings_in_recipe;
-        if (e.srcElement.parentElement.parentElement.getElementsByClassName("desired_servings")[0]){
-            desired_servings = e.srcElement.parentElement.parentElement.getElementsByClassName("desired_servings")[0].value;
-        }
-        dispatch("update_multiplier", {
-            multiplier: desired_servings / servings_in_recipe,
-            index: index
-        });
-    }
-
 
     function add_ingr(){
         edited_recipe.expand.ingr_list[edited_recipe.expand.ingr_list.length] = {amount: 1, unit: "", name: "", original:[""]};
@@ -231,22 +219,8 @@
         edited_recipe.directions = process_directions(dir_input.split("\n"));
     }
     
-    const done_editing = function(){
-        dispatch("done_editing");
-    }
-
-    async function update_fav(e){
-        e.stopPropagation();
-        const val = !recipe.favorite;
-        const result = await update_fav_made(recipe.id, "favorite", val);
-        dispatch("update_recipe", {recipe: result});
-    }
-
-    async function update_made(e){
-        e.stopPropagation();
-        const val = !recipe.made;
-        const result = await update_fav_made(recipe.id, "made", val);
-        dispatch("update_recipe", {recipe: result});
+    const handle_done = function(){
+        done_editing();
     }
 </script>
 
@@ -311,12 +285,12 @@
                         <div id="servings" class="flex flex-row justify-center content-center">
                             <div class="mr-1 form-control w-1/2">
                                 <label for="recipe_servings" class="mx-1 label p-0"><span class="label-text-alt p-0">servings</span></label>
-                                <input type="text" name="recipe_servings" id="recipe_servings" class="recipe_servings input input-bordered p-1 input-xs" bind:value={edited_recipe.servings} oninput={preventDefault(update_multiplier)} ondelete={preventDefault(update_multiplier)} min=1>
+                                <input type="text" name="recipe_servings" id="recipe_servings" class="recipe_servings input input-bordered p-1 input-xs" bind:value={edited_recipe.servings} min=1>
                             </div>
                             {#if $page.url.pathname == "/prep"}
                                 <div class="form-control w-1/2">
                                     <label for="recipe_servings" class="mx-1 label p-0"><span class="label-text-alt p-0">desired servings</span></label>
-                                    <input type="text" name="desired_servings" id="desired_servings" class="desired_servings input input-bordered p-1 input-xs" bind:value={edited_recipe.servings} oninput={preventDefault(update_multiplier)} ondelete={preventDefault(update_multiplier)} min=1 >
+                                    <input type="text" name="desired_servings" id="desired_servings" class="desired_servings input input-bordered p-1 input-xs" bind:value={edited_recipe.servings} min=1 >
                                 </div>
                             {/if}
                         </div>
@@ -363,7 +337,7 @@
                     </div>
                     <div class="w-full flex justify-evenly mt-1">
                         {#if edited_recipe.url}<a class="btn btn-primary btn-xs md:btn-sm" href={edited_recipe.url} target="_blank">original recipe</a>{/if}
-                        {#if $page.url.pathname != "/add_recipe"}<button class="btn btn-primary btn-xs md:btn-sm" onclick={done_editing}>done</button>{/if}
+                        {#if $page.url.pathname != "/add_recipe"}<button class="btn btn-primary btn-xs md:btn-sm" onclick={handle_done}>done</button>{/if}
                     </div>
                 </div>
             {:else}

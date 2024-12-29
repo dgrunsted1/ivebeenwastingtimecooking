@@ -159,8 +159,6 @@ export const database_sort_recipes = async function(sort_val, display_recipes){
 
 
 export const sort_menus = (user_menus, sort_val) => {
-    console.log("user_menus", user_menus);
-    console.log("sort_menus", sort_val);
     switch (sort_val) {
         case "Least Recipes":
             user_menus = user_menus.sort(compare_recipe_amounts_asc);

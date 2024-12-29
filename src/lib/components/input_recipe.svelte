@@ -24,8 +24,8 @@ function forward_input(e) {
 }
 
 function update_recipe(e){
-    recipe = e.detail.recipe;
-    multiplier = e.detail.multiplier;
+    recipe = e.recipe;
+    multiplier = e.multiplier;
     dispatch('recipe_edited', {
         items: recipe.expand.ingr_list, 
         multiplier: multiplier,
@@ -67,7 +67,10 @@ async function fetch_recipe(e){
 <div id="main" class="flex flex-col">
     
     {#if recipe}
-        <EditRecipe {recipe} {index} on:update_recipe={update_recipe}/>
+        <EditRecipe
+        {recipe}
+        {index}
+        {update_recipe}/>
     {:else}
         <div class="link">
             <form method='POST' oninput={preventDefault(fetch_recipe)}>

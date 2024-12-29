@@ -115,7 +115,7 @@
     async function update_groceries(e){
         grocery_list_status = "updating";
         for (let i = 0; i <  grocery_list.length; i++){
-            if (grocery_list[i].id = e.detail.id){
+            if (grocery_list[i].id = e.id){
                 const item_result = await update_grocery_item(grocery_list[i]);
                 break;
             }
@@ -129,7 +129,7 @@
     }
 
     async function toggle_made(e){
-        const id = e.detail.id;
+        const id = e.id;
         if (todays_menu.made){
             todays_menu.made[id] = !todays_menu.made[id];
         } else {
@@ -141,8 +141,7 @@
     }
 
     async function update_fave_queue(e){
-        const id = e.detail.id;
-        console.log(id)
+        const id = e.id;
         let favorite_val = false;
         for (let i = 0; i < todays_menu.expand.recipes.length; i++){
             if (todays_menu.expand.recipes[i].id == id){
@@ -165,12 +164,11 @@
     }
 
     const handle_check_item = async (e) => {
-        check_grocery_item(e.detail.id, e.detail.value);
+        check_grocery_item(e.id, e.value);
     }
 
     const cook_recipe = (e) => {
-        console.log("here")
-        let recipe = todays_menu.expand.recipes.filter(recipe => recipe.id == e.detail.id)[0];
+        let recipe = todays_menu.expand.recipes.filter(recipe => recipe.id == e.id)[0];
         window.location = `/cook_recipe/${recipe.url_id}/${todays_menu.servings[recipe.id]}`
     }
 </script>
@@ -219,9 +217,9 @@
                                     bind:checked={todays_menu.made[curr.id]}
                                     bind:servings={todays_menu.servings[curr.id]}
                                     type="today"
-                                    on:toggle_check_box={toggle_made}
-                                    on:toggle_heart={update_fave_queue}
-                                    on:card_click={cook_recipe}
+                                    toggle_check_box={toggle_made}
+                                    toggle_heart={update_fave_queue}
+                                    card_click={cook_recipe}
                                 />
                             {/if}
                         {/each}
@@ -238,10 +236,10 @@
                         <GroceryList 
                             {grocery_list_id} 
                             bind:grocery_list={grocery_list} 
-                            on:update_grocery_item={update_groceries} 
+                            update_grocery_item={update_groceries} 
                             bind:status={grocery_list_status}  
-                            on:reset_grocery_list={reset_list} 
-                            on:check_grocery_item={handle_check_item}
+                            reset_grocery_list={reset_list} 
+                            check_grocery_item={handle_check_item}
                         />
                     {:else} 
                         <div id="menu_loading" class="w-full flex justify-center content-center h-[calc(100svh-100px)]">

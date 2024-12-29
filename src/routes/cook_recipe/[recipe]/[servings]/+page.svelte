@@ -340,7 +340,10 @@
                         <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" onclick={() => {document.getElementById('modal_content').classList.add('hidden')}}>✕</button>
                     </form>
                     <div id="modal_content" class="hidden">
-                        <EditRecipe recipe={recipe} on:update_recipe={(e) => {recipe = e.detail.recipe}}/>
+                        <EditRecipe
+                            recipe={recipe}
+                            update_recipe={(e) => {recipe = e.recipe}}
+                        />
                     </div>
                 </div>
             </dialog>

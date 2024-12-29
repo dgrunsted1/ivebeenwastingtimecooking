@@ -1,20 +1,19 @@
 <script>
     import RecipeCard from "./recipe_card.svelte";
     import SearchInput from "./search.svelte";
-    import { createEventDispatcher } from 'svelte';
     import { pb } from '/src/lib/pocketbase';
-    import DeleteIcon from "/src/lib/icons/DeleteIcon.svelte";
-    import { onMount } from "svelte";
     import ThumbUp from "/src/lib/icons/ThumbUp.svelte";
     import Heart from "/src/lib/icons/Heart.svelte";
-    import Clear from "/src/lib/icons/Clear.svelte";
     import { update_fav_made } from '/src/lib/save_recipe.js';
     import { sort_recipes } from '/src/lib/sort.js';
 
-    const dispatch = createEventDispatcher();
     let { 
         recipes = $bindable(),
-        menu_recipes = $bindable()
+        menu_recipes = $bindable(),
+        update_edit,
+        reset_mode,
+        check_item,
+        update_recipe
     } = $props();
     const get_categories = () => {
         let out = {cuisines:[], countries:[], cats:[]};
@@ -39,10 +38,10 @@
     let loading = $state(true);
 
     function view(e) {
-            let index = e.detail.id;
+            let index = e.id;
             for (let i = 0; i < display_recipes.length; i++){
                 if (display_recipes[i].id == index){
-                    dispatch(`update_edit`, {index: index});
+                    update_edit({index: index});
                 }
             }
     }
@@ -51,10 +50,10 @@
         e.stopPropagation();
         let tmp = []
         for (let recipe of recipes){
-            if (recipe.id == e.detail.id) {
+            if (recipe.id == e.id) {
                 let delete_recipe = confirm(`Are you sure you want to delete your recipe "${recipe.title}"?`);
                 if (delete_recipe){
-                    await pb.collection('recipes').delete(e.detail.id);
+                    await pb.collection('recipes').delete(e.id);
                 }
             } else {
                 tmp.push(recipe);
@@ -216,7 +215,7 @@
                 update_selected_cats(selected_cat, clicked, type_cat);
             }
 
-            dispatch(`reset_mode`);
+            reset_mode();
         }, delay_time);
     }
 
@@ -238,29 +237,29 @@
         let val;
         
         for (let i = 0; i < recipes.length; i++){
-            if (recipes[i].id == e.detail.id){
+            if (recipes[i].id == e.id){
                 val = !recipes[i].favorite;
                 break;
             }
         }
-        const result = await update_fav_made(e.detail.id, "favorite", val);
-        dispatch("update_recipe", {recipe: result});
+        const result = await update_fav_made(e.id, "favorite", val);
+        update_recipe({recipe: result});
     }
 
     async function update_made(e){
         let val;
         for (let i = 0; i < recipes.length; i++){
-            if (recipes[i].id == e.detail.id){
+            if (recipes[i].id == e.id){
                 val = !recipes[i].made;
                 break;
             }
         }
-        const result = await update_fav_made(e.detail.id, "made", val);
-        dispatch("update_recipe", {recipe: result});
+        const result = await update_fav_made(e.id, "made", val);
+        update_recipe({recipe: result});
     }
 
-    function check_item(e){
-        dispatch("check_item", {index: e.detail.id});
+    function handle_check(e){
+        check_item({index: e.id});
     }
 
     function is_checked(id){
@@ -273,7 +272,7 @@
     }
 
     function update_search(e) {
-        search_val = e.detail.val;
+        search_val = e.val;
     }
 </script>
 <div class="hidden md:flex flex-col w-full">
@@ -292,7 +291,7 @@
     </div>
     <div class="form-control flex flex-row justify-between w-full items-center">
         <SearchInput 
-            on:update_search={update_search}
+            {update_search}
         />
         <p class="mx-5 text-xs md:text-sm">{display_recipes ? display_recipes.length+" Recipes" : ""}</p>
         <div class="dropdown dropdown-top md:dropdown-bottom dropdown-end">
@@ -314,11 +313,11 @@
             checked={is_checked(display_recipes[i].id)} 
             servings={display_recipes[i].servings}
             type="menu"
-            on:toggle_check_box={check_item} 
-            on:toggle_heart={update_fav}
-            on:delete_recipe={delete_recipe}
-            on:toggle_thumb={update_made}
-            on:card_click={view}
+            toggle_check_box={handle_check} 
+            toggle_heart={update_fav}
+            delete_recipe={delete_recipe}
+            toggle_thumb={update_made}
+            card_click={view}
         />
         {/each}
         <div class="flex justify-center m-3">
@@ -338,7 +337,7 @@
 <div class="flex flex-col md:hidden">
     <div class="form-control flex flex-row justify-between w-full items-center">
         <SearchInput 
-            on:update_search={update_search}
+            {update_search}
         />
 
         <p class="mx-5 text-xs md:text-sm">{display_recipes ? display_recipes.length+" Recipes" : ""}</p>

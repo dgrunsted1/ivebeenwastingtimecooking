@@ -44,8 +44,8 @@
     });
 
     function update_edit(e){
-        if (e.detail.index != -1) {
-            edit_id = e.detail.index;
+        if (e.index != -1) {
+            edit_id = e.index;
             my_modal_3.showModal();
             mode = "edit";
         }else {
@@ -60,8 +60,7 @@
     }
 
     function update_mult(e){
-        console.log(e.detail);
-        mults[e.detail.id] = e.detail.mult;
+        mults[e.id] = e.mult;
         $state.snapshot(mults);
     }
 
@@ -69,7 +68,7 @@
 
     function check_item(e){
         for (let recipe of user_recipes){
-            if (recipe.id == e.detail.index){
+            if (recipe.id == e.index){
                 recipe.checked = !recipe.checked;
                 if (recipe.checked) mults[recipe.id] = recipe.servings;
                 else delete mults[recipe.id];
@@ -78,14 +77,14 @@
     }
 
     function update_title(e){
-        menu_title = e.detail.title;
+        menu_title = e.title;
     }
 
     function update_recipe(e){
         for (let i = 0; i < user_recipes.length; i++){
-            if (user_recipes[i].id == e.detail.recipe.id){
-                e.detail.recipe.checked = user_recipes[i].checked;
-                user_recipes[i] = e.detail.recipe;
+            if (user_recipes[i].id == e.recipe.id){
+                e.recipe.checked = user_recipes[i].checked;
+                user_recipes[i] = e.recipe;
                 break;
             }
         }
@@ -109,10 +108,10 @@
                     <RecipeList 
                         recipes={user_recipes} 
                         menu_recipes={menu_recipes}
-                        on:update_edit={update_edit} 
-                        on:reset_mode={reset_mode} 
-                        on:check_item={check_item} 
-                        on:update_recipe={update_recipe}
+                        {update_edit} 
+                        {reset_mode} 
+                        {check_item}
+                        {update_recipe}
                     />
                 </div>
                 <!-- --------------
@@ -140,9 +139,9 @@
                                 bind:mults={mults} 
                                 bind:menu_title={menu_title} 
                                 {total_servings}
-                                on:update_mult={update_mult} 
-                                on:update_title={update_title}
-                                on:remove_from_menu={check_item}
+                                {update_mult} 
+                                {update_title}
+                                remove_from_menu={check_item}
                             />
                         {:else}
                             <div class="flex flex-col justify-center items-center space-y-5 mx-2 md:mx-auto p-5 rounded-md shadow-md  md:text-xl max-w-5xl">
@@ -162,9 +161,9 @@
                             bind:mults={mults}
                             bind:menu_title={menu_title} 
                             {total_servings}
-                            on:update_mult={update_mult}
-                            on:update_title={update_title}
-                            on:remove_from_menu={check_item}
+                            {update_mult}
+                            {update_title}
+                            remove_from_menu={check_item}
                         />
                     {:else}
                         <div class="flex h-full justify-center w-full items-center">
@@ -181,9 +180,17 @@
                             </form>
                             {#if edit_recipe}
                                 {#if edit_modal_recipe}
-                                    <EditRecipe recipe={edit_recipe} on:update_edit={update_edit} on:update_recipe={update_recipe} on:done_editing={() => edit_modal_recipe = false}/>
+                                    <EditRecipe
+                                        recipe={edit_recipe}
+                                        {update_recipe}
+                                        done_editing={() => edit_modal_recipe = false}
+                                    />
                                 {:else}
-                                    <DisplayRecipe recipe={edit_recipe} on:update_recipe={update_recipe} on:edit_recipe={()=>{edit_modal_recipe = true}}/>
+                                    <DisplayRecipe
+                                        recipe={edit_recipe}
+                                        {update_recipe}
+                                        edit_recipe={()=>{edit_modal_recipe = true}}
+                                    />
                                 {/if}
                             {/if}
                         </div>

@@ -100,11 +100,11 @@
     }
 
     function update_mult(e){
-        rec_mults[e.detail.id] = e.detail.mult;
+        rec_mults[e.id] = e.mult;
     }
 
     function update_title(e){
-        menu_title = e.detail.title;
+        menu_title = e.title;
     }
 </script>
 
@@ -220,8 +220,8 @@
                             bind:menu_title={menu_title} 
                             menu={menu_rec} 
                             mults={rec_mults} 
-                            on:update_mult={update_mult} 
-                            on:update_title={update_title} 
+                            {update_mult} 
+                            {update_title} 
                             {total_servings}/>
                     {/if}
                 {/if}

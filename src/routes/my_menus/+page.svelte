@@ -37,7 +37,7 @@
 
     function show_menu_modal(e){
         const is_mobile = (window.getComputedStyle(document.getElementById("desktop_menu")).display == "none") ? true : false;
-        let id = e.detail.id;
+        let id = e.id;
         for (let i = 0; i < user_menus.length; i++){
             if (user_menus[i].id == id){
                 modal_menu = user_menus[i];
@@ -51,12 +51,12 @@
         let tmp_menus = [];
         let menu;
         for (let i = 0; i < user_menus.length; i++){
-            if (user_menus[i].id != e.detail.id) tmp_menus.push(user_menus[i]);
+            if (user_menus[i].id != e.id) tmp_menus.push(user_menus[i]);
             else menu = user_menus[i];
         }
         if (menu && confirm(`Are you sure you want to delete your "${menu.title}" menu?`)) {
             const resultList = await pb.collection('grocery_lists').getList(1, 50, {
-                filter: `menu = "${e.detail.id}"`,
+                filter: `menu = "${e.id}"`,
             });
             if (resultList.items.length > 0){
                 for (let i = 0; i < resultList.items.length; i++){
@@ -64,14 +64,14 @@
                 }
             }
             const resultListLog = await pb.collection('menu_log').getList(1, 50, {
-                filter: `menu = "${e.detail.id}"`,
+                filter: `menu = "${e.id}"`,
             });
             if (resultListLog.items.length > 0){
                 for (let i = 0; i < resultListLog.items.length; i++){
                     await pb.collection('menu_log').update(resultListLog.items[i].id, { "menu": null });
                 }
             }
-            await pb.collection('menus').delete(e.detail.id);
+            await pb.collection('menus').delete(e.id);
             user_menus = tmp_menus;
         }
     }
@@ -134,7 +134,7 @@
 
     async function update_mult(e){
         const newServings = { ...modal_menu.servings };
-        newServings[e.detail.id] = e.detail.mult;
+        newServings[e.id] = e.mult;
         modal_menu.servings = await update_menu_mults(modal_menu.id, newServings);
     }
 
@@ -143,7 +143,7 @@
         let tmp = []
         let delete_msg = "";
         for (let recipe of modal_menu.expand.recipes){
-            if (recipe.id == e.detail.index) {
+            if (recipe.id == e.index) {
                 delete_msg = `Are you sure you want to remove "${recipe.title}" from "${modal_menu.title}"?`;
             } else {
                 tmp.push(recipe);
@@ -152,7 +152,7 @@
 
         let delete_recipe = confirm(delete_msg);
         if (delete_recipe){
-            const result = await pb.collection('menus').update(modal_menu.id, {"recipes-": e.detail.index}, {expand: `recipes,recipes.ingr_list`});
+            const result = await pb.collection('menus').update(modal_menu.id, {"recipes-": e.index}, {expand: `recipes,recipes.ingr_list`});
             for (let i = 0; i < user_menus.length; i++){
                 if (user_menus[i].id == modal_menu.id){
                     user_menus[i] = result;
@@ -163,7 +163,7 @@
     }
 
     async function update_title(e){
-        const result = await pb.collection('menus').update(e.detail.id, {"title": e.detail.title}, {expand: `recipes,recipes.ingr_list`});
+        const result = await pb.collection('menus').update(e.id, {"title": e.title}, {expand: `recipes,recipes.ingr_list`});
         for (let i = 0; i < user_menus.length; i++){
             if (user_menus[i].id == result.id){
                 user_menus[i] = result;
@@ -172,7 +172,7 @@
     }
 
     async function update_search(e) {
-        search_val = e.detail.val;
+        search_val = e.val;
         await search();
     }
 
@@ -198,7 +198,7 @@
         <div class="hidden md:flex justify-between mx-4">
             <div class="flex w-fit space-x-6 items-center">
                 <SearchInput 
-                    on:update_search={update_search}
+                    {update_search}
                 />
                 <div class="w-full flex space-x-1 text-xs"><div id="user_menus_length">{user_menus.length}</div><div>Menus</div></div>
             </div>
@@ -225,8 +225,8 @@
                 {#each user_menus as curr, i}
                     <MenuCard
                         bind:menu={user_menus[i]}
-                        on:delete_menu={delete_menu}
-                        on:card_click={show_menu_modal}
+                        {delete_menu}
+                        card_click={show_menu_modal}
                     />
                 {/each}
             {/if}
@@ -234,7 +234,7 @@
         <div class="flex md:hidden justify-between">
             <div class="flex w-fit space-x-6 items-center">
                 <SearchInput 
-                    on:update_search={update_search}
+                    {update_search}
                 />
                 <div class="w-full flex space-x-1 text-xs"><div id="user_menus_length">{user_menus.length}</div><div>Menus</div></div>
             </div>
@@ -264,9 +264,9 @@
                         id={modal_menu.id} 
                         bind:menu_title={modal_menu.title} 
                         {total_servings} 
-                        on:update_mult={update_mult}
-                        on:remove_from_menu={remove_from_menu}
-                        on:update_title={update_title}
+                        {update_mult}
+                        {remove_from_menu}
+                        {update_title}
                     />
                 </form>
                 <form method="dialog" class="modal-backdrop">
@@ -293,9 +293,9 @@
                 sub_recipes={modal_menu.sub_recipes} 
                 id={modal_menu.id}
                 {total_servings}
-                on:update_mult={update_mult}
-                on:remove_from_menu={remove_from_menu}
-                on:update_title={update_title}
+                {update_mult}
+                {remove_from_menu}
+                {update_title}
             />
         {/if}
     </div>
