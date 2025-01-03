@@ -1,8 +1,7 @@
 <script>
     import { preventDefault } from 'svelte/legacy';
-
     import EditRecipe from "/src/lib/components/edit_recipe.svelte";
-    import { currentUser, pb } from '/src/lib/pocketbase.js';
+    import { currentUser, pb, auth_refresh } from '/src/lib/pocketbase.js';
     import { process_ingr, process_directions } from '/src/lib/process_recipe.js';
     import { deserialize } from '$app/forms';
     import { onMount } from "svelte";
@@ -38,9 +37,20 @@
 
     onMount(async () => {
         if (!$currentUser) window.location.href = "/login";
-        else await pb.collection('users').authRefresh();
+        else {
+            const result = await auth_refresh;
+            if (result.error){
+                show_error(e.message);
+            }
+        }
     });
 
+    function show_error(title){
+        alert.title = title;
+        alert.type = "error";
+        alert.show = true;
+    }
+    
     async function fetch_recipe(e){
         if (!$currentUser.verified){
             show_alert("Please verify your email to add recipes", "error", "Please verify your email");

@@ -1,10 +1,10 @@
 <script>
     import { onMount } from 'svelte';
-    import { pb, currentUser } from '/src/lib/pocketbase.js';
+    import { pb, currentUser, auth_refresh } from '/src/lib/pocketbase.js';
     import CheckMark from "/src/lib/icons/CheckMark.svelte";
     import { get_servings } from '/src/lib/recipe_util.js';
     import Menu from "/src/lib/components/menu.svelte";
-    import { page } from '$app/stores';
+    import Alerts from "../../lib/components/alerts.svelte";
 
     let main_recipes = [];
     let dessert_recipes = [];
@@ -27,13 +27,17 @@
     });
     let total_servings = $derived(get_servings(menu_rec, {}, rec_mults));
     let menu_title = $state("New Menu");
+    let alert = $state({show: false, msg: "", title: "", type: "warning"});
 
     onMount(async () => {
         if (!$currentUser){
             window.location.href = "/login";
             return;
         } else {
-            await pb.collection('users').authRefresh();
+            const result = await auth_refresh;
+            if (result.error){
+                show_error(e.message);
+            }
         }
 
         loading.user = false;
@@ -52,6 +56,12 @@
         rec_mults = get_mults();
         loading.menu = false;
     });
+
+    function show_error(title){
+        alert.title = title;
+        alert.type = "error";
+        alert.show = true;
+    }
 
     function get_mults(){
         let output = {};
@@ -228,4 +238,5 @@
             </div>
         </div>
     </div>
+    <Alerts msg={alert.msg} type={alert.type} bind:show={alert.show} title={alert.title}/>
 </div>

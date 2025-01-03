@@ -2,7 +2,7 @@
     import { stopPropagation } from 'svelte/legacy';
 
     import { onMount } from 'svelte';
-    import { currentUser, pb } from '/src/lib/pocketbase.js';
+    import { currentUser, pb, auth_refresh } from '/src/lib/pocketbase.js';
     import GroceryList from "/src/lib/components/grocery_list.svelte";
     import { get_grocery_list, groupBySimilarity } from '/src/lib/merge_ingredients.js'
     import { create_grocery_list, update_made, log_made, check_grocery_item, update_grocery_item } from '/src/lib/groceries.js'
@@ -10,6 +10,7 @@
     import SubTask from "/src/lib/icons/subtask.svelte";
     import { update_fave } from '/src/lib/save_recipe.js';
     import RecipeCard from "../../lib/components/recipe_card.svelte";
+    import Alerts from "../../lib/components/alerts.svelte";
 
 
 
@@ -25,12 +26,18 @@
     let tab = $state("grocery_list");
     let sub_recipe_ids = $state([]);
     let recipes_ready = $state([]);
+    let alert = $state({show: false, msg: "", title: "", type: "warning"});
     
 
 
     onMount(async () => {
         if (!$currentUser) window.location.href = "/login";
-        else await pb.collection('users').authRefresh();
+        else{
+            const result = await auth_refresh;
+            if (result.error){
+                show_error(e.message);
+            }
+        }
         const result_list = await pb.collection('menus').getList(1, 1, {
             filter: `user="${$currentUser.id}" && today=True`,
             expand: `recipes,recipes.notes,recipes.ingr_list, grocery_list, grocery_list.items, grocery_list.items.ingrs`
@@ -77,6 +84,12 @@
         loading = false;
     });
     
+    function show_error(title){
+        alert.title = title;
+        alert.type = "error";
+        alert.show = true;
+    }
+
     function update_recipes_ready(){
         recipes_ready = [];
         for (let recipe of todays_menu.expand.recipes) {
@@ -255,4 +268,5 @@
             <button id="recipe_list" class="tab tab-xs {(tab == "recipe_list") ? "tab-active" : ""}" onclick={switch_tab}>Recipes</button>
             <button id="grocery_list" class="tab {(tab == "grocery_list") ? "tab-active" : ""} tab-xs" onclick={switch_tab}>Grocery List</button>
         </div>
+        <Alerts msg={alert.msg} type={alert.type} bind:show={alert.show} title={alert.title}/>
     </div>

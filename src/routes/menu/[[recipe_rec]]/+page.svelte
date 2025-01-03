@@ -1,12 +1,14 @@
 <script>
     import { onMount } from 'svelte';
-    import { currentUser, pb } from '/src/lib/pocketbase.js';
+    import { currentUser, pb, auth_refresh } from '/src/lib/pocketbase.js';
     import { get_servings, get_total_time } from '/src/lib/recipe_util.js';
     import EditRecipe from "/src/lib/components/edit_recipe.svelte";
     import DisplayRecipe from "/src/lib/components/display_recipe.svelte";
     import RecipeList from "/src/lib/components/recipe_list.svelte";
     import Menu from "/src/lib/components/menu.svelte";
     import { page } from '$app/stores';
+    import Alerts from "/src/lib/components/alerts.svelte";
+
 
     let user_recipes = $state([]);
     
@@ -19,12 +21,17 @@
     let loading = $state(true);
     let total_servings = $derived(get_servings(menu_recipes, {}, mults));
     let menu_title = $state("New Menu");
-    
+    let alert = $state({show: false, msg: "", title: "", type: "warning"});
 
 
     onMount(async () => {
         if (!$currentUser) window.location.href = "/login";
-        else await pb.collection('users').authRefresh();
+        else{
+            const result = await auth_refresh;
+            if (result.error){
+                show_error(e.message);
+            }
+        }
         const result_list = await pb.collection('recipes').getList(1, 250, {
             filter: `user="${$currentUser.id}"`,
             expand: `notes, ingr_list`,
@@ -42,6 +49,12 @@
         }
         loading = false;
     });
+
+    function show_error(title){
+        alert.title = title;
+        alert.type = "error";
+        alert.show = true;
+    }
 
     function update_edit(e){
         if (e.index != -1) {
@@ -204,6 +217,7 @@
                 </div>
             </div>
         {/if}
+        <Alerts msg={alert.msg} type={alert.type} bind:show={alert.show} title={alert.title}/>
 </div>
 
 

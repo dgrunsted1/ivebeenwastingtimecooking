@@ -1,9 +1,7 @@
 <script>
-  import { createBubbler, preventDefault } from 'svelte/legacy';
+  import { currentUser, pb, auth_refresh } from '/src/lib/pocketbase.js';
   import Alerts from "../../lib/components/alerts.svelte";
 
-  const bubble = createBubbler();
-    import { currentUser, pb } from '/src/lib/pocketbase.js';
     import { onMount } from 'svelte';
 
     let alert = $state({show: false, msg: "", title: "", type: "warning"});
@@ -11,16 +9,31 @@
     let password = $state();
 
     onMount(async () => {
-      if ($currentUser) await pb.collection('users').authRefresh();
+      if ($currentUser){
+        const result = await auth_refresh;
+        if (result.error){
+          show_error(e.message);
+        }
+      }
     })
     
     async function login() {
-      const user = await pb.collection('users').authWithPassword(username, password);
-      window.location = document.referrer;
+      try {
+        const user = await pb.collection('users').authWithPassword(username, password);
+        window.location = document.referrer;
+      } catch (e) {
+        show_error(e.message);
+      }
     }
   
     function signOut() {
       pb.authStore.clear();
+    }
+
+    function show_error(title){
+      alert.title = title;
+      alert.type = "error";
+      alert.show = true;
     }
   </script>
   <svelte:head>
@@ -39,7 +52,7 @@
               <button class="btn" onclick={signOut}>Sign Out</button>
             </div>
           {:else}
-            <form onsubmit={preventDefault(bubble('submit'))} class="m-auto flex flex-col">
+            <form class="m-auto flex flex-col">
               <input
                 placeholder="Username or Email"
                 type="text"

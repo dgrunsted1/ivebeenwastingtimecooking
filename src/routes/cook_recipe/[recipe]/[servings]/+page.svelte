@@ -1,7 +1,7 @@
 <script>
     import { stopPropagation } from 'svelte/legacy';
 
-    import { currentUser, pb } from '/src/lib/pocketbase.js';
+    import { currentUser, pb, auth_refresh } from '/src/lib/pocketbase.js';
     import ThumbUp from "/src/lib/icons/ThumbUp.svelte";
     import Heart from "/src/lib/icons/Heart.svelte";
     import Edit from "/src/lib/icons/EditIcon.svelte";
@@ -11,6 +11,7 @@
     import { update_image_upload, update_recipe_image } from '/src/lib/save_recipe.js';
     import EditRecipe from "/src/lib/components/edit_recipe.svelte";
     import Timer from "/src/lib/components/timer.svelte";
+    import Alerts from "/src/lib/components/alerts.svelte";
 
     
     
@@ -29,10 +30,16 @@
     let delay_timer;
     let toast = $state({info: null, success: null, error: null});
     let timers = $state({});
+    let alert = $state({show: false, msg: "", title: "", type: "warning"});
 
 
     onMount(async () => {
-        if ($currentUser) await pb.collection('users').authRefresh();
+        if ($currentUser){
+            const result = await auth_refresh;
+            if (result.error){
+                show_error(e.message);
+            }
+        }
         if ($currentUser && $currentUser.id == recipe.user) {
             user_logged_in = true;
 
@@ -201,6 +208,11 @@
         return timeString.trim();
     }
 
+    function show_error(title){
+        alert.title = title;
+        alert.type = "error";
+        alert.show = true;
+    }
 </script>
 
     <svelte:head>
@@ -318,6 +330,7 @@
             {/if}
         </div>
     </div>
+    <Alerts msg={alert.msg} type={alert.type} bind:show={alert.show} title={alert.title}/>
     <div class="toast toast-center">
         {#if toast.info}
             <div class="alert alert-info">
