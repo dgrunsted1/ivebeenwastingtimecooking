@@ -9,6 +9,7 @@
     import MenuCard from "/src/lib/components/menu_card.svelte";
     import Sort from "../../lib/components/sort.svelte";
     import Alerts from "../../lib/components/alerts.svelte";
+    import NoteCard from "../../lib/components/note_card.svelte";
     
     let user_menus = $state([]);
     
@@ -205,100 +206,96 @@
     <meta property="og:type" content="website" />
 </svelte:head>
 
-<div class="flex">
-    <div class="flex flex-col w-full md:w-1/2">
-        <div class="hidden md:flex justify-between mx-4">
-            <div class="flex w-fit space-x-6 items-center">
-                <SearchInput 
-                    {update_search}
-                />
-                <div class="w-full flex space-x-1 text-xs"><div id="user_menus_length">{user_menus.length}</div><div>Menus</div></div>
-            </div>
-            <Sort
-                {sort_val}
-                {update_sort},
-                type="menu"  
-            />
-        </div>
+<div class="flex flex-col w-full">
     {#if user_menus.length > 0 || loading || no_results_found}
-        <div id="menus" class="h-[calc(100svh-55px)] md:h-[calc(100svh-90px)] overflow-y-auto rounded-md md:border-none w-full space-y-2">
-            {#if loading}
-                <div class="text-center flex flex-col justify-center items-center space-y-5 mx-2 md:mx-auto md:text-4xl h-full w-full"><span class="loading loading-bars loading-lg"></span></div>
-            {:else if no_results_found}
-                <div class="flex flex-col justify-center items-center space-y-5 bg-base-200 mx-2 md:mx-auto p-16 border-2 border-base-300 rounded-md shadow-md  md:text-4xl mt-[30vh] max-w-md">
-                    <div class="w-full flex justify-center content-center h-full">
-                        no results
-                    </div>
+        <div class="flex flex-col w-full md:w-1/2">
+            <div class="hidden md:flex justify-between mx-4">
+                <div class="flex w-fit space-x-6 items-center">
+                    <SearchInput 
+                        {update_search}
+                    />
+                    <div class="w-full flex space-x-1 text-xs"><div id="user_menus_length">{user_menus.length}</div><div>Menus</div></div>
                 </div>
-            {:else}
-                {#each user_menus as curr, i}
-                    <MenuCard
-                        bind:menu={user_menus[i]}
-                        {delete_menu}
-                        card_click={show_menu_modal}
-                    />
-                {/each}
-            {/if}
-        </div>
-        <div class="flex md:hidden justify-between">
-            <div class="flex w-fit space-x-6 items-center">
-                <SearchInput 
-                    {update_search}
+                <Sort
+                    {sort_val}
+                    {update_sort},
+                    type="menu"  
                 />
-                <div class="w-full flex space-x-1 text-xs"><div id="user_menus_length">{user_menus.length}</div><div>Menus</div></div>
             </div>
-            
-            <Sort
-                {sort_val}
-                {update_sort}
-                type="menu" 
-            />
-        </div>
-        <dialog id="my_modal_2" class="modal">
-            {#if modal_menu.id}
-                <form method="dialog" class="modal-box max-w-full md:w-2/3 p-1">
-                    <button class="btn btn-xs p-2 flex content-center fixed top-1 right-1">x</button>
-                    <Menu 
-                        title={modal_menu.title} 
-                        bind:menu={modal_menu.expand.recipes} 
-                        bind:mults={modal_menu.servings} 
-                        sub_recipes={modal_menu.sub_recipes} 
-                        id={modal_menu.id} 
-                        bind:menu_title={modal_menu.title} 
-                        {total_servings} 
-                        {update_mult}
-                        {remove_from_menu}
-                        {update_title}
+            <div id="menus" class="h-[calc(100svh-55px)] md:h-[calc(100svh-90px)] overflow-y-auto rounded-md md:border-none w-full space-y-2">
+                {#if loading}
+                    <div class="text-center flex flex-col justify-center items-center space-y-5 mx-2 md:mx-auto md:text-4xl h-full w-full"><span class="loading loading-bars loading-lg"></span></div>
+                {:else if no_results_found}
+                    <div class="flex flex-col justify-center items-center space-y-5 bg-base-200 mx-2 md:mx-auto p-16 border-2 border-base-300 rounded-md shadow-md  md:text-4xl mt-[30vh] max-w-md">
+                        <div class="w-full flex justify-center content-center h-full">
+                            no results
+                        </div>
+                    </div>
+                {:else}
+                    {#each user_menus as curr, i}
+                        <MenuCard
+                            bind:menu={user_menus[i]}
+                            {delete_menu}
+                            card_click={show_menu_modal}
+                        />
+                    {/each}
+                {/if}
+            </div>
+            <div class="flex md:hidden justify-between">
+                <div class="flex w-fit space-x-6 items-center">
+                    <SearchInput 
+                        {update_search}
                     />
-                </form>
-                <form method="dialog" class="modal-backdrop">
-                    <button>close</button>
-                </form>
-            {/if}
-        </dialog>
-    {:else}
-        <div class="flex flex-col justify-center items-center space-y-5 bg-base-200 mx-2 md:mx-auto p-16 border-2 border-base-300 rounded-md shadow-md  md:text-4xl mt-[30vh] max-w-5xl">
-            <h2>You have no menus yet</h2>
-            <div class="flex flex-row items-center space-x-1">
-                <h3>Click </h3><a href="/menu" class="btn btn-primary btn-sm p-2 flex content-center">here</a><h3> to create a new menu</h3>
+                    <div class="w-full flex space-x-1 text-xs"><div id="user_menus_length">{user_menus.length}</div><div>Menus</div></div>
+                </div>
+                
+                <Sort
+                    {sort_val}
+                    {update_sort}
+                    type="menu" 
+                />
             </div>
+            <dialog id="my_modal_2" class="modal">
+                {#if modal_menu.id}
+                    <form method="dialog" class="modal-box max-w-full md:w-2/3 p-1">
+                        <button class="btn btn-xs p-2 flex content-center fixed top-1 right-1">x</button>
+                        <Menu 
+                            title={modal_menu.title} 
+                            bind:menu={modal_menu.expand.recipes} 
+                            bind:mults={modal_menu.servings} 
+                            sub_recipes={modal_menu.sub_recipes} 
+                            id={modal_menu.id} 
+                            bind:menu_title={modal_menu.title} 
+                            {total_servings} 
+                            {update_mult}
+                            {remove_from_menu}
+                            {update_title}
+                        />
+                    </form>
+                    <form method="dialog" class="modal-backdrop">
+                        <button>close</button>
+                    </form>
+                {/if}
+            </dialog>
         </div>
+        <div id="desktop_menu" class="hidden md:flex w-1/2">
+            {#if modal_menu.id}
+                <Menu 
+                    title={modal_menu.title} 
+                    bind:menu={modal_menu.expand.recipes} 
+                    bind:mults={modal_menu.servings} 
+                    bind:menu_title={modal_menu.title} 
+                    sub_recipes={modal_menu.sub_recipes} 
+                    id={modal_menu.id}
+                    {total_servings}
+                    {update_mult}
+                    {remove_from_menu}
+                    {update_title}
+                />
+            {/if}
+        </div>
+    {:else}
+        <NoteCard msg={`No menus found`} action={() => window.location.href = `/menu`} btn_name={"create a new menu"} />
     {/if}
-    </div>
-    <div id="desktop_menu" class="hidden md:flex w-1/2">
-        {#if modal_menu.id}
-            <Menu 
-                title={modal_menu.title} 
-                bind:menu={modal_menu.expand.recipes} 
-                bind:mults={modal_menu.servings} 
-                bind:menu_title={modal_menu.title} 
-                sub_recipes={modal_menu.sub_recipes} 
-                id={modal_menu.id}
-                {total_servings}
-                {update_mult}
-                {remove_from_menu}
-                {update_title}
-            />
-        {/if}
-    </div>
+    <Alerts msg={alert.msg} type={alert.type} bind:show={alert.show} title={alert.title}/>
 </div>

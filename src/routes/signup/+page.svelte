@@ -1,6 +1,7 @@
 <script>
     import Alerts from "../../lib/components/alerts.svelte";
     import { currentUser, pb } from '/src/lib/pocketbase.js';
+    import NoteCard from "../../lib/components/note_card.svelte";
 
     let alert = $state({show: false, msg: "", title: "", type: "warning"});
     let username = $state("");
@@ -109,10 +110,7 @@
                         <button class="btn btn-primary border-black m-2.5 w-fit my-1 mx-auto" onclick={handle_click}>Sign Up</button>
                     </form>
                 {:else}
-                    <div class="m-auto flex flex-col items-center space-y-10 md:space-y-20 backdrop-blur-md rounded-xl shadow-lg p-6 md:p-8 border border-gray-500">
-                        <p>verification email sent</p>
-                        <a class="btn btn-primary" href="/recipes">recipe feed</a>
-                    </div>
+                    <NoteCard msg={`Verification email sent`} action={() => window.location.href = `/recipes`} btn_name={"recipe feed"} />
                 {/if}
             </div>
         </div>

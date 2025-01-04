@@ -8,6 +8,7 @@
     import Menu from "/src/lib/components/menu.svelte";
     import { page } from '$app/stores';
     import Alerts from "/src/lib/components/alerts.svelte";
+    import NoteCard from "/src/lib/components/note_card.svelte";
 
 
     let user_recipes = $state([]);
@@ -210,12 +211,7 @@
                 </dialog>
             </div>
         {:else}
-            <div class="flex flex-col justify-center items-center space-y-5 bg-base-200 mx-2 md:mx-auto p-16 border-2 border-base-300 rounded-md shadow-md  md:text-4xl mt-[30vh] max-w-5xl">
-                <h2>You have no recipes yet</h2>
-                <div class="flex flex-row items-center space-x-1">
-                    <h3>Click </h3><a href="/add_recipe" class="btn btn-primary btn-sm p-2 flex content-center">here</a><h3> to add a new recipe</h3>
-                </div>
-            </div>
+                <NoteCard msg={`No recipes Found`} action={() => window.location.href = `/add_recipe`} btn_name={"add a recipe"} />
         {/if}
         <Alerts msg={alert.msg} type={alert.type} bind:show={alert.show} title={alert.title}/>
 </div>

@@ -1,6 +1,7 @@
 <script>
   import { currentUser, pb, auth_refresh } from '/src/lib/pocketbase.js';
   import Alerts from "../../lib/components/alerts.svelte";
+  import NoteCard from "../../lib/components/note_card.svelte";
 
     import { onMount } from 'svelte';
 
@@ -47,10 +48,8 @@
     <div style="background-image: url('https://db.ivebeenwastingtime.com/api/files/photos/s7f3suof21cxupr/0059_99ZbLSLOOM.jpg?thumb=400x0')" class="flex flex-col relative w-full h-screen m-auto bg-cover bg-no-repeat bg-center">
         <div id="web_title" class="m-auto cursor-default md:text-5xl">
           {#if $currentUser}
-            <div class="m-auto flex flex-col items-center space-y-10 md:space-y-20 backdrop-blur-md rounded-xl shadow-lg p-6 md:p-8 border border-gray-500">
-              <p class="m-auto">Signed in as {$currentUser.username}</p> 
-              <button class="btn" onclick={signOut}>Sign Out</button>
-            </div>
+            <NoteCard msg={`Signed in as ${$currentUser.username}`} action={signOut} btn_name={"Sign Out"} />
+            
           {:else}
             <form class="m-auto flex flex-col">
               <input

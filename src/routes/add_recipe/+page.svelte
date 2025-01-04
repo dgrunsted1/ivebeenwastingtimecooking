@@ -113,9 +113,9 @@
 
 <div class="flex flex-col max-w-5xl m-auto h-[95svh] px-2">
     {#if !edit}
-        <div class="link my-auto">
+        <div class="my-auto">
             <form method='POST' oninput={preventDefault(fetch_recipe)} class="text-center w-full flex flex-col gap-5">
-                <input placeholder="Link to recipe" name="url" type="text" class="input input-bordered input-xs text-center input-accent mx-2"/>
+                <input placeholder="Link to recipe" name="url" type="text" class="input input-bordered input-xs text-center input-accent mx-2 no-underline"/>
                 {#if !loading}
                     <p>or</p>
                     <button class="btn btn-primary btn-lg m-auto" onclick={edit = true}>Input Recipe</button>
