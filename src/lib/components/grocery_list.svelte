@@ -5,7 +5,7 @@
     import EditIcon from "/src/lib/icons/EditIcon.svelte";
     import CheckMark from "/src/lib/icons/CheckMark.svelte";
     import { delete_grocery_item } from '/src/lib/groceries.js'
-    import { pb } from '/src/lib/pocketbase';
+    import { pb, currentUser } from '/src/lib/pocketbase';
     import Plus from "/src/lib/icons/Plus.svelte";
 
 
@@ -15,6 +15,7 @@
         grocery_list = $bindable([]), 
         status = $bindable(), 
         grocery_list_id,
+        list_owner,
         update_grocery_item,
         reset_grocery_list,
         check_grocery_item
@@ -26,12 +27,16 @@
     let view_size_desktop = $state(`md:h-[calc(100svh-210px)]`);
     let just_copied = $state(false);
     let new_item = $state({qty: null, unit: "", name: ""});
-    
+    let interactable = ($page.url.pathname.includes("/today") || $page.url.pathname.includes("/list/"));
+    let is_owner = ($currentUser && $currentUser.id == list_owner);
 
     onMount(async () => {
-        if ($page.url.pathname == "/today"){
+        if ($page.url.pathname.includes("/today")){
             view_size_mobile = `h-[calc(100svh-150px)]`;
             view_size_desktop = `md:h-[calc(100svh-105px)]`;
+        } else if ( $page.url.pathname.includes("/list/")){
+            view_size_mobile = `h-[calc(100svh-75px)]`;
+            view_size_desktop = `md:h-[calc(100svh-60px)]`;
         }
     });
 
@@ -120,9 +125,8 @@
             "checked": false,
             "active": true
         };
-
         const record = await pb.collection('grocery_items').create(data);
-        const list_update = pb.collection('grocery_lists').update(grocery_list_id, {
+        const list_update = await pb.collection('grocery_lists').update(grocery_list_id, {
             "items+": record.id
         });
         grocery_list.unshift(record);
@@ -161,13 +165,18 @@
         my_modal_1.showModal();
         document.getElementById("modal_ingr").focus();
     }
+
+    const share_list = () => {
+        const share_link = `${window.location.origin}/list/${$currentUser.useename}`;
+        navigator.clipboard.writeText(share_link);
+    }
 </script>
 
 <div id="list" class="flex flex-col w-full">
-    <div id="header" class="hidden md:flex {($page.url.pathname == "/today") ? `justify-between` : `justify-evenly`} items-center mt-0">
+    <div id="header" class="hidden md:flex {($page.url.pathname.includes("/today")) ? `justify-between` : `justify-evenly`} items-center mt-0">
         {#if grocery_list.length > 0}
             <div>
-                {#if status != "none" && $page.url.pathname == "/today"}<div id="update_status" class="text-xs">{status}</div>{/if}
+                {#if status != "none" && $page.url.pathname.includes("/today")}<div id="update_status" class="text-xs">{status}</div>{/if}
                 <div id="count" class="text-xs">{grocery_list.reduce((count, item) => count + (item.checked ? 0 : 1), 0)}/{grocery_list.length} Items</div>
             </div>
             <button id="copy" class="btn btn-xs btn-primary cursor-copy" onclick={copy_to_clipboard}>
@@ -177,10 +186,10 @@
                     copy
                 {/if}
             </button>
-            {#if status != "none"}<button id="uncheck" class="btn btn-xs btn-primary" onclick={uncheck_list}>uncheck</button>{/if}
-            {#if status != "none"}<button id="reset" class="btn btn-xs btn-primary" onclick={reset_list}>reset</button>{/if}
-            {#if status != "none"}<button id="edit" class="btn btn-xs btn-primary" onclick={edit_groceries}><EditIcon/></button>{/if}
-            {#if status != "none"}<button id="add" class="btn btn-xs btn-primary" onclick={add_item_modal}><Plus/></button>{/if}
+            {#if is_owner}<button id="uncheck" class="btn btn-xs btn-primary" onclick={uncheck_list}>uncheck</button>{/if}
+            {#if is_owner}<button id="reset" class="btn btn-xs btn-primary" onclick={reset_list}>reset</button>{/if}
+            {#if interactable}<button id="edit" class="btn btn-xs btn-primary" onclick={edit_groceries}><EditIcon/></button>{/if}
+            {#if interactable}<button id="add" class="btn btn-xs btn-primary" onclick={add_item_modal}><Plus/></button>{/if}
         {/if}
     </div>
     <div class="md:mx-3">
@@ -195,7 +204,7 @@
                             {#if status != "none"}<button class="btn btn-sm p-1 btn-accent" onclick={() => remove_item(item.id)}><DeleteIcon/></button>{/if}
                         </div>
                     {:else}
-                        <div class="grocery_item flex space-x-3 {($page.url.pathname == "/today")? "justify-end md:justify-start" : "justify-start"} items-center">
+                        <div class="grocery_item flex space-x-3 {($page.url.pathname.includes("/today") || $page.url.pathname.includes("/list/"))? "justify-end md:justify-start" : "justify-start"} items-center">
                             {#if status != "none"}<input type="checkbox" class="hidden md:flex checkbox checkbox-primary checkbox-lg p-1" id={item.id} bind:checked={item.checked} onchange={check_item_handle}>{/if}
                             <div class="flex md:tooltip {(i > 2) ? "tooltip-top": "tooltip-bottom"}" data-tip={tool_tip_string(item)}>
                                 <p class="text-xs">{ingrs_to_string([item])}</p>
@@ -210,13 +219,14 @@
             {/if}
         </div>
     </div>
-    <div id="header" class="flex md:hidden {($page.url.pathname == "/today") ? `justify-between` : `justify-evenly`} items-center mt-0">
-        {#if grocery_list.length > 0 && status != "none"}
+    <div id="header" class="flex md:hidden {($page.url.pathname.includes("/today")) ? `justify-between` : `justify-evenly`} items-center mt-0">
+        {#if grocery_list.length > 0 && interactable}
             <div>
-                {#if $page.url.pathname == "/today"}<div id="update_status" class="text-xs">{status}</div>{/if}
-                <div id="count" class="text-xs">{grocery_list.reduce((count, item) => count + (item.checked ? 0 : 1), 0)}/{grocery_list.length} Items</div>
+                {#if interactable}<div id="update_status" class="text-xs">{status}</div>{/if}
+                <div id="count" class="text-xs text-nowrap">{grocery_list.reduce((count, item) => count + (item.checked ? 0 : 1), 0)}/{grocery_list.length} Items</div>
             </div>
-            <div class="flex items-center space-x-4 mx-1 my-2">
+            <div class="flex items-center space-x-4 mx-1 my-2 w-full justify-end">
+                {#if is_owner}
                     <div class="dropdown dropdown-top">
                         <label tabindex="-1" for="save_menu" class="btn btn-primary btn-sm md:btn-sm">options</label>
                         <ul tabindex="-1" name="save_menu" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-max bg-primary">
@@ -229,8 +239,16 @@
                             <li class="btn btn-sm btn-primary p-0"><button class="p-0" onclick={reset_list}>
                                 reset
                             </button></li>
+                            <li class="btn btn-sm btn-primary p-0"><button class="p-0" onclick={share_list}>
+                                share
+                            </button></li>
                         </ul>
                     </div>
+                {:else}
+                    <button class="btn btn-sm btn-primary" onclick={edit_groceries}>
+                        edit
+                    </button>
+                {/if}
                     <button id="copy" class="btn btn-sm btn-primary cursor-copy" onclick={copy_to_clipboard}>
                         {#if just_copied}
                             <CheckMark color=""/>

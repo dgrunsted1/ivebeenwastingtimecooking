@@ -44,7 +44,7 @@
 									<li class=""><a href={link.href} class="btn btn-xs {(link.href != $page.url.pathname) ? 'btn-primary' : 'btn-ghost'} flex content-center whitespace-nowrap">{link.display}</a></li>
 								{/each}
 							{#if !$currentUser && $page.url.pathname != "/login"}
-								<li><a href="login" class="btn btn-xs btn-primary flex content-center">login</a></li>
+								<li><a href="/login" class="btn btn-xs btn-primary flex content-center">login</a></li>
 							{:else if $currentUser && $page.url.pathname != "/login" && $page.url.pathname != "/gallery"}
 								<li><button onclick={signOut} class="btn btn-xs btn-primary flex content-center" onkeypress={signOut}>logout</button></li>
 							{/if}

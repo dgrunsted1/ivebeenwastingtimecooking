@@ -1,6 +1,6 @@
 <script>
     import { stopPropagation } from 'svelte/legacy';
-
+    import { page } from '$app/stores';
     import { onMount } from 'svelte';
     import { currentUser, pb, auth_refresh } from '/src/lib/pocketbase.js';
     import GroceryList from "/src/lib/components/grocery_list.svelte";
@@ -9,9 +9,9 @@
     import Heart from "/src/lib/icons/Heart.svelte";
     import SubTask from "/src/lib/icons/subtask.svelte";
     import { update_fave } from '/src/lib/save_recipe.js';
-    import RecipeCard from "../../lib/components/recipe_card.svelte";
-    import Alerts from "../../lib/components/alerts.svelte";
-    import NoteCard from "../../lib/components/note_card.svelte";
+    import RecipeCard from "/src/lib/components/recipe_card.svelte";
+    import Alerts from "/src/lib/components/alerts.svelte";
+    import NoteCard from "/src/lib/components/note_card.svelte";
 
 
     let todays_menu = $state({});
@@ -31,17 +31,27 @@
 
 
     onMount(async () => {
-        if (!$currentUser) window.location.href = "/login";
-        else{
-            const result = await auth_refresh;
-            if (result.error){
-                show_error(e.message);
+        if ($currentUser && $page.params.user_name == $currentUser.username) window.location.href = `/today`;
+        let result_list;
+        if (!$page.params.user_name){
+            if (!$currentUser) window.location.href = "/login";
+            else{
+                const result = await auth_refresh;
+                if (result.error){
+                    show_error(e.message);
+                }
             }
+            result_list = await pb.collection('menus').getList(1, 1, {
+                filter: `user="${$currentUser.id}" && today=True`,
+                expand: `recipes,recipes.notes,recipes.ingr_list, grocery_list, grocery_list.items, grocery_list.items.ingrs`
+            });
+        } else {
+            result_list = await pb.collection('menus').getList(1, 1, {
+                filter: `user.username='${$page.params.user_name}' && today=true`,
+                expand: `recipes,recipes.notes,recipes.ingr_list, grocery_list, grocery_list.items, grocery_list.items.ingrs, user`
+            })
         }
-        const result_list = await pb.collection('menus').getList(1, 1, {
-            filter: `user="${$currentUser.id}" && today=True`,
-            expand: `recipes,recipes.notes,recipes.ingr_list, grocery_list, grocery_list.items, grocery_list.items.ingrs`
-        });
+        
         if (result_list.items[0]){
             todays_menu = result_list.items[0];
             for (let i in todays_menu.sub_recipes){
@@ -198,7 +208,13 @@
 
     <div id="main">
         <div class="flex justify-center pb-1">
-            <h1 class="text-xl h-6 text-ellipsis overflow-hidden text-center">{todays_menu.title ? todays_menu.title : ""}</h1>
+            
+            <h1 class="text-xl h-6 text-ellipsis overflow-hidden text-center">
+                {#if $page.params.user_name && todays_menu.expand}
+                    {todays_menu.expand.user.username}'s
+                {/if}
+                {todays_menu.title ? todays_menu.title+` Menu` : "Menu"}
+            </h1>
         </div>
         <div id="content" class="flex flex-col md:flex-row md:space-x-3 md:mx-2">
             {#if todays_menu.expand || loading}

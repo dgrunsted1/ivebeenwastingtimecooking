@@ -22,7 +22,7 @@
     } = $props();
 
     let just_copied = $state(false);
-    let fave_btn = $derived(type == "today" || type == "menu");
+    let fave_btn = $derived(!$page.params.user_name && (type == "today" || type == "menu"));
     let check_box = $derived(type == "today" || type == "menu");
     let add_btn = $derived(type == "recipes");
     let delete_btn = $derived(type == "menu" || (type == "menu_component" && $page.url.pathname != "/profile"));
