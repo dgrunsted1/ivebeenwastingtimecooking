@@ -272,7 +272,8 @@
                         <GroceryList 
                             {grocery_list_id} 
                             bind:grocery_list={grocery_list} 
-                            update_grocery_item={update_groceries} 
+                            update_grocery_item={update_groceries}
+                            list_owner={todays_menu.user}
                             bind:status={grocery_list_status}  
                             reset_grocery_list={reset_list} 
                             check_grocery_item={handle_check_item}
