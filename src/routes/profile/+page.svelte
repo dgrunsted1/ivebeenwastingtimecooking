@@ -6,7 +6,8 @@
     import Menu from "/src/lib/components/menu.svelte";
     import Alerts from "../../lib/components/alerts.svelte";
 
-    let main_recipes = [];
+    let main_recipes = $state([]);
+    let recipes = $state([]);
     let dessert_recipes = [];
     let breakfast_recipes = [];
     let other_recipes = [];
@@ -45,6 +46,8 @@
             fields: `id, category`,
             filter: `user="${$currentUser.id}"`,
         });
+        recipes = recipe_result.items;
+        console.log(recipes);
         recipe_rec = await get_random_recipe(recipe_result.items.map(item => item.id));
         loading.recipe = false;
         main_recipes = recipe_result.items.filter(item => item.category == 'Main').map(item => item.id);
@@ -163,7 +166,7 @@
             </div>
         {/if}
     </div>
-    {#if main_recipes.length > 5}
+    {#if recipes.length > 5}
         <div class="flex md:space-x-4 flex-col items-center w-full">
             <p class="text-4xl text-primary">What to cook</p>
             <div class="flex justify-evenly flex-col md:flex-row w-full">
