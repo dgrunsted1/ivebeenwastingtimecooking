@@ -167,7 +167,7 @@
     }
 
     const share_list = () => {
-        const share_link = `${window.location.origin}/list/${$currentUser.useename}`;
+        const share_link = `${window.location.origin}/today/${$currentUser.useename}`;
         navigator.clipboard.writeText(share_link);
     }
 </script>
