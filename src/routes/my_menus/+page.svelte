@@ -54,7 +54,6 @@
         for (let i = 0; i < user_menus.length; i++){
             if (user_menus[i].id == id){
                 modal_menu = user_menus[i];
-                // total_servings = get_servings(modal_menu.expand.recipes, {}, modal_menu.servings);
             }
         }
         if (is_mobile) my_modal_2.showModal();
@@ -206,7 +205,7 @@
     <meta property="og:type" content="website" />
 </svelte:head>
 
-<div class="flex flex-col w-full">
+<div class="flex flex-col w-full md:flex-row">
     {#if user_menus.length > 0 || loading || no_results_found}
         <div class="flex flex-col w-full md:w-1/2">
             <div class="hidden md:flex justify-between mx-4">
