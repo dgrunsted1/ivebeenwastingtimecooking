@@ -135,7 +135,7 @@ export const update_made = async function(made, id, user_id){
         }
     }
     if (menu_completed){
-        const menu_log_row = await pb.collection('menu_log').getList(1, 1, {filter: `user = '${user_id}' && menu = '${id}'`, sort: `-created`});
+        const menu_log_row = await pb.collection('menu_log').getList(1, 1, {filter: `menu = '${id}'`, sort: `-created`});
         if (menu_log_row.items.length){
             const menu_log_data = {
                 "complete": true,

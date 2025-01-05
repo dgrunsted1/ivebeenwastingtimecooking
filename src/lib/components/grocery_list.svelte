@@ -38,6 +38,7 @@
             view_size_mobile = `h-[calc(100svh-75px)]`;
             view_size_desktop = `md:h-[calc(100svh-60px)]`;
         }
+        
     });
 
     const copy_to_clipboard = () => {

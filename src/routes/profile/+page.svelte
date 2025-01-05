@@ -47,7 +47,6 @@
             filter: `user="${$currentUser.id}"`,
         });
         recipes = recipe_result.items;
-        console.log(recipes);
         recipe_rec = await get_random_recipe(recipe_result.items.map(item => item.id));
         loading.recipe = false;
         main_recipes = recipe_result.items.filter(item => item.category == 'Main').map(item => item.id);

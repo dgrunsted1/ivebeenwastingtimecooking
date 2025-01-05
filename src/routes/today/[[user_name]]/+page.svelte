@@ -1,7 +1,7 @@
 <script>
     import { stopPropagation } from 'svelte/legacy';
     import { page } from '$app/stores';
-    import { onMount } from 'svelte';
+    import { onDestroy, onMount } from 'svelte';
     import { currentUser, pb, auth_refresh } from '/src/lib/pocketbase.js';
     import GroceryList from "/src/lib/components/grocery_list.svelte";
     import { get_grocery_list, groupBySimilarity } from '/src/lib/merge_ingredients.js'
@@ -28,8 +28,6 @@
     let recipes_ready = $state([]);
     let alert = $state({show: false, msg: "", title: "", type: "warning"});
     
-
-
     onMount(async () => {
         if ($currentUser && $page.params.user_name == $currentUser.username) window.location.href = `/today`;
         let result_list;
@@ -49,10 +47,15 @@
             result_list = await pb.collection('menus').getList(1, 1, {
                 filter: `user.username='${$page.params.user_name}' && today=true`,
                 expand: `recipes,recipes.notes,recipes.ingr_list, grocery_list, grocery_list.items, grocery_list.items.ingrs, user`
-            })
+            });
         }
         
         if (result_list.items[0]){
+            await pb.realtime.connect();
+            pb.realtime.subscribe(`menus/${result_list.items[0].id}`, (data) => {
+                const tmp = {...data.record, expand: todays_menu.expand};
+                todays_menu = tmp;
+            });
             todays_menu = result_list.items[0];
             for (let i in todays_menu.sub_recipes){
                for (let j in todays_menu.sub_recipes[i]){
@@ -69,9 +72,23 @@
                 grocery_list = groupBySimilarity(todays_menu.expand.grocery_list.expand.items);
                 grocery_list_id = todays_menu.expand.grocery_list.id;
             }
+            pb.realtime.subscribe(`grocery_lists/${grocery_list_id}`, (data) => {
+                const curr_item_ids = grocery_list.map(item => item.id);
+                const new_item_ids = grocery_list.filter(item => !curr_item_ids.includes(item.id));
+                if (new_item_ids.length > 0){
+                    grocery_list = grocery_list.concat(new_item_ids.map(async item_id => await pb.collection('grocery_items').getOne(item_id, {expand: `ingrs`})));
+                }
+            });
             let checked = [];
             let unchecked = [];
             for (let i = 0; i < grocery_list.length; i++){
+                pb.realtime.subscribe(`grocery_items/${grocery_list[i].id}`, async (data) => {
+                    grocery_list[i] = data.record;
+                    const tmp = await pb.collection('ingredients').getList(1, 50, {
+                        filter: `id = '${data.record.ingrs.join(`' || id='`)}'`
+                    });
+                    grocery_list[i].expand = {ingrs: tmp.items};
+                });
                 if (grocery_list[i].checked){
                     checked.push(grocery_list[i]);
                 } else {
@@ -80,6 +97,9 @@
             }
             grocery_list = unchecked.concat(checked);
             for (let i = 0; i < todays_menu.expand.recipes.length; i++){
+                pb.realtime.subscribe(`recipes/${todays_menu.expand.recipes[i].id}`, async (data) => {
+                    todays_menu.expand.recipes[i] = {...data.record, expand: todays_menu.expand.recipes[i].expand};                   
+                });
                 if (!todays_menu.made){
                     todays_menu.made = {};
                 }
@@ -90,12 +110,19 @@
             if (grocery_list.reduce((count, item) => count + (item.checked ? 1 : 0),0) / grocery_list.length > 0.8) {
                 tab = "recipe_list";
             }
+            
         } else {
             tab = "recipe_list";
         }
         loading = false;
     });
     
+
+    onDestroy(() => {
+        if (todays_menu.id){
+            pb.collection('menus').unsubscribe(todays_menu.id);
+        }
+    });
     function show_error(title){
         alert.title = title;
         alert.type = "error";
@@ -161,8 +188,9 @@
             todays_menu.made = {};
             todays_menu.made[id] = true;
         }
-        if (todays_menu.made[id]) log_made(id, $currentUser.id);
-        update_made(todays_menu.made, todays_menu.id, $currentUser.id);
+        const user = ($currentUser && $currentUser.id) ? $currentUser.id : todays_menu.user;
+        if (todays_menu.made[id]) log_made(id, user);
+        update_made(todays_menu.made, todays_menu.id, user);
     }
 
     async function update_fave_queue(e){

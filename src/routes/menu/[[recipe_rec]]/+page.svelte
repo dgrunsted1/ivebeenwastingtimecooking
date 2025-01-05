@@ -158,9 +158,7 @@
                                 remove_from_menu={check_item}
                             />
                         {:else}
-                            <div class="flex flex-col justify-center items-center space-y-5 mx-2 md:mx-auto p-5 rounded-md shadow-md  md:text-xl max-w-5xl">
-                                <p>select recipes to add to your menu</p>
-                            </div>
+                            <NoteCard msg={`select recipes to add to your menu`}/>
                         {/if}
                     </div>
                 </details>
@@ -180,11 +178,7 @@
                             remove_from_menu={check_item}
                         />
                     {:else}
-                        <div class="flex h-full justify-center w-full items-center">
-                            <div class="flex flex-col justify-center content-center h-fit p-16 rounded-md shadow-md md:text-xl max-w-5xl">
-                                <p>select recipes to add to your menu</p>
-                            </div>
-                        </div>
+                        <NoteCard msg={`select recipes to add to your menu`}/>
                     {/if}
                 </div>
                 <dialog id="my_modal_3" class="modal">
@@ -211,7 +205,7 @@
                 </dialog>
             </div>
         {:else}
-                <NoteCard msg={`No recipes Found`} action={() => window.location.href = `/add_recipe`} btn_name={"add a recipe"} />
+            <NoteCard msg={`No recipes Found`} action={() => window.location.href = `/add_recipe`} btn_name={"add a recipe"} />
         {/if}
         <Alerts msg={alert.msg} type={alert.type} bind:show={alert.show} title={alert.title}/>
 </div>
