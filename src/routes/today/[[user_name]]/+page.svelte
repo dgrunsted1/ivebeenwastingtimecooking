@@ -12,7 +12,7 @@
     import RecipeCard from "/src/lib/components/recipe_card.svelte";
     import Alerts from "/src/lib/components/alerts.svelte";
     import NoteCard from "/src/lib/components/note_card.svelte";
-
+    import Plus from "/src/lib/icons/Plus.svelte";
 
     let todays_menu = $state({});
     let grocery_list = $state([]);
@@ -29,26 +29,8 @@
     let alert = $state({show: false, msg: "", title: "", type: "warning"});
     
     onMount(async () => {
-        if ($currentUser && $page.params.user_name == $currentUser.username) window.location.href = `/today`;
-        let result_list;
-        if (!$page.params.user_name){
-            if (!$currentUser) window.location.href = "/login";
-            else{
-                const result = await auth_refresh;
-                if (result.error){
-                    show_error(e.message);
-                }
-            }
-            result_list = await pb.collection('menus').getList(1, 1, {
-                filter: `user="${$currentUser.id}" && today=True`,
-                expand: `recipes,recipes.notes,recipes.ingr_list, grocery_list, grocery_list.items, grocery_list.items.ingrs`
-            });
-        } else {
-            result_list = await pb.collection('menus').getList(1, 1, {
-                filter: `user.username='${$page.params.user_name}' && today=true`,
-                expand: `recipes,recipes.notes,recipes.ingr_list, grocery_list, grocery_list.items, grocery_list.items.ingrs, user`
-            });
-        }
+        await handleAuth();
+        const result_list = await fetchMenuData();
         
         if (result_list.items[0]){
             await pb.realtime.connect();
@@ -104,7 +86,6 @@
                     todays_menu.made = {};
                 }
                 if (!todays_menu.made[todays_menu.expand.recipes[i].id]){
-                    todays_menu.made[todays_menu.expand.recipes[i].id] = false;
                 }
             }
             if (grocery_list.reduce((count, item) => count + (item.checked ? 1 : 0),0) / grocery_list.length > 0.8) {
@@ -117,12 +98,38 @@
         loading = false;
     });
     
+    async function handleAuth() {
+        if ($currentUser && $page.params.user_name == $currentUser.username) {
+            window.location.href = `/today`;
+            return;
+        }
+        if (!$page.params.user_name && !$currentUser) {
+            window.location.href = "/login";
+            return;
+        }
+        if (!$page.params.user_name) {
+            const result = await auth_refresh;
+            if (result.error) show_error(e.message);
+        }
+    }
+
+    async function fetchMenuData() {
+        const filter = $page.params.user_name 
+            ? `user.username='${$page.params.user_name}' && today=true`
+            : `user="${$currentUser.id}" && today=True`;
+            
+        return await pb.collection('menus').getList(1, 1, {
+            filter,
+            expand: `recipes,recipes.notes,recipes.ingr_list, grocery_list, grocery_list.items, grocery_list.items.ingrs${$page.params.user_name ? ', user' : ''}`
+        });
+    }
 
     onDestroy(() => {
         if (todays_menu.id){
             pb.collection('menus').unsubscribe(todays_menu.id);
         }
     });
+
     function show_error(title){
         alert.title = title;
         alert.type = "error";
@@ -224,6 +231,11 @@
         let recipe = todays_menu.expand.recipes.filter(recipe => recipe.id == e.id)[0];
         window.location = `/cook_recipe/${recipe.url_id}/${todays_menu.servings[recipe.id]}`
     }
+
+    const add_recipe = (e) => {
+        console.log(e.currentTarget);
+        console.log({e});
+    }
 </script>
 
 <svelte:head>
@@ -283,6 +295,7 @@
                                 />
                             {/if}
                         {/each}
+                        <button id="add" class="btn btn-lg btn-primary w-fit p-2 flex m-auto" onclick={add_recipe}><Plus size={12}/></button>
                     {:else if loading}
                         <div id="menu_loading" class="w-full flex justify-center content-center h-full">
                             <span class="loading loading-bars loading-lg"></span>
