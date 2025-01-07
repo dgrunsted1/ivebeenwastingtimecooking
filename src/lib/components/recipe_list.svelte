@@ -10,11 +10,12 @@
     let { 
         recipes = $bindable(),
         menu_recipes = $bindable(),
-        update_edit,
+        card_click,
         reset_mode,
         check_item,
         update_recipe
     } = $props();
+
     const get_categories = () => {
         let out = {cuisines:[], countries:[], cats:[]};
         for (let i = 0; i < recipes.length; i++){
@@ -37,12 +38,7 @@
     let loading = $state(true);
 
     function view(e) {
-            let index = e.id;
-            for (let i = 0; i < display_recipes.length; i++){
-                if (display_recipes[i].id == index){
-                    update_edit({index: index});
-                }
-            }
+        card_click({index: e.id});
     }
 
     async function delete_recipe(e){

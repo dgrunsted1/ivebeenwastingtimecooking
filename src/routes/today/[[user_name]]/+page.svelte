@@ -1,18 +1,16 @@
 <script>
-    import { stopPropagation } from 'svelte/legacy';
     import { page } from '$app/stores';
     import { onDestroy, onMount } from 'svelte';
     import { currentUser, pb, auth_refresh } from '/src/lib/pocketbase.js';
     import GroceryList from "/src/lib/components/grocery_list.svelte";
     import { get_grocery_list, groupBySimilarity } from '/src/lib/merge_ingredients.js'
     import { create_grocery_list, update_made, log_made, check_grocery_item, update_grocery_item } from '/src/lib/groceries.js'
-    import Heart from "/src/lib/icons/Heart.svelte";
-    import SubTask from "/src/lib/icons/subtask.svelte";
     import { update_fave } from '/src/lib/save_recipe.js';
     import RecipeCard from "/src/lib/components/recipe_card.svelte";
     import Alerts from "/src/lib/components/alerts.svelte";
     import NoteCard from "/src/lib/components/note_card.svelte";
-
+    import Plus from "/src/lib/icons/Plus.svelte";
+    import RecipeList from "/src/lib/components/recipe_list.svelte";
 
     let todays_menu = $state({});
     let grocery_list = $state([]);
@@ -20,35 +18,15 @@
     let grocery_list_status = $state("saved");
     let mode = "menu";
     let loading = $state(true);
-    
-    let delay_timer;
-    let update_fave_list = [];
     let tab = $state("grocery_list");
     let sub_recipe_ids = $state([]);
     let recipes_ready = $state([]);
     let alert = $state({show: false, msg: "", title: "", type: "warning"});
+    let user_recipes = $state([]);
     
     onMount(async () => {
-        if ($currentUser && $page.params.user_name == $currentUser.username) window.location.href = `/today`;
-        let result_list;
-        if (!$page.params.user_name){
-            if (!$currentUser) window.location.href = "/login";
-            else{
-                const result = await auth_refresh;
-                if (result.error){
-                    show_error(e.message);
-                }
-            }
-            result_list = await pb.collection('menus').getList(1, 1, {
-                filter: `user="${$currentUser.id}" && today=True`,
-                expand: `recipes,recipes.notes,recipes.ingr_list, grocery_list, grocery_list.items, grocery_list.items.ingrs`
-            });
-        } else {
-            result_list = await pb.collection('menus').getList(1, 1, {
-                filter: `user.username='${$page.params.user_name}' && today=true`,
-                expand: `recipes,recipes.notes,recipes.ingr_list, grocery_list, grocery_list.items, grocery_list.items.ingrs, user`
-            });
-        }
+        await handleAuth();
+        const result_list = await fetchMenuData();
         
         if (result_list.items[0]){
             await pb.realtime.connect();
@@ -104,7 +82,6 @@
                     todays_menu.made = {};
                 }
                 if (!todays_menu.made[todays_menu.expand.recipes[i].id]){
-                    todays_menu.made[todays_menu.expand.recipes[i].id] = false;
                 }
             }
             if (grocery_list.reduce((count, item) => count + (item.checked ? 1 : 0),0) / grocery_list.length > 0.8) {
@@ -115,14 +92,47 @@
             tab = "recipe_list";
         }
         loading = false;
+        get_user_recipes();
     });
+
+    async function get_user_recipes(){
+        const user_filter = ($page.params.user_name) ? `user.username='${$page.params.user_name}'` : `user='${$currentUser.id}'`;
+        const result = await pb.collection('recipes').getList(1, 250, {filter: user_filter, expand:`ingr_list`});
+        user_recipes = result.items;
+    }
     
+    async function handleAuth() {
+        if ($currentUser && $page.params.user_name == $currentUser.username) {
+            window.location.href = `/today`;
+            return;
+        }
+        if (!$page.params.user_name && !$currentUser) {
+            window.location.href = "/login";
+            return;
+        }
+        if (!$page.params.user_name) {
+            const result = await auth_refresh;
+            if (result.error) show_error(e.message);
+        }
+    }
+
+    async function fetchMenuData() {
+        const filter = $page.params.user_name 
+            ? `user.username='${$page.params.user_name}' && today=true`
+            : `user="${$currentUser.id}" && today=True`;
+            
+        return await pb.collection('menus').getList(1, 1, {
+            filter,
+            expand: `recipes,recipes.notes,recipes.ingr_list, grocery_list, grocery_list.items, grocery_list.items.ingrs${$page.params.user_name ? ', user' : ''}`
+        });
+    }
 
     onDestroy(() => {
         if (todays_menu.id){
             pb.collection('menus').unsubscribe(todays_menu.id);
         }
     });
+
     function show_error(title){
         alert.title = title;
         alert.type = "error";
@@ -224,6 +234,40 @@
         let recipe = todays_menu.expand.recipes.filter(recipe => recipe.id == e.id)[0];
         window.location = `/cook_recipe/${recipe.url_id}/${todays_menu.servings[recipe.id]}`
     }
+
+    const add_recipe_modal = (e) => {
+        my_modal_3.showModal();
+    }
+
+    const add_to_today = async (e) => {
+        const new_recipe = user_recipes.filter(recipe => recipe.id == e.index)[0];
+        let grocery_item_ids = [];
+        for (let i = 0; i < new_recipe.expand.ingr_list.length; i++){
+            const result = await update_grocery_item({
+                qty: new_recipe.expand.ingr_list[i].quantity,
+                unit: new_recipe.expand.ingr_list[i].unit,
+                name: new_recipe.expand.ingr_list[i].ingredient,
+                checked: false,
+                ingrs: [new_recipe.expand.ingr_list[i].id]
+            });
+            grocery_item_ids.push(result.id);
+        }
+        let tmp_servings = {...todays_menu.servings};
+        tmp_servings[new_recipe.id] = new_recipe.servings;
+        let tmp_made = {...todays_menu.made};
+        tmp_made[new_recipe.id] = false;
+        const update_menu_data = {
+            "recipes+": new_recipe.id,
+            "servings": tmp_servings,
+            "made": tmp_made
+        };
+        const menu_result = await pb.collection('menus').update(todays_menu.id, update_menu_data, {expand: `recipes,recipes.notes,recipes.ingr_list, grocery_list, grocery_list.items, grocery_list.items.ingrs${$page.params.user_name ? ', user' : ''}`});
+        todays_menu = menu_result;
+        const update_grocery_list_data = {"items+": grocery_item_ids};
+        const grocery_list_result = await pb.collection('grocery_lists').update(grocery_list_id, update_grocery_list_data, {expand: `items, items.ingrs`});
+        grocery_list = grocery_list_result.expand.items;
+        my_modal_3.close();
+    }
 </script>
 
 <svelte:head>
@@ -251,7 +295,7 @@
                     {#if todays_menu.expand}
                         {#each todays_menu.expand.recipes as curr, i}
                             {#if !sub_recipe_ids.includes(curr.id)}
-                                {#if todays_menu.sub_recipes}
+                                <!-- {#if todays_menu.sub_recipes}
                                     {#each todays_menu.sub_recipes[curr.id] as sub_recipe}
                                         {#each todays_menu.expand.recipes as curr_sub_recipe, i}
                                             {#if curr_sub_recipe.id === sub_recipe.recipe_id}
@@ -271,7 +315,7 @@
                                             {/if}
                                         {/each}
                                     {/each}
-                                {/if}
+                                {/if} -->
                                 <RecipeCard
                                     bind:recipe={todays_menu.expand.recipes[i]}
                                     bind:checked={todays_menu.made[curr.id]}
@@ -283,6 +327,7 @@
                                 />
                             {/if}
                         {/each}
+                        <button id="add" class="btn btn-lg btn-primary w-fit p-2 flex m-auto rounded-[20px]" onclick={add_recipe_modal}><Plus size={12}/></button>
                     {:else if loading}
                         <div id="menu_loading" class="w-full flex justify-center content-center h-full">
                             <span class="loading loading-bars loading-lg"></span>
@@ -331,3 +376,15 @@
         </div>
         <Alerts msg={alert.msg} type={alert.type} bind:show={alert.show} title={alert.title}/>
     </div>
+    <dialog id="my_modal_3" class="modal">
+        <div class="modal-box max-w-full md:w-2/3 p-1 h-[95svh]">
+            <form method="dialog">
+                <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+            </form>
+            <RecipeList 
+                recipes={user_recipes}
+                menu_recipes={[]}
+                card_click={add_to_today}
+            />
+        </div>
+    </dialog>

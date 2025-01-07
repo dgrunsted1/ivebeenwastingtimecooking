@@ -122,7 +122,7 @@
                     <RecipeList 
                         recipes={user_recipes} 
                         menu_recipes={menu_recipes}
-                        {update_edit} 
+                        card_click={update_edit} 
                         {reset_mode} 
                         {check_item}
                         {update_recipe}

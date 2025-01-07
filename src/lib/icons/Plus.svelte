@@ -1,8 +1,13 @@
-
+<script>
+    let { 
+        size = 4
+    } = $props();
+    let width_height = $derived(`w-${size} h-${size}`);
+</script>
 <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
 viewBox="0 0 124.000000 124.000000"
 preserveAspectRatio="xMidYMid meet"
-class="w-4 h-4 primary pointer-events-none fill-current">
+class="{width_height} primary pointer-events-none fill-current">
 
 <g transform="translate(0.000000,124.000000) scale(0.100000,-0.100000)"
 stroke="none">
