@@ -240,6 +240,7 @@
     }
 
     const add_to_today = async (e) => {
+        my_modal_3.close();
         const new_recipe = user_recipes.filter(recipe => recipe.id == e.index)[0];
         let grocery_item_ids = [];
         for (let i = 0; i < new_recipe.expand.ingr_list.length; i++){
@@ -266,7 +267,6 @@
         const update_grocery_list_data = {"items+": grocery_item_ids};
         const grocery_list_result = await pb.collection('grocery_lists').update(grocery_list_id, update_grocery_list_data, {expand: `items, items.ingrs`});
         grocery_list = grocery_list_result.expand.items;
-        my_modal_3.close();
     }
 </script>
 
