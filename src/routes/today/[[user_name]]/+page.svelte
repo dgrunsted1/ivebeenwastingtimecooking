@@ -271,8 +271,8 @@
 </script>
 
 <svelte:head>
-    <meta property="og:title" content="Today" />
-    <meta property="og:description" content="See What Others are Cooking" />
+    <meta property="og:title" content={$page.params.user_name ? `${$page.params.user_name}'s Menu` : `Menu`} />
+    <meta property="og:description" content={$page.params.user_name ? `${$page.params.user_name}'s current recipes and grocery list.` : `Current recipes and grocery list.`} />
     <meta property="og:image" content="static/ChefBookIconV2.png" />
     <meta property="og:url" content="https://www.ivebeenwastingtimecooking.com/recipes" />
     <meta property="og:type" content="website" />

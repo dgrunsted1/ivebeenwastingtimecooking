@@ -167,9 +167,10 @@
         document.getElementById("modal_ingr").focus();
     }
 
-    const share_list = () => {
-        const share_link = `${window.location.origin}/today/${$currentUser.useename}`;
+    const share_list = (e) => {
+        const share_link = `${window.location.origin}/today/${$currentUser.username}`;
         navigator.clipboard.writeText(share_link);
+        e.currentTarget.parentNode.parentNode.blur();
     }
 </script>
 
@@ -189,6 +190,7 @@
             </button>
             {#if is_owner}<button id="uncheck" class="btn btn-xs btn-primary" onclick={uncheck_list}>uncheck</button>{/if}
             {#if is_owner}<button id="reset" class="btn btn-xs btn-primary" onclick={reset_list}>reset</button>{/if}
+            {#if is_owner}<button class="btn btn-xs btn-primary" onclick={share_list}>share</button>{/if}
             {#if interactable}<button id="edit" class="btn btn-xs btn-primary" onclick={edit_groceries}><EditIcon/></button>{/if}
             {#if interactable}<button id="add" class="btn btn-xs btn-primary" onclick={add_item_modal}><Plus/></button>{/if}
         {/if}
