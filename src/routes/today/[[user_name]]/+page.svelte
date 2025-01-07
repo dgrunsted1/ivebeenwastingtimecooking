@@ -268,8 +268,9 @@
         };
         const menu_result = await pb.collection('menus').update(todays_menu.id, update_menu_data, {expand: `recipes,recipes.notes,recipes.ingr_list, grocery_list, grocery_list.items, grocery_list.items.ingrs${$page.params.user_name ? ', user' : ''}`});
         todays_menu = menu_result;
-        const grocery_list_result = await pb.collection('grocery_list').update(grocery_list_id, {"items+": grocery_item_ids}, {expand: `items, items.ingrs${$page.params.user_name ? ', user' : ''}`});
-        grocery_list = grocery_list_result;
+        const update_grocery_list_data = {"items+": grocery_item_ids};
+        const grocery_list_result = await pb.collection('grocery_lists').update(grocery_list_id, update_grocery_list_data, {expand: `items, items.ingrs`});
+        grocery_list = grocery_list_result.expand.items;
         my_modal_3.close();
     }
 </script>
