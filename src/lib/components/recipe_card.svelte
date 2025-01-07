@@ -22,11 +22,11 @@
     } = $props();
 
     let just_copied = $state(false);
-    let fave_btn = $derived(!$page.params.user_name && (type == "today" || type == "menu"));
-    let check_box = $derived(type == "today" || type == "menu");
+    let fave_btn = $derived(!$page.params.user_name && (type == "today" || type == "menu") && (!$page.url.pathname.includes("/today") && type == "menu"));
+    let check_box = $derived((type == "today" || type == "menu") && (!$page.url.pathname.includes("/today") && type == "menu"));
     let add_btn = $derived(type == "recipes");
-    let delete_btn = $derived(type == "menu" || (type == "menu_component" && $page.url.pathname != "/profile"));
-    let thumb_btn = $derived(type == "menu");
+    let delete_btn = $derived((type == "menu" || (type == "menu_component" && $page.url.pathname != "/profile")) && (!$page.url.pathname.includes("/today") && type == "menu"));
+    let thumb_btn = $derived(type == "menu" && (!$page.url.pathname.includes("/today") && type == "menu"));
     let edit_serv = $state(type == "menu_component");
 
     const handle_click = (e) => {

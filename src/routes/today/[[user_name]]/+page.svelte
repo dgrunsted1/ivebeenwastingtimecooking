@@ -1,18 +1,16 @@
 <script>
-    import { stopPropagation } from 'svelte/legacy';
     import { page } from '$app/stores';
     import { onDestroy, onMount } from 'svelte';
     import { currentUser, pb, auth_refresh } from '/src/lib/pocketbase.js';
     import GroceryList from "/src/lib/components/grocery_list.svelte";
     import { get_grocery_list, groupBySimilarity } from '/src/lib/merge_ingredients.js'
     import { create_grocery_list, update_made, log_made, check_grocery_item, update_grocery_item } from '/src/lib/groceries.js'
-    import Heart from "/src/lib/icons/Heart.svelte";
-    import SubTask from "/src/lib/icons/subtask.svelte";
     import { update_fave } from '/src/lib/save_recipe.js';
     import RecipeCard from "/src/lib/components/recipe_card.svelte";
     import Alerts from "/src/lib/components/alerts.svelte";
     import NoteCard from "/src/lib/components/note_card.svelte";
     import Plus from "/src/lib/icons/Plus.svelte";
+    import RecipeList from "/src/lib/components/recipe_list.svelte";
 
     let todays_menu = $state({});
     let grocery_list = $state([]);
@@ -20,13 +18,11 @@
     let grocery_list_status = $state("saved");
     let mode = "menu";
     let loading = $state(true);
-    
-    let delay_timer;
-    let update_fave_list = [];
     let tab = $state("grocery_list");
     let sub_recipe_ids = $state([]);
     let recipes_ready = $state([]);
     let alert = $state({show: false, msg: "", title: "", type: "warning"});
+    let user_recipes = $state([]);
     
     onMount(async () => {
         await handleAuth();
@@ -96,7 +92,17 @@
             tab = "recipe_list";
         }
         loading = false;
+        get_user_recipes();
     });
+
+    async function get_user_recipes(){
+        console.log("get user recipes---------------------------------");
+        const user_filter = ($page.params.user_name) ? `user.username='${$page.params.user_name}'` : `user='${$currentUser.id}'`;
+        console.log({user_filter});
+        const result = await pb.collection('recipes').getList(1, 250, {filter: user_filter, expand:`ingr_list`});
+        console.log({result})
+        user_recipes = result.items;
+    }
     
     async function handleAuth() {
         if ($currentUser && $page.params.user_name == $currentUser.username) {
@@ -232,9 +238,39 @@
         window.location = `/cook_recipe/${recipe.url_id}/${todays_menu.servings[recipe.id]}`
     }
 
-    const add_recipe = (e) => {
-        console.log(e.currentTarget);
-        console.log({e});
+    const add_recipe_modal = (e) => {
+        my_modal_3.showModal();
+    }
+
+    const add_to_today = async (e) => {
+        const new_recipe = user_recipes.filter(recipe => recipe.id == e.index)[0];
+        let grocery_item_ids = [];
+        for (let i = 0; i < new_recipe.expand.ingr_list.length; i++){
+            const result = await update_grocery_item({
+                qty: new_recipe.expand.ingr_list[i].quantity,
+                unit: new_recipe.expand.ingr_list[i].unit,
+                name: new_recipe.expand.ingr_list[i].ingredient,
+                checked: false,
+                ingrs: [new_recipe.expand.ingr_list[i].id]
+            });
+            // console.log({result});
+            grocery_item_ids.push(result.id);
+        }
+        console.log({grocery_item_ids});
+        let tmp_servings = {...todays_menu.servings};
+        tmp_servings[new_recipe.id] = new_recipe.servings;
+        let tmp_made = {...todays_menu.made};
+        tmp_made[new_recipe.id] = false;
+        const update_menu_data = {
+            "recipes+": new_recipe.id,
+            "servings": tmp_servings,
+            "made": tmp_made
+        };
+        const menu_result = await pb.collection('menus').update(todays_menu.id, update_menu_data, {expand: `recipes,recipes.notes,recipes.ingr_list, grocery_list, grocery_list.items, grocery_list.items.ingrs${$page.params.user_name ? ', user' : ''}`});
+        todays_menu = menu_result;
+        const grocery_list_result = await pb.collection('grocery_list').update(grocery_list_id, {"items+": grocery_item_ids}, {expand: `items, items.ingrs${$page.params.user_name ? ', user' : ''}`});
+        grocery_list = grocery_list_result;
+        my_modal_3.close();
     }
 </script>
 
@@ -263,7 +299,7 @@
                     {#if todays_menu.expand}
                         {#each todays_menu.expand.recipes as curr, i}
                             {#if !sub_recipe_ids.includes(curr.id)}
-                                {#if todays_menu.sub_recipes}
+                                <!-- {#if todays_menu.sub_recipes}
                                     {#each todays_menu.sub_recipes[curr.id] as sub_recipe}
                                         {#each todays_menu.expand.recipes as curr_sub_recipe, i}
                                             {#if curr_sub_recipe.id === sub_recipe.recipe_id}
@@ -283,7 +319,7 @@
                                             {/if}
                                         {/each}
                                     {/each}
-                                {/if}
+                                {/if} -->
                                 <RecipeCard
                                     bind:recipe={todays_menu.expand.recipes[i]}
                                     bind:checked={todays_menu.made[curr.id]}
@@ -295,7 +331,7 @@
                                 />
                             {/if}
                         {/each}
-                        <button id="add" class="btn btn-lg btn-primary w-fit p-2 flex m-auto" onclick={add_recipe}><Plus size={12}/></button>
+                        <button id="add" class="btn btn-lg btn-primary w-fit p-2 flex m-auto rounded-[20px]" onclick={add_recipe_modal}><Plus size={12}/></button>
                     {:else if loading}
                         <div id="menu_loading" class="w-full flex justify-center content-center h-full">
                             <span class="loading loading-bars loading-lg"></span>
@@ -344,3 +380,15 @@
         </div>
         <Alerts msg={alert.msg} type={alert.type} bind:show={alert.show} title={alert.title}/>
     </div>
+    <dialog id="my_modal_3" class="modal">
+        <div class="modal-box max-w-full md:w-2/3 p-1 h-[95svh]">
+            <form method="dialog">
+                <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" onclick={()=>{edit_id = ""; edit_modal_recipe = false}}>✕</button>
+            </form>
+            <RecipeList 
+                recipes={user_recipes}
+                menu_recipes={[]}
+                card_click={add_to_today}
+            />
+        </div>
+    </dialog>
