@@ -96,11 +96,8 @@
     });
 
     async function get_user_recipes(){
-        console.log("get user recipes---------------------------------");
         const user_filter = ($page.params.user_name) ? `user.username='${$page.params.user_name}'` : `user='${$currentUser.id}'`;
-        console.log({user_filter});
         const result = await pb.collection('recipes').getList(1, 250, {filter: user_filter, expand:`ingr_list`});
-        console.log({result})
         user_recipes = result.items;
     }
     
@@ -253,10 +250,8 @@
                 checked: false,
                 ingrs: [new_recipe.expand.ingr_list[i].id]
             });
-            // console.log({result});
             grocery_item_ids.push(result.id);
         }
-        console.log({grocery_item_ids});
         let tmp_servings = {...todays_menu.servings};
         tmp_servings[new_recipe.id] = new_recipe.servings;
         let tmp_made = {...todays_menu.made};
@@ -384,7 +379,7 @@
     <dialog id="my_modal_3" class="modal">
         <div class="modal-box max-w-full md:w-2/3 p-1 h-[95svh]">
             <form method="dialog">
-                <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" onclick={()=>{edit_id = ""; edit_modal_recipe = false}}>✕</button>
+                <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
             </form>
             <RecipeList 
                 recipes={user_recipes}

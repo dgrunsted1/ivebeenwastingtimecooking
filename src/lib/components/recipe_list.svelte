@@ -6,7 +6,6 @@
     import { sort_recipes } from '/src/lib/sort.js';
     import Sort from "../../lib/components/sort.svelte";
     import CatCarousel from "../../lib/components/cat_carousel.svelte";
-    import { onMount } from "svelte";
 
     let { 
         recipes = $bindable(),
@@ -17,9 +16,6 @@
         update_recipe
     } = $props();
 
-    onMount(() => {
-        console.log({recipes});
-    });
     const get_categories = () => {
         let out = {cuisines:[], countries:[], cats:[]};
         for (let i = 0; i < recipes.length; i++){
