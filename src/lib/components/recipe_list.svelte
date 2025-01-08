@@ -6,6 +6,7 @@
     import { sort_recipes } from '/src/lib/sort.js';
     import Sort from "../../lib/components/sort.svelte";
     import CatCarousel from "../../lib/components/cat_carousel.svelte";
+    import { page } from '$app/stores';
 
     let { 
         recipes = $bindable(),
@@ -32,6 +33,7 @@
     let search_val = $state("");
     let display_recipes = $derived(sort_recipes(sort_val, filter_recipes(search(search_val))));
     let delay_timer;
+    let scroll_size = $derived($page.url.pathname.includes(`/today`) ? `h-[calc(80svh-120px)] md:h-[calc(80svh-120px)]` : `h-[calc(100svh-160px)] md:h-[calc(100svh-135px)]`);
 
     
     let display_cats = $derived(update_diplay_cats());
@@ -306,7 +308,7 @@
     </div>
 </div>
 
-<div id="recipes" class="h-[calc(100svh-160px)] md:h-[calc(100svh-135px)] overflow-y-auto space-y-2 rounded-md md:border-none py-2">
+<div id="recipes" class="{scroll_size} overflow-y-auto space-y-2 rounded-md md:border-none py-2">
     {#if display_recipes && display_recipes.length}
         {#each display_recipes as curr, i}
         <RecipeCard 

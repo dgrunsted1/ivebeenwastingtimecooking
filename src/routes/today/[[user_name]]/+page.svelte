@@ -377,14 +377,16 @@
         <Alerts msg={alert.msg} type={alert.type} bind:show={alert.show} title={alert.title}/>
     </div>
     <dialog id="my_modal_3" class="modal">
-        <div class="modal-box max-w-full md:w-2/3 p-1 h-[95svh]">
+        <div class="modal-box max-w-full md:w-2/3 p-1 h-[80svh]">
             <form method="dialog">
                 <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
             </form>
-            <RecipeList 
-                recipes={user_recipes}
-                menu_recipes={[]}
-                card_click={add_to_today}
-            />
+            <div class="mt-10">
+                <RecipeList 
+                    recipes={user_recipes}
+                    menu_recipes={[]}
+                    card_click={add_to_today}
+                />
+            </div>
         </div>
     </dialog>
