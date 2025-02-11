@@ -1,6 +1,6 @@
 <script>
     import { onMount } from 'svelte';
-    import GroceryList from "/src/lib/components/grocery_list.svelte";
+    import IngredientList from "/src/lib/components/ingredient_list.svelte";
     import { currentUser, pb } from '/src/lib/pocketbase';
     import { page } from '$app/stores';
     import { get_grocery_list } from '/src/lib/merge_ingredients.js';
@@ -311,8 +311,7 @@
             {/if}
         </div>
     {:else if tab == "grocery_list"}
-        <GroceryList 
-            status="none" 
+        <IngredientList 
             {grocery_list}
         />
     {/if}

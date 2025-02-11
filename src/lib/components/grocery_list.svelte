@@ -1,10 +1,9 @@
 <script>
-    import { onMount } from 'svelte';
     import DeleteIcon from "/src/lib/icons/DeleteIcon.svelte";
     import { page } from '$app/stores';
     import EditIcon from "/src/lib/icons/EditIcon.svelte";
     import CheckMark from "/src/lib/icons/CheckMark.svelte";
-    import { delete_grocery_item } from '/src/lib/groceries.js'
+    import { delete_grocery_item, ingrs_to_string } from '/src/lib/groceries.js'
     import { pb, currentUser } from '/src/lib/pocketbase';
     import Plus from "/src/lib/icons/Plus.svelte";
 
@@ -23,23 +22,10 @@
     let edit = $state(false);
     
     let delay_timer;
-    let view_size_mobile = $state(`h-[calc(100svh-210px)]`);
-    let view_size_desktop = $state(`md:h-[calc(100svh-210px)]`);
     let just_copied = $state(false);
     let new_item = $state({qty: null, unit: "", name: ""});
-    let interactable = ($page.url.pathname.includes("/today") || $page.url.pathname.includes("/list/"));
+    let interactable = true;
     let is_owner = ($currentUser && $currentUser.id == list_owner);
-
-    onMount(async () => {
-        if ($page.url.pathname.includes("/today")){
-            view_size_mobile = `h-[calc(100svh-150px)]`;
-            view_size_desktop = `md:h-[calc(100svh-105px)]`;
-        } else if ( $page.url.pathname.includes("/list/")){
-            view_size_mobile = `h-[calc(100svh-75px)]`;
-            view_size_desktop = `md:h-[calc(100svh-60px)]`;
-        }
-        
-    });
 
     const copy_to_clipboard = () => {
         let copy_text = "";
@@ -145,23 +131,6 @@
         else return ingrs_to_string(item.expand.ingrs);
     }
 
-    const ingrs_to_string = (ingrs) => {
-        if (!ingrs) return "none";
-        let ingrs_string = "";
-        for (let i = 0; i < ingrs.length; i++){
-            if (!ingrs[i]) continue;
-            if (i > 0) ingrs_string += " + ";
-            if (ingrs[i].quantity) {
-                ingrs_string += ingrs[i].quantity;
-            }else if (ingrs[i].qty){
-                ingrs_string += ingrs[i].qty;
-            }
-            ingrs_string += (ingrs[i].unit) ? " "+ingrs[i].unit+" " : " ";
-            ingrs_string += (ingrs[i].name) ? ingrs[i].name : ingrs[i].ingredient;
-        }
-        return ingrs_string;
-    }
-
     const add_item_modal = () => {
         my_modal_1.showModal();
         document.getElementById("modal_ingr").focus();
@@ -175,10 +144,10 @@
 </script>
 
 <div id="list" class="flex flex-col w-full">
-    <div id="header" class="hidden md:flex {($page.url.pathname.includes("/today")) ? `justify-between` : `justify-evenly`} items-center mt-0">
+    <div id="header" class="hidden md:flex justify-between items-center mt-0">
         {#if grocery_list.length > 0}
             <div>
-                {#if status != "none" && $page.url.pathname.includes("/today")}<div id="update_status" class="text-xs">{status}</div>{/if}
+                {#if status != "none"}<div id="update_status" class="text-xs">{status}</div>{/if}
                 <div id="count" class="text-xs">{grocery_list.reduce((count, item) => count + (item.checked ? 0 : 1), 0)}/{grocery_list.length} Items</div>
             </div>
             <button id="copy" class="btn btn-xs btn-primary cursor-copy" onclick={copy_to_clipboard}>
@@ -196,7 +165,7 @@
         {/if}
     </div>
     <div class="md:mx-3">
-        <div class="grocery_list {view_size_mobile} {view_size_desktop} overflow-y-auto px-2 py-4">
+        <div class="grocery_list h-[calc(100svh-150px)] md:h-[calc(100svh-105px)] overflow-y-auto px-2 py-4">
             {#if grocery_list.length > 0}
                 {#each grocery_list as item, i}
                     {#if edit}
@@ -207,10 +176,10 @@
                             {#if status != "none"}<button class="btn btn-sm p-1 btn-accent" onclick={() => remove_item(item.id)}><DeleteIcon/></button>{/if}
                         </div>
                     {:else}
-                        <div class="grocery_item flex space-x-3 {($page.url.pathname.includes("/today") || $page.url.pathname.includes("/list/"))? "justify-end md:justify-start" : "justify-start"} items-center">
+                        <div class="grocery_item flex space-x-3 justify-end md:justify-start items-center">
                             {#if status != "none"}<input type="checkbox" class="hidden md:flex checkbox checkbox-primary checkbox-lg p-1" id={item.id} bind:checked={item.checked} onchange={check_item_handle}>{/if}
                             <div class="flex md:tooltip {(i > 2) ? "tooltip-top": "tooltip-bottom"}" data-tip={tool_tip_string(item)}>
-                                <p class="text-xs">{ingrs_to_string([item])}</p>
+                                <p class="text">{ingrs_to_string([item])}</p>
                             </div>
                             {#if status != "none"}<input type="checkbox" class="md:hidden checkbox checkbox-primary checkbox-lg p-1" id={item.id} bind:checked={item.checked} onchange={check_item_handle}>{/if}
                         </div>
@@ -222,7 +191,7 @@
             {/if}
         </div>
     </div>
-    <div id="header" class="flex md:hidden {($page.url.pathname.includes("/today")) ? `justify-between` : `justify-evenly`} items-center mt-0">
+    <div id="header" class="flex md:hidden justify-between items-center mt-0">
         {#if grocery_list.length > 0 && interactable}
             <div>
                 {#if interactable}<div id="update_status" class="text-xs">{status}</div>{/if}

@@ -1,0 +1,23 @@
+<script>
+    import { ingrs_to_string } from '/src/lib/groceries.js'
+
+    let { 
+        grocery_list = $bindable([])
+    } = $props();
+
+</script>
+
+<div id="list" class="flex flex-col w-full">
+    <div class="md:mx-3">
+        <div class="grocery_list h-[calc(100svh-210px)] md:h-[calc(100svh-210px)] overflow-y-auto px-2 py-4">
+            {#if grocery_list.length > 0}
+                {#each grocery_list as item, i}
+                        <p class="text">{ingrs_to_string([item])}</p>
+                    {#if i != grocery_list.length-1}
+                        <div class="divider my-0 h-3"></div>
+                    {/if}
+                {/each}
+            {/if}
+        </div>
+    </div>
+</div>

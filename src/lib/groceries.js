@@ -176,3 +176,20 @@ export const check_grocery_item = async function(id, checked){
     const record = await pb.collection('grocery_items').update(id, data);
     return record;
 }
+
+export const ingrs_to_string = (ingrs) => {
+    if (!ingrs) return "none";
+    let ingrs_string = "";
+    for (let i = 0; i < ingrs.length; i++){
+        if (!ingrs[i]) continue;
+        if (i > 0) ingrs_string += " + ";
+        if (ingrs[i].quantity) {
+            ingrs_string += ingrs[i].quantity;
+        }else if (ingrs[i].qty){
+            ingrs_string += ingrs[i].qty;
+        }
+        ingrs_string += (ingrs[i].unit) ? " "+ingrs[i].unit+" " : " ";
+        ingrs_string += (ingrs[i].name) ? ingrs[i].name : ingrs[i].ingredient;
+    }
+    return ingrs_string;
+}
