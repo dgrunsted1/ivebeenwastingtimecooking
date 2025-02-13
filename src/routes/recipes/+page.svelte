@@ -63,6 +63,7 @@
     let alert = $state({show: false, msg: "", title: "", type: "warning"});
     
     let total_recipes_num = $state(0);
+    let flags = $state({});
 
 	async function fetchData() {
         
@@ -220,6 +221,10 @@
             const result = await auth_refresh;
             if (result.error){
                 show_error(e.message);
+            } else {
+                const flag_result = await pb.collection('flags').getFirstListItem(`user="${$currentUser.id}"`);
+                flags = flag_result;
+                console.log(flags);
             }
         }
 		await fetchData();
@@ -442,6 +447,7 @@
                                 recipe={item}
                                 type="recipes"
                                 servings={item.servings}
+                                {flags}
                                 card_click={cook_recipe}
                             />
                         {/each}

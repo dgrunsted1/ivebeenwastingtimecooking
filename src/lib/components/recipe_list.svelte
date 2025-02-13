@@ -14,7 +14,8 @@
         card_click,
         reset_mode,
         check_item,
-        update_recipe
+        update_recipe,
+        flags
     } = $props();
 
     const get_categories = () => {
@@ -315,6 +316,7 @@
             recipe={display_recipes[i]} 
             checked={is_checked(display_recipes[i].id)} 
             servings={display_recipes[i].servings}
+            {flags}
             type="menu"
             toggle_check_box={handle_check} 
             toggle_heart={update_fav}

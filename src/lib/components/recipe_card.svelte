@@ -13,6 +13,7 @@
         checked = $bindable(),
         servings = $bindable(),
         type = $bindable(),
+        flags,
         toggle_check_box,
         toggle_heart,
         card_click,
@@ -105,71 +106,143 @@
 </script>
 
     <!-- svelte-ignore a11y_no_static_element_interactions-->
-    <div class="card card-side bg-base-200 h-24 md:h-28 card-bordered border-primary cursor-pointer mx-1" onkeydown={handle_click} onclick={handle_click}>
-        <figure class="w-1/4 bg-cover bg-no-repeat bg-center" style="background-image: url('{recipe.image}')"></figure>
-        <div class="card-body h-full flex flex-row p-1 w-1/2 justify-between">
-            <div class="flex flex-col justify-between md:p-1 w-full">
-                <h2 id={recipe.id} class="card-title text-sm text-ellipsis overflow-hidden line-clamp-2">{recipe.title}</h2>
-                {#if edit_serv}
-                    <div class="flex items-center space-x-1">
-                        <input type="text" name="servings" class="input input-xs input-bordered input-primary w-12 text-center p-0" value={servings} onblur={handle_servings}/><label for="servings" class="text-sm ">servings</label>
-                    </div>
-                {/if}
-                <div class="flex w-full">
-                    {#if !edit_serv}
-                        <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow rounded-tl rounded-bl">
-                            {#if isNaN(recipe.servings)}
-                                {servings}
-                            {:else}
-                                {servings} servings
-                            {/if}
-                        </div>
-                        <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow">
-                            {#if recipe.time}
-                                {recipe.time}
-                            {:else}
-                                no time
-                            {/if}
-                        </div>
-                    {:else}
-                        <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow rounded-tl rounded-bl">
-                            {#if recipe.time}
-                                {recipe.time}
-                            {:else}
-                                no time
-                            {/if}
+    {#if flags === undefined || flags.is_compact}
+        <div class="card card-side bg-base-200 h-24 md:h-28 card-bordered border-primary cursor-pointer mx-1" onkeydown={handle_click} onclick={handle_click}>
+            <figure class="w-1/4 bg-cover bg-no-repeat bg-center" style="background-image: url('{recipe.image}')"></figure>
+            <div class="card-body h-full flex flex-row p-1 w-1/2 justify-between">
+                <div class="flex flex-col justify-between md:p-1 w-full">
+                    <h2 id={recipe.id} class="card-title text-sm text-ellipsis overflow-hidden line-clamp-2">{recipe.title}</h2>
+                    {#if edit_serv}
+                        <div class="flex items-center space-x-1">
+                            <input type="text" name="servings" class="input input-xs input-bordered input-primary w-12 text-center p-0" value={servings} onblur={handle_servings}/><label for="servings" class="text-sm ">servings</label>
                         </div>
                     {/if}
-                    <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow">
-                        {recipe.expand.ingr_list.length} ingredients
+                    <div class="flex w-full">
+                        {#if !edit_serv}
+                            <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow rounded-tl rounded-bl">
+                                {#if isNaN(recipe.servings)}
+                                    {servings}
+                                {:else}
+                                    {servings} servings
+                                {/if}
+                            </div>
+                            <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow">
+                                {#if recipe.time}
+                                    {recipe.time}
+                                {:else}
+                                    no time
+                                {/if}
+                            </div>
+                        {:else}
+                            <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow rounded-tl rounded-bl">
+                                {#if recipe.time}
+                                    {recipe.time}
+                                {:else}
+                                    no time
+                                {/if}
+                            </div>
+                        {/if}
+                        <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow">
+                            {recipe.expand.ingr_list.length} ingredients
+                        </div>
+                        <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow rounded-tr rounded-br">
+                            {recipe.directions.length} steps
+                        </div>
                     </div>
-                    <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow rounded-tr rounded-br">
-                        {recipe.directions.length} steps
+                </div>
+            </div>
+            <div class="card-actions flex flex-col justify-evenly items-end items-center py-1 pr-1 max-w-1/4">
+                {#if add_btn && (!$currentUser || $currentUser.id != recipe.user)}
+                    <button id={recipe.id} class="btn btn-primary btn-xs h-8 m-1 md:m-3" onclick={add_recipe} onkeydown={add_recipe}>
+                        {#if just_copied == recipe.id}
+                            <CheckMark color=""/>
+                        {:else}
+                            <Plus/>
+                        {/if}
+                    </button>
+                {/if}
+                {#if fave_btn || thumb_btn}
+                    <div class="flex flex-w-fit space-x-1">
+                        {#if fave_btn}<button class="btn btn-xs p-1 favorite flex content-center" onclick={toggle_favorite}><Heart color={(recipe.favorite) ? "fill-primary" : "fill-neutral"}/></button>{/if}
+                        {#if thumb_btn}<button class="btn btn-xs  p-1 made flex content-center" onclick={handle_thumb}><ThumbUp color={(recipe.made) ? "fill-primary" : "fill-neutral"}/></button>{/if}
+                    </div>
+                {/if}
+                {#if delete_btn || check_box}
+                    <div class="flex w-fit space-x-2">
+                        {#if check_box}<input type="checkbox" class="checkbox checkbox-primary checkbox-lg p-1" bind:checked={checked} onclick={toggle_made}>{/if}
+                        {#if delete_btn}<button class="btn btn-sm p-1 btn-accent {recipe.id} " onclick={handle_delete}><DeleteIcon/></button>{/if}
+                    </div>
+                {/if}
+            </div>
+        </div>
+    {:else}
+        <div class="card card-bordered border-primary cursor-pointer h-[100vw] md:h-[30vw] relative" onkeydown={handle_click} onclick={handle_click}>
+            <figure class="bg-cover bg-no-repeat bg-center absolute inset-0 rounded-xl" style="background-image: url('{recipe.image}')"></figure>
+            <div class="card-body flex flex-row p-1 justify-between mx-3 z-10">
+                <div class="flex flex-col justify-between md:p-1 my-5 w-full space-y-5">
+                    <div class="flex h-full justify-between space-x-5">
+                        <div class="flex flex-col mb-5 space-y-5 p-2">
+                            <h2 class="card-title text-ellipsis overflow-hidden line-clamp-2 text-white w-fit px-1 bg-base-100/50 rounded-lg">{recipe.title}</h2>
+                            {#if recipe.description}
+                                <div class="flex flex-wrap">
+                                    <p class="text text-ellipsis overflow-hidden line-clamp-5 text-white bg-base-100/50 px-1 rounded-lg">{recipe.description}</p>
+                                </div>
+                            {/if}
+                            {#if edit_serv}
+                                <div class="flex items-center space-x-1">
+                                    <input type="text" name="servings" class="input input-xs input-bordered input-primary w-12 text-center p-0" value={servings} onblur={handle_servings}/><label for="servings" class="text-sm ">servings</label>
+                                </div>
+                            {/if}
+                        </div>
+                        <div class="card-actions flex flex-col justify-evenly items-end items-center py-1 pr-1 max-w-1/4">
+                            {#if add_btn && (!$currentUser || $currentUser.id != recipe.user)}
+                                <button id={recipe.id} class="btn btn-primary btn-sm h-8 m-1 md:m-3" onclick={add_recipe} onkeydown={add_recipe}>
+                                    {#if just_copied == recipe.id}
+                                        <CheckMark color=""/>
+                                    {:else}
+                                        <Plus/>
+                                    {/if}
+                                </button>
+                            {/if}
+                            {#if delete_btn}<button class="btn btn-sm p-1 btn-accent {recipe.id} " onclick={handle_delete}><DeleteIcon/></button>{/if}
+                            {#if fave_btn}<button class="btn btn-sm p-1 favorite flex content-center" onclick={toggle_favorite}><Heart color={(recipe.favorite) ? "fill-primary" : "fill-neutral"}/></button>{/if}
+                            {#if thumb_btn}<button class="btn btn-sm  p-1 made flex content-center" onclick={handle_thumb}><ThumbUp color={(recipe.made) ? "fill-primary" : "fill-neutral"}/></button>{/if}
+                            {#if check_box}<input type="checkbox" class="checkbox checkbox-primary checkbox-lg p-1 border-primary bg-base-100/50" bind:checked={checked} onclick={toggle_made}>{/if}
+                        </div>
+                    </div>
+                    <div class="flex w-full bg-base-100/50 rounded-lg">
+                        {#if !edit_serv}
+                            <div class="text-base text-white border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow rounded-tl rounded-bl">
+                                {#if isNaN(recipe.servings)}
+                                    {servings}
+                                {:else}
+                                    {servings} servings
+                                {/if}
+                            </div>
+                            <div class="text-base text-white border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow">
+                                {#if recipe.time}
+                                    {recipe.time}
+                                {:else}
+                                    no time
+                                {/if}
+                            </div>
+                        {:else}
+                            <div class="text-base text-white border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow rounded-tl rounded-bl">
+                                {#if recipe.time}
+                                    {recipe.time}
+                                {:else}
+                                    no time
+                                {/if}
+                            </div>
+                        {/if}
+                        <div class="text-base text-white border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow">
+                            {recipe.expand.ingr_list.length} ingredients
+                        </div>
+                        <div class="text-base text-white border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow rounded-tr rounded-br">
+                            {recipe.directions.length} steps
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="card-actions flex flex-col justify-evenly items-end items-center py-1 pr-1 max-w-1/4">
-            {#if add_btn && (!$currentUser || $currentUser.id != recipe.user)}
-                <button id={recipe.id} class="btn btn-primary btn-xs h-8 m-1 md:m-3" onclick={add_recipe} onkeydown={add_recipe}>
-                    {#if just_copied == recipe.id}
-                        <CheckMark color=""/>
-                    {:else}
-                        <Plus/>
-                    {/if}
-                </button>
-            {/if}
-            {#if fave_btn || thumb_btn}
-                <div class="flex flex-w-fit space-x-1">
-                    {#if fave_btn}<button class="btn btn-xs p-1 favorite flex content-center" onclick={toggle_favorite}><Heart color={(recipe.favorite) ? "fill-primary" : "fill-neutral"}/></button>{/if}
-                    {#if thumb_btn}<button class="btn btn-xs  p-1 made flex content-center" onclick={handle_thumb}><ThumbUp color={(recipe.made) ? "fill-primary" : "fill-neutral"}/></button>{/if}
-                </div>
-            {/if}
-            {#if delete_btn || check_box}
-                <div class="flex w-fit space-x-2">
-                    {#if check_box}<input type="checkbox" class="checkbox checkbox-primary checkbox-lg p-1" bind:checked={checked} onclick={toggle_made}>{/if}
-                    {#if delete_btn}<button class="btn btn-sm p-1 btn-accent {recipe.id} " onclick={handle_delete}><DeleteIcon/></button>{/if}
-                </div>
-            {/if}
-        </div>
-    </div>
+    {/if}

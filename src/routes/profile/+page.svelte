@@ -12,6 +12,7 @@
     let breakfast_recipes = [];
     let other_recipes = [];
     let recipe_rec = $state({});
+    let flags = $state({});
     let main_recs = [];
     let dessert_rec = {};
     let breakfast_rec = {};
@@ -40,7 +41,11 @@
                 show_error(e.message);
             }
         }
-
+        const flag_result = await pb.collection('flags').getList(1, 50, {
+                filter: `user = "${$currentUser.id}"`
+            });
+        flags = flag_result.items[0];
+        pb.collection('flags').subscribe(flags.id, update_compact);
         loading.user = false;
         const recipe_result = await pb.collection('recipes').getList(1, 250, {
             fields: `id, category`,
@@ -58,6 +63,10 @@
         rec_mults = get_mults();
         loading.menu = false;
     });
+
+    function update_compact(e) {
+        flags = e.record;
+    }
 
     function show_error(title){
         alert.title = title;
@@ -118,6 +127,12 @@
     function update_title(e){
         menu_title = e.title;
     }
+
+    function toggle_compact(){
+        pb.collection('flags').update(flags.id, {
+            is_compact: !flags.is_compact
+        });
+    }
 </script>
 
 <div class="flex flex-col items-center space-y-6">
@@ -161,6 +176,12 @@
                         <div class="text">last bill: {get_local_time($currentUser.last_bill_date)}</div>
                         <div class="flex space-x-2"><label for="credit_card_num">credit card:</label><input type="text" name="username" value="************0006" class="input input-bordered input-xs"/></div>
                     {/if}
+                    <!-- <div class="form-control"> -->
+                        <label class="label cursor-pointer space-x-2">
+                            <input type="checkbox" class="toggle toggle-primary" bind:checked={flags.is_compact} onclick={toggle_compact}/>
+                            <span class="label-text">compact cards</span>
+                        </label>
+                    <!-- </div> -->
                 </div>
             </div>
         {/if}

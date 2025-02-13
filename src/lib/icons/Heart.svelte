@@ -5,7 +5,7 @@
 <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
   viewBox="0 0 394.000000 363.000000"
  preserveAspectRatio="xMidYMid meet"
- class="w-6 primary pointer-events-none {color}">
+ class="w-6 h-6 primary pointer-events-none {color}">
 
 <g transform="translate(0.000000,363.000000) scale(0.100000,-0.100000)"
  stroke="none">
