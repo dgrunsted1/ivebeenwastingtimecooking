@@ -23,7 +23,6 @@
     let total_servings = $derived(get_servings(menu_recipes, {}, mults));
     let menu_title = $state("New Menu");
     let alert = $state({show: false, msg: "", title: "", type: "warning"});
-    let flags = $state({});
 
     onMount(async () => {
         if (!$currentUser) window.location.href = "/login";
@@ -33,10 +32,6 @@
                 show_error(e.message);
             }
         }
-        const flag_result = await pb.collection('flags').getList(1, 1, {
-            filter: `user="${$currentUser.id}"`,
-        });
-        flags = flag_result.items[0];
         const result_list = await pb.collection('recipes').getList(1, 250, {
             filter: `user="${$currentUser.id}"`,
             expand: `notes, ingr_list`,
@@ -130,7 +125,6 @@
                         {reset_mode} 
                         {check_item}
                         {update_recipe}
-                        {flags}
                     />
                 </div>
                 <!-- --------------

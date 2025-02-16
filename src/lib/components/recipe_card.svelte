@@ -6,14 +6,13 @@
     import Heart from "/src/lib/icons/Heart.svelte";
     import DeleteIcon from "/src/lib/icons/DeleteIcon.svelte";
     import ThumbUp from "/src/lib/icons/ThumbUp.svelte";
-
+    import { flagsStore } from "/src/lib/stores.js";
 
     let { 
         recipe = $bindable(),
         checked = $bindable(),
         servings = $bindable(),
         type = $bindable(),
-        flags,
         toggle_check_box,
         toggle_heart,
         card_click,
@@ -106,7 +105,7 @@
 </script>
 
     <!-- svelte-ignore a11y_no_static_element_interactions-->
-    {#if flags === undefined || flags.is_compact}
+    {#if $flagsStore === undefined || $flagsStore.is_compact}
         <div class="card card-side bg-base-200 h-24 md:h-28 card-bordered border-primary cursor-pointer mx-1" onkeydown={handle_click} onclick={handle_click}>
             <figure class="w-1/4 bg-cover bg-no-repeat bg-center" style="background-image: url('{recipe.image}')"></figure>
             <div class="card-body h-full flex flex-row p-1 w-1/2 justify-between">

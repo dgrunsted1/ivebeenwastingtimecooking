@@ -407,7 +407,7 @@
 <main class="flex flex-col w-full justify-center items-center">
   <h4>See what others are cooking</h4>
   <div class="flex w-full justify-center flex-col md:mt-2 space-y-1 md:space-y-2">
-    <div class="hidden md:flex flex-row md:flex-col w-full">
+    <div class="hidden md:flex flex-row md:flex-col m-2">
         <CatCarousel
             {display_categories}
             {display_cuisines}
