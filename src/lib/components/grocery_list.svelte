@@ -1,6 +1,5 @@
 <script>
     import DeleteIcon from "/src/lib/icons/DeleteIcon.svelte";
-    import { page } from '$app/stores';
     import EditIcon from "/src/lib/icons/EditIcon.svelte";
     import CheckMark from "/src/lib/icons/CheckMark.svelte";
     import { delete_grocery_item, ingrs_to_string } from '/src/lib/groceries.js'

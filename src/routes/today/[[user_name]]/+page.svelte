@@ -177,7 +177,7 @@
     async function update_groceries(e){
         grocery_list_status = "updating";
         for (let i = 0; i <  grocery_list.length; i++){
-            if (grocery_list[i].id = e.id){
+            if (grocery_list[i].id == e.id){
                 const item_result = await update_grocery_item(grocery_list[i]);
                 break;
             }
