@@ -66,9 +66,6 @@
     let flags = $state({});
 
 	async function fetchData() {
-        console.log("fetching data -----------------------------------------");
-        console.log({selected_authors});
-        console.log({selected_cuisines});
         if (search_val){
             
             //get recipes with title
