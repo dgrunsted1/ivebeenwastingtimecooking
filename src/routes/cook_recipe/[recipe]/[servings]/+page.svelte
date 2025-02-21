@@ -350,9 +350,9 @@
             <dialog id="my_modal_3" class="modal">
                 <div class="modal-box max-w-full md:w-2/3 p-1 h-[80vh] z-0">
                     <form method="dialog">
-                        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" onclick={() => {document.getElementById('modal_content').classList.add('hidden')}}>✕</button>
+                        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
                     </form>
-                    <div id="modal_content" class="hidden">
+                    <div id="modal_content">
                         <EditRecipe
                             recipe={recipe}
                             update_recipe={(e) => {recipe = e.recipe}}

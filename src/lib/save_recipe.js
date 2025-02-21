@@ -1,5 +1,4 @@
 import { pb } from '/src/lib/pocketbase';
-import { process_ingr } from '/src/lib/process_recipe.js'
  
 export async function save_recipe(e, recipe, user, new_note) {
     e.srcElement.disabled = true;
@@ -34,9 +33,10 @@ export async function save_recipe(e, recipe, user, new_note) {
         "country": recipe.country,
         "ingr_list": ingr_ids,
         "ingr_num": ingr_ids.length,
-        "url_id": await get_url_id(recipe),
+        "url_id": (recipe.url_id) ? recipe.url_id : await get_url_id(recipe),
         "made": recipe.made,
-        "favorite": recipe.favorite
+        "favorite": recipe.favorite,
+        "url": recipe.url
     };
     if (note_ids.length) data.notes = note_ids;
     let recipe_result;
@@ -44,7 +44,7 @@ export async function save_recipe(e, recipe, user, new_note) {
         recipe_result = await pb.collection('recipes').update(recipe.id, data, {expand: "notes,ingr_list"});
     }else {
         data.user = user.id;
-        data.url = recipe.url;
+        // data.url = recipe.url;
         recipe = await pb.collection('recipes').create(data, {expand: "notes,ingr_list"});
         e.srcElement.innerHTML = "updating ingredients";
         for (let curr_ingr_id of ingr_ids){

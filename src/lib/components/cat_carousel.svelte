@@ -53,8 +53,8 @@
         </button> 
     {/each}
     {#each display_authors as author}
-        <button id="cuisine" 
-            class="btn btn-xs {selected_authors.includes(author)?'btn-primary text-black':'bg-base-300 text-neutral'} cuisine" 
+        <button id="author" 
+            class="btn btn-xs {selected_authors.includes(author)?'btn-primary text-black':'bg-base-300 text-neutral'} author" 
             onclick={select_cat}>
                 {author}
         </button> 

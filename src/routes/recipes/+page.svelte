@@ -66,7 +66,9 @@
     let flags = $state({});
 
 	async function fetchData() {
-        
+        console.log("fetching data -----------------------------------------");
+        console.log({selected_authors});
+        console.log({selected_cuisines});
         if (search_val){
             
             //get recipes with title
@@ -224,7 +226,6 @@
             } else {
                 const flag_result = await pb.collection('flags').getFirstListItem(`user="${$currentUser.id}"`);
                 flags = flag_result;
-                console.log(flags);
             }
         }
 		await fetchData();
@@ -440,7 +441,7 @@
                     type="recipe" 
                 />
                 </div>
-                <ul class="flex flex-col w-full space-y-2 md:space-y-4 h-[calc(100svh-130px)] md:h-[calc(100svh-160px)] overflow-y-auto">
+                <ul class="flex flex-col w-full space-y-2 md:space-y-4 h-[calc(100svh-130px)] md:h-[calc(100svh-160px)] overflow-y-auto px-1">
                     {#if data.length && !refresh_loading}
                         {#each data as item}
                             <RecipeCard 

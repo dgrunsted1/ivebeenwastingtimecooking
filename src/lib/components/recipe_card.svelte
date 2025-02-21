@@ -178,18 +178,18 @@
         <div class="card card-bordered border-primary cursor-pointer h-[100vw] md:h-[30vw] relative" onkeydown={handle_click} onclick={handle_click}>
             <figure class="bg-cover bg-no-repeat bg-center absolute inset-0 rounded-xl" style="background-image: url('{recipe.image}')"></figure>
             <div class="card-body flex flex-row p-1 justify-between mx-3 z-10">
-                <div class="flex flex-col justify-between md:p-1 my-5 w-full space-y-5">
+                <div class="flex flex-col justify-between md:p-1 my-5 w-full">
                     <div class="flex h-full justify-between space-x-5">
-                        <div class="flex flex-col mb-5 space-y-5 p-2">
+                        <div class="flex flex-col space-y-5 p-2">
                             <h2 class="card-title text-ellipsis overflow-hidden line-clamp-2 text-white w-fit px-1 bg-base-100/50 rounded-lg">{recipe.title}</h2>
                             {#if recipe.description}
                                 <div class="flex flex-wrap">
-                                    <p class="text text-ellipsis overflow-hidden line-clamp-5 text-white bg-base-100/50 px-1 rounded-lg">{recipe.description}</p>
+                                    <p class="text text-ellipsis overflow-hidden {edit_serv ? `line-clamp-3` : `line-clamp-5`} text-white bg-base-100/50 px-1 rounded-lg">{recipe.description}</p>
                                 </div>
                             {/if}
                             {#if edit_serv}
-                                <div class="flex items-center space-x-1">
-                                    <input type="text" name="servings" class="input input-xs input-bordered input-primary w-12 text-center p-0" value={servings} onblur={handle_servings}/><label for="servings" class="text-sm ">servings</label>
+                                <div class="flex items-center">
+                                    <input type="text" name="servings" class="input input-bordered input-primary w-12 text-center p-0" value={servings} onblur={handle_servings}/><label for="servings" class="text-base text-white bg-base-100/50 px-1 rounded-lg">servings</label>
                                 </div>
                             {/if}
                         </div>
