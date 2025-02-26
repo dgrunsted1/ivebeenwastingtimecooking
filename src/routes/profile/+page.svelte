@@ -195,8 +195,8 @@
                     <img src="https://db.ivebeenwastingtime.com/api/files/716b9n2y44y92zp/w27w7eusm0jjeb4/unknown_3_sc7jpHPrHp.png?token=" alt="avatar" class="profile-avatar border rounded-xl" />
                 {/if}
             </div>
-            <div class="flex md:space-x-4 items-center">
-                <div class="flex flex-col space-y-2 my-5">
+            <div class="flex flex-col md:flex-row md:space-x-4 items-center">
+                <div class="flex flex-col space-y-2 w-full md:w-auto m-1 md:my-5">
                     {#if !edit_profile}
                         <div class="text">name: {$currentUser.name}</div>
                         <div class="text">email: {$currentUser.email}</div>
