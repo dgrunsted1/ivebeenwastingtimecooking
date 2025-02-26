@@ -4,7 +4,6 @@
 	import "../input.css";
     import { onMount } from 'svelte';
 	import { flagsStore } from '/src/lib/stores.js';
-	import FlagToggle from '/src/lib/components/flag_toggle.svelte';
 	/**
 	 * @typedef {Object} Props
 	 * @property {import('svelte').Snippet} [children]
@@ -12,7 +11,6 @@
 
 	/** @type {Props} */
 	let { children } = $props();
-	let flags = $state({});
 	let page_links = ($currentUser) ? [
 		{href:"/today", display: "Today"},
 		{href:"/recipes", display: "Recipes"},
@@ -30,13 +28,6 @@
 		});
 		flagsStore.set(flags_result.items[0]);
 	});
-
-	function toggle_compact(){
-		$flagsStore.is_compact = !$flagsStore.is_compact;
-        pb.collection('flags').update($flagsStore.id, {
-            is_compact: $flagsStore.is_compact
-        });
-	}
 </script>
 		<div class="navbar bg-base-100 fixed z-100 flex content-center min-h-0 h-6 md:h-9 relative">
 			<div class="navbar-start">
@@ -66,13 +57,6 @@
 						{#each page_links as link}
 							<li class=""><a href={link.href} class="btn btn-xs {(link.href != $page.url.pathname) ? 'btn-primary' : 'btn-ghost'} flex content-center whitespace-nowrap">{link.display}</a></li>
 						{/each}
-						<li class="flex content-center m-0">
-							<FlagToggle
-								type="is_compact"
-								value={$flagsStore.is_compact}
-								handle_func={toggle_compact}
-							/>
-						</li>
 						{#if !$currentUser && $page.url.pathname != "/login"}
 							<li><a href="/login" class="btn btn-xs btn-primary flex content-center">login</a></li>
 						{:else if $currentUser && $page.url.pathname != "/login" && $page.url.pathname != "/gallery"}

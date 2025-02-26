@@ -5,6 +5,7 @@
     import { get_servings } from '/src/lib/recipe_util.js';
     import Menu from "/src/lib/components/menu.svelte";
     import Alerts from "../../lib/components/alerts.svelte";
+	import { flagsStore } from '/src/lib/stores.js';
 
     let main_recipes = $state([]);
     let recipes = $state([]);
@@ -12,7 +13,6 @@
     let breakfast_recipes = [];
     let other_recipes = [];
     let recipe_rec = $state({});
-    let flags = $state({});
     let main_recs = [];
     let dessert_rec = {};
     let breakfast_rec = {};
@@ -30,6 +30,9 @@
     let total_servings = $derived(get_servings(menu_rec, {}, rec_mults));
     let menu_title = $state("New Menu");
     let alert = $state({show: false, msg: "", title: "", type: "warning"});
+    let fave = $state({});
+    let avg_recipes = $state(0);
+    let month_menus = $state(0);
 
     onMount(async () => {
         if (!$currentUser){
@@ -41,12 +44,21 @@
                 show_error(e.message);
             }
         }
-        const flag_result = await pb.collection('flags').getList(1, 50, {
-                filter: `user = "${$currentUser.id}"`
-            });
-        flags = flag_result.items[0];
-        pb.collection('flags').subscribe(flags.id, update_compact);
         loading.user = false;
+        const recipe_log_result = await pb.collection('recipe_log').getList(1, 250, {
+            filter: `user = "${$currentUser.id}"`,
+            expand: `recipe`,
+            sort: `-created`
+        });
+        console.log(recipe_log_result.items);
+        fave = getMostFrequent(recipe_log_result.items);
+        avg_recipes = get_avg_recipes(recipe_log_result.items);
+        const menu_log_result = await pb.collection('menu_log').getList(1, 250, {
+            filter: `user = "${$currentUser.id}" && date_completed > "${last_month()}"`,
+            expand: `menu`,
+            sort: `-date_completed`
+        });
+        month_menus = menu_log_result.items.length;
         const recipe_result = await pb.collection('recipes').getList(1, 250, {
             fields: `id, category`,
             filter: `user="${$currentUser.id}"`,
@@ -64,8 +76,43 @@
         loading.menu = false;
     });
 
-    function update_compact(e) {
-        flags = e.record;
+    function last_month(){
+        const today = new Date()
+        today.setMonth(today.getMonth() - 1)
+        return today.toISOString().split('T')[0]
+    }
+
+    function get_avg_recipes(list){
+        let start = new Date()
+        start.setMonth(start.getMonth() - 6);
+        const a = new Date(list[0].created);
+        let cnt = 1;
+        console.log({start})
+        for (let i = 1; i < list.length; i++){
+            cnt++;
+            console.log(list[i].created)
+            if (new Date(list[i].created) < start){
+                break;
+            }
+        }
+        return cnt / 24;
+    }
+
+    function getMostFrequent(list) {
+        const frequencyMap = new Map();
+        let maxItem = list[0];
+        let maxCount = 1;
+
+        for (const item of list) {
+            const count = (frequencyMap.get(item.recipe) || 0) + 1;
+            frequencyMap.set(item.recipe, count);
+            if (count > maxCount) {
+                maxCount = count;
+                maxItem = item;
+            }
+        }
+
+        return {item: maxItem, cnt: maxCount};
     }
 
     function show_error(title){
@@ -129,8 +176,8 @@
     }
 
     function toggle_compact(){
-        pb.collection('flags').update(flags.id, {
-            is_compact: !flags.is_compact
+        pb.collection('flags').update($flagsStore.id, {
+            is_compact: !$flagsStore.is_compact
         });
     }
 </script>
@@ -176,12 +223,17 @@
                         <div class="text">last bill: {get_local_time($currentUser.last_bill_date)}</div>
                         <div class="flex space-x-2"><label for="credit_card_num">credit card:</label><input type="text" name="username" value="************0006" class="input input-bordered input-xs"/></div>
                     {/if}
-                    <!-- <div class="form-control"> -->
-                        <label class="label cursor-pointer space-x-2">
-                            <input type="checkbox" class="toggle toggle-primary" bind:checked={flags.is_compact} onclick={toggle_compact}/>
-                            <span class="label-text">compact cards</span>
-                        </label>
-                    <!-- </div> -->
+                    <label class="label cursor-pointer space-x-2">
+                        <input type="checkbox" class="toggle toggle-primary" bind:checked={$flagsStore.is_compact} onclick={toggle_compact}/>
+                        <span class="label-text">compact cards</span>
+                    </label>
+                </div>
+                <div class="flex flex-col space-y-2 my-5 h-full min-w-56 items-center justify-center">
+                    {#if fave.item}
+                        <p>favorite recipe: {fave.item.expand.recipe.title} ({fave.cnt})</p>
+                    {/if}
+                    <p>you average {avg_recipes} recipes per week</p>
+                    <p>you have completed {month_menus} menus in the last month</p>
                 </div>
             </div>
         {/if}
