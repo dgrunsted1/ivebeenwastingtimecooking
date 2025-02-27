@@ -43,6 +43,10 @@
         card_click({index: e.id});
     }
 
+    function scroll_to_top(){
+        document.getElementById('recipes').scrollTop = 0;
+    }
+
     async function delete_recipe(e){
         e.stopPropagation();
         let tmp = []
@@ -213,6 +217,7 @@
             }
 
             reset_mode();
+            scroll_to_top();
         }, delay_time);
     }
 
@@ -270,12 +275,14 @@
 
     function update_search(e) {
         search_val = e.val;
+        scroll_to_top();
     }
 
     async function update_sort(e){
         loading = true;
         sort_val = e.currentTarget.innerHTML; 
         document.activeElement.blur();
+        scroll_to_top();
         loading = false;
     }
 </script>

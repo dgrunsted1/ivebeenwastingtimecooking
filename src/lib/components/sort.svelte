@@ -12,7 +12,7 @@
 
 <div class="dropdown dropdown-top md:dropdown-bottom dropdown-end">
     <label tabindex="-1" for="sort_mobile" class="btn m-0 btn-primary btn-xs md:btn-sm">{sort_val}</label>
-    <ul tabindex="-1" name="sort_mobile" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-max bg-primary">
+    <ul tabindex="-1" name="sort_mobile" class="dropdown-content z-[100] menu p-2 shadow bg-base-100 rounded-box w-max bg-primary">
         {#each sort_opts as opt}
             <li class="btn btn-xs {opt == sort_val ? 'btn-neutral': 'btn-primary'}"><button onclick={update_sort}>{opt}</button></li>
         {/each}

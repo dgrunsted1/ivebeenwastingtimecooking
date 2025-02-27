@@ -241,6 +241,7 @@
   async function select_cat(e){
     // TODO
     refresh_loading = true;
+    scroll_to_top();
     toggle_cat(e.currentTarget.id, e.currentTarget.innerHTML);
     page = 1; 
     
@@ -348,6 +349,7 @@
 
     async function update_sort(e){
         refresh_loading = true;
+        scroll_to_top();
         document.activeElement.blur();
         sort_val = e.currentTarget.innerHTML;
         newBatch = [];
@@ -361,6 +363,7 @@
 
     async function update_search(e){
         refresh_loading = true;
+        scroll_to_top();
         search_val = e.val;
         clearTimeout(delay_timer);
         delay_timer = setTimeout(async () => {
@@ -381,17 +384,18 @@
     }
 
     function show_error(title){
-        alert.title = title;
-        alert.type = "error";
-        alert.show = true;
+        show_alert("", "error", title);
     }
 
     function show_alert(msg, type, title){
-        
         alert.show = true;
         alert.msg = msg;
         alert.type = type;
         alert.title = title;
+    }
+
+    function scroll_to_top(){
+        document.getElementById('recipes').scrollTop = 0;
     }
 </script>
 <svelte:head>
@@ -438,7 +442,7 @@
                     type="recipe" 
                 />
                 </div>
-                <ul class="flex flex-col w-full space-y-2 md:space-y-4 h-[calc(100svh-130px)] md:h-[calc(100svh-160px)] overflow-y-auto px-1">
+                <ul id="recipes" class="flex flex-col w-full space-y-2 md:space-y-4 h-[calc(100svh-130px)] md:h-[calc(100svh-160px)] overflow-y-auto px-1">
                     {#if data.length && !refresh_loading}
                         {#each data as item}
                             <RecipeCard 
