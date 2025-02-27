@@ -132,7 +132,7 @@
                 -------------- -->
                 <!-- svelte-ignore a11y_click_events_have_key_events -->
                 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-                <details class="md:hidden collapse bg-base-200 md:bg-base-100 collapse-arrow mt-1 w-full md:w-1/2" onclick={() => {window.scrollBy({ top: 700, left: 0, behavior: "smooth"});}}>
+                <details class="md:hidden collapse bg-base-200 md:bg-base-100 collapse-arrow mt-1 md:w-1/2" onclick={() => {window.scrollBy({ top: 700, left: 0, behavior: "smooth"});}}>
                     <summary class="collapse-title text-xl font-medium">
                         {#if menu_recipes.length > 0}
                             <div class="flex justify-around m-1 items-center">
@@ -144,7 +144,7 @@
                             Your Menu
                         {/if}
                     </summary>
-                    <div id="right_column" class="collapse-content w-full">
+                    <div id="right_column" class="collapse-content">
                         {#if menu_recipes.length}
                             <Menu 
                                 title="New Menu" 
