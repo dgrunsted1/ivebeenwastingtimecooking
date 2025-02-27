@@ -181,15 +181,15 @@
                 <div class="flex flex-col justify-between md:p-1 my-5 w-full">
                     <div class="flex h-full justify-between space-x-5">
                         <div class="flex flex-col space-y-5 p-2">
-                            <h2 class="card-title text-ellipsis overflow-hidden line-clamp-2 text-white w-fit px-1 bg-base-100/50 rounded-lg">{recipe.title}</h2>
+                            <h2 class="card-title text-ellipsis overflow-hidden line-clamp-2 text-white w-fit px-1 bg-black/50 rounded-lg">{recipe.title}</h2>
                             {#if recipe.description}
                                 <div class="flex flex-wrap">
-                                    <p class="text text-ellipsis overflow-hidden {edit_serv ? `line-clamp-3` : `line-clamp-5`} text-white bg-base-100/50 px-1 rounded-lg">{recipe.description}</p>
+                                    <p class="text text-ellipsis overflow-hidden {edit_serv ? `line-clamp-3` : `line-clamp-5`} text-white bg-black/50 px-1 rounded-lg">{recipe.description}</p>
                                 </div>
                             {/if}
                             {#if edit_serv}
                                 <div class="flex items-center">
-                                    <input type="text" name="servings" class="input input-bordered input-primary w-12 text-center p-0" value={servings} onblur={handle_servings}/><label for="servings" class="text-base text-white bg-base-100/50 px-1 rounded-lg">servings</label>
+                                    <input type="text" name="servings" class="input input-bordered input-primary w-12 text-center p-0" value={servings} onblur={handle_servings}/><label for="servings" class="text-base text-white bg-black/50 px-1 rounded-lg">servings</label>
                                 </div>
                             {/if}
                         </div>
@@ -203,13 +203,13 @@
                                     {/if}
                                 </button>
                             {/if}
-                            {#if delete_btn}<button class="btn btn-sm p-1 btn-accent {recipe.id} " onclick={handle_delete}><DeleteIcon/></button>{/if}
-                            {#if fave_btn}<button class="btn btn-sm p-1 favorite flex content-center" onclick={toggle_favorite}><Heart color={(recipe.favorite) ? "fill-primary" : "fill-neutral"}/></button>{/if}
-                            {#if thumb_btn}<button class="btn btn-sm  p-1 made flex content-center" onclick={handle_thumb}><ThumbUp color={(recipe.made) ? "fill-primary" : "fill-neutral"}/></button>{/if}
-                            {#if check_box}<input type="checkbox" class="checkbox checkbox-primary checkbox-lg p-1 border-primary bg-base-100/50" bind:checked={checked} onclick={toggle_made}>{/if}
+                            {#if delete_btn}<button class="btn btn-sm p-1 btn-accent {recipe.id}" onclick={handle_delete}><DeleteIcon/></button>{/if}
+                            {#if fave_btn}<button class="btn btn-sm p-1 favorite flex content-center bg-black/50" onclick={toggle_favorite}><Heart color={(recipe.favorite) ? "fill-primary" : "fill-neutral"}/></button>{/if}
+                            {#if thumb_btn}<button class="btn btn-sm  p-1 made flex content-center bg-black/50" onclick={handle_thumb}><ThumbUp color={(recipe.made) ? "fill-primary" : "fill-neutral"}/></button>{/if}
+                            {#if check_box}<input type="checkbox" class="checkbox checkbox-primary checkbox-lg p-1 border-primary bg-black/50" bind:checked={checked} onclick={toggle_made}>{/if}
                         </div>
                     </div>
-                    <div class="flex w-full bg-base-100/50 rounded-lg">
+                    <div class="flex w-full bg-black/50 rounded-lg">
                         {#if !edit_serv}
                             <div class="text-base text-white border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow rounded-tl rounded-bl">
                                 {#if isNaN(recipe.servings)}

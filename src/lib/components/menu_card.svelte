@@ -68,10 +68,10 @@
                 <div class="flex w-full space-x-1">
                     <div class="flex flex-col justify-between content-center lg:h-full mt-0 basis-full min-w-0">
                         <div class="flex flex-row justify-evenly text-xs lg:text-md items-center h-full min-w-0">
-                            <div class="card-title text-ellipsis overflow-hidden line-clamp-2 text-white w-fit px-1 bg-base-100/50 rounded-lg">{menu.title}</div>
-                            <div class="text-base text-ellipsis overflow-hidden line-clamp-2 text-white w-fit px-1 bg-base-100/50 rounded-lg">{format_date(menu.created)}</div>
+                            <div class="card-title text-ellipsis overflow-hidden line-clamp-2 text-white w-fit px-1 bg-black/50 rounded-lg">{menu.title}</div>
+                            <div class="text-base text-ellipsis overflow-hidden line-clamp-2 text-white w-fit px-1 bg-black/50 rounded-lg">{format_date(menu.created)}</div>
                         </div>
-                        <div class="flex w-full bg-base-100/50 rounded-lg">
+                        <div class="flex w-full bg-black/50 rounded-lg">
                             <p class="text-base text-white border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow rounded-tl rounded-bl">{menu.expand.recipes.length} recipes</p>
                             <p class="text-base text-white border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow">{get_grocery_list(menu, menu.servings, menu.sub_recipes).length} ingredients</p>
                             <p class="text-base text-white border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow">{get_servings(menu.expand.recipes, menu.sub_recipes, menu.servings)} servings</p>
