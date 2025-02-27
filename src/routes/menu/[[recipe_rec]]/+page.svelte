@@ -144,7 +144,7 @@
                             Your Menu
                         {/if}
                     </summary>
-                    <div id="right_column" class="collapse-content">
+                    <div id="right_column" class="collapse-content px-1">
                         {#if menu_recipes.length}
                             <Menu 
                                 title="New Menu" 
