@@ -106,7 +106,7 @@
 
     <!-- svelte-ignore a11y_no_static_element_interactions-->
     {#if $flagsStore === undefined || $flagsStore.is_compact}
-        <div class="card card-side bg-base-200 h-24 md:h-28 card-bordered border-primary cursor-pointer mx-1" onkeydown={handle_click} onclick={handle_click}>
+        <div class="card card-side bg-base-300 h-24 md:h-28 cursor-pointer mx-1" onkeydown={handle_click} onclick={handle_click}>
             <figure class="w-1/4 bg-cover bg-no-repeat bg-center" style="background-image: url('{recipe.image}')"></figure>
             <div class="card-body h-full flex flex-row p-1 w-1/2 justify-between">
                 <div class="flex flex-col justify-between md:p-1 w-full">
@@ -175,7 +175,7 @@
             </div>
         </div>
     {:else}
-        <div class="card card-bordered border-primary cursor-pointer h-[100vw] md:h-[30vw] relative" onkeydown={handle_click} onclick={handle_click}>
+        <div class="card cursor-pointer h-[100vw] md:h-[30vw] relative" onkeydown={handle_click} onclick={handle_click}>
             <figure class="bg-cover bg-no-repeat bg-center absolute inset-0 rounded-xl" style="background-image: url('{recipe.image}')"></figure>
             <div class="card-body flex flex-row p-1 justify-between mx-3 z-10">
                 <div class="flex flex-col justify-between md:p-1 my-5 w-full">

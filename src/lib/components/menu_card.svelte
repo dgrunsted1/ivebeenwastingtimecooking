@@ -26,7 +26,7 @@
 {#if menu?.expand?.recipes}
     {#if $flagsStore === undefined || $flagsStore.is_compact}
         <!-- svelte-ignore a11y_no_static_element_interactions-->
-        <div id={menu.id} class="card lg:card-side card-bordered border-primary bg-base-200 h-24 mx-1 cursor-pointer" onclick={handle_click} onkeypress={handle_click}>
+        <div id={menu.id} class="card lg:card-side bg-base-300 h-24 mx-1 cursor-pointer" onclick={handle_click} onkeypress={handle_click}>
             <figure class="h-1/2 lg:h-24 w-full lg:w-1/2 shrink-0 flex overflow-hidden">
                 {#each menu.expand.recipes.slice(0,6) as recipe, j}
                     {#if menu.expand.recipes[j].image}
