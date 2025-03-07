@@ -247,27 +247,15 @@
                 <div class="description_container m-auto w-5/6">
                     <div class="desc text-xs md:text-sm" >{recipe.description}</div>
                 </div>
-                <div class="misc flex justify-evenly">
-                    <div class="author_container text-center w-1/3 text-xs md:text-sm">
-                        <div class="auth">{recipe.author}</div>
-                    </div>
-                    <div class="time_container text-center w-1/3 text-xs md:text-sm">
-                        <div class="time">{recipe.time}</div>
-                    </div>
-                    <div class="servings text-center w-1/3 text-xs md:text-sm">
-                        <input type="text" class="input input-primary input-sm w-10 p-1 mx-2 text-center" bind:value={servings} />servings
-                    </div>
+                <div class="misc flex justify-evenly content-center">
+                    <div class="content-center">{recipe.author}</div>
+                    <div class="content-center">{recipe.time}</div>
+                    <div class="content-center"><input type="text" class="input input-primary input-sm w-10 p-1 mx-2 text-center" bind:value={servings} />servings</div>
                 </div>
-                <div class="misc flex justify-evenly">
-                    <div class="author_container text-center w-1/3 text-xs md:text-sm">
-                        <div class="cat">{recipe.category}</div>
-                    </div>
-                    <div class="time_container text-center w-1/3 text-xs md:text-sm">
-                        <div class="cuisine">{recipe.cuisine}</div>
-                    </div>
-                    <div class="servings text-center w-1/3 text-xs md:text-sm">
-                        <div class="country">{recipe.country}</div>
-                    </div>
+                <div class="flex justify-evenly">
+                    <div class="content-center">{recipe.category}</div>
+                    <div class="content-center">{recipe.cuisine}</div>
+                    <div class="content-center">{recipe.country}</div>
                 </div>
                 <div class="flex justify-evenly items-center">
                     {#if recipe.url}
@@ -315,7 +303,7 @@
                 <div class="flex justify-between items-center mr-2">
                     <button class="step flex items-center justify-left gap-x-1 md:gap-x-3 md:mx-2 p-1 w-fit" onclick={(e) => {e.currentTarget.classList.toggle('blur'); }} onkeydown={(e) => {e.currentTarget.classList.toggle('blur'); }}>
                         <label for="directions" class="flex md:text-right text-xs md:text-sm whitespace-nowrap">Step {i+1}</label>
-                        <p class="directions flex m-1 p-1 text-sm border-l border-neutral md:pl-3 {timers[i] && timers[i].sec ? "w-64 md:w-full" : ""}">{curr}</p>
+                        <p class="directions flex m-1 p-1 text-sm border-l border-neutral md:pl-3 text-left{timers[i] && timers[i].sec ? " w-64 md:w-full" : ""}">{curr}</p>
                     </button>
                     {#if timers[i] && timers[i].show}
                         <div class="my-1 flex md:w-1/5 max-w-[150px]">
