@@ -31,6 +31,28 @@
     let toast = $state({info: null, success: null, error: null});
     let timers = $state({});
     let alert = $state({show: false, msg: "", title: "", type: "warning"});
+    let servings = $state(data.post.servings);
+
+    const get_quantity = function(quantity, servings){
+        if (isNaN(recipe.servings) || isNaN(servings)){
+            return quantity;
+        }
+        if (quantity){
+            const temp_serv = parseFloat(servings) ? parseFloat(servings) : 1;
+            let output = quantity * (parseFloat(temp_serv) / parseFloat(recipe.servings));
+            return output.toFixed(2) * 1;
+        } else {
+            return "";
+        }
+    }
+
+    let ingrs = $derived(recipe.expand.ingr_list.map((ingr) => {
+        return {
+            quantity: get_quantity(ingr.quantity, servings),
+            unit: ingr.unit ? ingr.unit : "",
+            ingredient: ingr.ingredient,
+        }
+    }));
 
 
     onMount(async () => {
@@ -115,17 +137,7 @@
         }
     }
 
-    const get_quantity = function(quantity){
-        if (isNaN(recipe.servings) || isNaN(data.post.servings)){
-            return quantity;
-        }
-        if (quantity){
-            let output = quantity * (parseFloat(data.post.servings) / parseFloat(recipe.servings));
-            return output.toFixed(2) * 1;
-        } else {
-            return "";
-        }
-    }
+    
 
     async function update_fave_made_pre(){
         await update_fav_made(recipe.id);
@@ -243,7 +255,7 @@
                         <div class="time">{recipe.time}</div>
                     </div>
                     <div class="servings text-center w-1/3 text-xs md:text-sm">
-                        <div>{data.post.servings} servings</div>
+                        <input type="text" class="input input-primary input-sm w-10 p-1 mx-2 text-center" bind:value={servings} />servings
                     </div>
                 </div>
                 <div class="misc flex justify-evenly">
@@ -282,18 +294,20 @@
         </div>
         <div class="ingr_directions_container flex flex-col md:flex-row justify-center w-full items-center">
             <div id="ingredient_list" class="flex flex-col h-fit w-full md:w-2/5 m-2 max-h-[calc(40vh)] md:max-h-[calc(64vh)] overflow-y-auto border border-primary rounded-md py-5 md:py-4">
-                {#each recipe.expand.ingr_list as ingr}
-                    {#if ingr}
-                        <button class="ingr_row flex items-center ml-2 md:ml-4 mr-1 gap-x-1 md:gap-x-2" onclick={(e) => {e.currentTarget.classList.toggle('blur'); }}>
-                            <div class="ingr_amount text-sm text-center">{get_quantity(ingr.quantity)}</div>
-                            <div class="ingr_unit text-center text-sm">{ingr.unit ? ingr.unit : ""}</div>
-                            <div class="ingr_name text-center text-sm">{ingr.ingredient}</div>
-                        </button>
-                        {#if recipe.expand.ingr_list[recipe.expand.ingr_list.length-1] != ingr}
-                            <div class="divider my-1 "></div>
+                {#if ingrs}
+                    {#each ingrs as ingr}
+                        {#if ingr}
+                            <button class="ingr_row flex items-center ml-2 md:ml-4 mr-1 gap-x-1 md:gap-x-2" onclick={(e) => {e.currentTarget.classList.toggle('blur'); }}>
+                                <div class="ingr_amount text-sm text-center">{ingr.quantity}</div>
+                                <div class="ingr_unit text-center text-sm">{ingr.unit}</div>
+                                <div class="ingr_name text-center text-sm">{ingr.ingredient}</div>
+                            </button>
+                            {#if ingrs[ingrs.length-1] != ingr}
+                                <div class="divider my-1 "></div>
+                            {/if}
                         {/if}
-                    {/if}
-                {/each}
+                    {/each}
+                {/if}
             </div>
         
             <div class="flex flex-col directions_list md:w-3/5 h-fit  max-h-[calc(40vh)] md:max-h-[calc(64vh)] overflow-y-auto border border-primary rounded-md cursor-pointer py-5">
