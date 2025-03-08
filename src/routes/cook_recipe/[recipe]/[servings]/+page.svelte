@@ -242,7 +242,7 @@
             </div>
             <div class="info_container w-full md:w-1/2 flex flex-col m-1 space-y-2 md:space-y-4">
                 <div class="title_container mx-auto my-2">
-                    <div class="title w-full text-sm md:text-xl">{recipe.title}</div>
+                    <div class="title w-full md:text-xl">{recipe.title}</div>
                 </div>
                 <div class="description_container m-auto w-5/6">
                     <div class="desc text-xs md:text-sm" >{recipe.description}</div>
