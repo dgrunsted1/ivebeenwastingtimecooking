@@ -65,6 +65,9 @@ const selectors = {
                             group: '#main-content > article > div:nth-child(2) > div > div > div > div:nth-child(6) > ol > li > *',
                             item: '#main-content > article > div:nth-child(2) > div > div > div > div:nth-child(6) > ol > li > p:nth-child(ITEM_INDEX)'
                         }]
+        },
+        ig: {
+
         }
     };
 
@@ -262,6 +265,58 @@ async function get_ba_data(page){
     return result;
 }
 
+async function get_ig_data(page){
+    let result = await page.evaluate(() => {
+        let text = document.querySelector("section > main > div > div > div");
+        // let text = document.querySelector("section > main > div > div > div > div:nth-child(2) > div > div:nth-child(3) > div > div > div > div:nth-child(2) > div > span > div > span").textContent;
+        // let header = article.querySelector("header");
+        // let img = header.querySelector("img").src ? header.querySelector("img").src : document.querySelector("img").data('src');
+        // let title = header.querySelector("h1").textContent;
+        // let author = header.querySelector("span > a").textContent;
+        // let body = article.querySelector(".recipe__main-content");
+        // let description = body.querySelector(".body").textContent;
+        // let time_servings = body.querySelector("[data-testid='InfoSliceList'] > ul");
+        // let servings = (time_servings.querySelectorAll("li").length > 1) ? time_servings.querySelector("li:nth-child(2) > div > p:nth-child(2)").textContent : time_servings.querySelector("li > div > p:nth-child(2)").textContent;
+        // let time = (time_servings.querySelectorAll("li").length > 1) ? time_servings.querySelector("li:nth-child(1) > div > p:nth-child(2)").textContent : null;
+        // let ingr_list = body.querySelector("[data-testid='IngredientList']");
+        // let ingredient_list = ingr_list.querySelectorAll("div:nth-child(3) > *");
+        // if (ingredient_list.length <= 2) ingredient_list = ingr_list.querySelectorAll("div > *");
+        // let ingredients = [];
+        // for (let i = 0; i < ingredient_list.length; i++){
+        //     if ((ingredient_list[i].tagName == "DIV" || ingredient_list[i].tagName == "P") &&
+        //         ingredient_list[i].querySelectorAll("*").length == 0) {
+        //         if (ingredients[ingredients.length - 1] && !ingredients[ingredients.length - 1].includes(" ") && !/[a-z]/i.test(ingredients[ingredients.length - 1])){
+        //             ingredients[ingredients.length - 1] = ingredients[ingredients.length - 1] + " " + ingredient_list[i].textContent;
+        //         }else if (ingredient_list[i].textContent) ingredients.push(ingredient_list[i].textContent);
+        //     }
+        // }
+        // let dir_list = body.querySelectorAll("[data-testid='InstructionsWrapper'] > ol > *");
+        // let directions = [];
+        // let tags = [];
+        // for (let i = 0; i < dir_list.length; i++){
+        //     let curr_list = dir_list[i].querySelectorAll("li > *");
+        //     for (let j = 0; j < curr_list.length; j++){
+        //         if (curr_list[j].tagName == "P") directions.push(curr_list[j].textContent);
+        //     }
+        // }
+        
+        // return {
+        //     title: title,
+        //     author: author,
+        //     description: description,
+        //     image: img,
+        //     time: time,
+        //     servings: servings,
+        //     expand: {ingr_list: ingredients},
+        //     directions: directions,
+        // };
+        return {
+            text: text
+        }
+    });
+    return result;
+}
+
 async function validate_recipe_data(recipe_data, url){
     let errors = [];
     let msg = [];
@@ -328,7 +383,7 @@ export const scrape = async function(url) {
                     '--no-sandbox',
                     '--disable-setuid-sandbox'
                 ], 
-                executablePath: '/home/git_actions/.cache/puppeteer/chrome/linux-130.0.6723.116/chrome-linux64/chrome'
+                // executablePath: '/home/git_actions/.cache/puppeteer/chrome/linux-130.0.6723.116/chrome-linux64/chrome'
             });
         } catch(err){
             let data = {
@@ -350,6 +405,8 @@ export const scrape = async function(url) {
             site_selectors = selectors.nyt;
         }else if(url.includes("www.bonappetit.com")){
             site_selectors = selectors.ba;
+        }else if(url.includes("www.instagram.com")){
+            site_selectors = selectors.ig;
         }else{
             const url_match = url.match(/http(|s):\/\/(www.)?(.*?)\.(com|co\.uk|org|net)/);
             if (url_match){
@@ -377,7 +434,9 @@ export const scrape = async function(url) {
                 results = await get_ba_data(page);
             }else if (url.includes("cooking.nytimes.com")) {
                 results = await get_nyt_data(page);
-
+            }else if (url.includes("cooking.nytimes.com")) {
+                results = await get_ig_data(page);
+                console.log(results);
             } else {
                 for (const k in site_selectors){
                         if(k == "ingredients"){
