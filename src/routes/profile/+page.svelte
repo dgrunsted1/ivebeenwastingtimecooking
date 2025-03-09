@@ -95,7 +95,7 @@
                 break;
             }
         }
-        return cnt / 24;
+        return Math.round(cnt / 24);
     }
 
     function getMostFrequent(list) {
