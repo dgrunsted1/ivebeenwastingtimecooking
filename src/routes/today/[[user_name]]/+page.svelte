@@ -61,7 +61,8 @@
             let unchecked = [];
             for (let i = 0; i < grocery_list.length; i++){
                 pb.realtime.subscribe(`grocery_items/${grocery_list[i].id}`, async (data) => {
-                    grocery_list[i] = data.record;
+                    let updated_item = grocery_list.filter(item => item.id == data.record.id)[0];
+                    updated_item = data.record;
                     const tmp = await pb.collection('ingredients').getList(1, 50, {
                         filter: `id = '${data.record.ingrs.join(`' || id='`)}'`
                     });
