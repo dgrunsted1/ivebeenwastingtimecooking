@@ -318,7 +318,7 @@ export const merge = function(ingrs) {
 						expand: { ingrs: match.expand.ingrs.concat(item.expand.ingrs)}
 					};
 			if (match.unit != item.unit && conv_unit[match.unit] != item.unit && conv_unit[item.unit] != match.unit) {
-				let conv = combine(match, item, conv_match);
+				let conv = combine(match, item);
 				tmp.qty = conv.amount;
 				tmp.unit = conv.unit;
 			} else {
@@ -336,10 +336,9 @@ export const merge = function(ingrs) {
 			let tmp = {};
 				try{
 					if (item.qty && item.unit){
-						const best_unit = convert(item.qty, item.unit).to("best", "imperial");
 						tmp = { checked: false,
-							qty: round_amount(best_unit.quantity),
-							unit: best_unit.unit,
+							qty: round_amount(item.qty),
+							unit: item.unit,
 							name: item.name,
 							ingrs: (item.ingrs) ?  item.ingrs : [],
 							expand: { ingrs: item.expand.ingrs}
@@ -371,7 +370,7 @@ export const merge = function(ingrs) {
 
 
 
-const combine = (i, j, conv) => {
+export const combine = (i, j) => {
 	const tmp = convert(i.qty, i.unit).to(j.unit);
 	const amount = convert(tmp+j.qty, j.unit).to("best", "imperial");
 	let out = {unit: amount.unit, amount: round_amount(amount.quantity)}

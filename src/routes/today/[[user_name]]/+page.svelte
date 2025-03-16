@@ -61,12 +61,24 @@
             let unchecked = [];
             for (let i = 0; i < grocery_list.length; i++){
                 pb.realtime.subscribe(`grocery_items/${grocery_list[i].id}`, async (data) => {
-                    let updated_item = grocery_list.filter(item => item.id == data.record.id)[0];
-                    updated_item = data.record;
-                    const tmp = await pb.collection('ingredients').getList(1, 50, {
-                        filter: `id = '${data.record.ingrs.join(`' || id='`)}'`
-                    });
-                    grocery_list[i].expand = {ingrs: tmp.items};
+                    if (data.action != "delete"){
+                        const tmp = await pb.collection('ingredients').getList(1, 50, {
+                            filter: `id = '${data.record.ingrs.join(`' || id='`)}'`
+                        });
+                        grocery_list = grocery_list.map(item => {
+                            if (item.id === data.record.id) {
+                                return {
+                                    ...data.record,
+                                    expand: {
+                                        ingrs: tmp.items
+                                    }
+                                };
+                            }
+                            return item;
+                        });
+                    } else {
+                        grocery_list = grocery_list.filter(item => item.id != data.record.id);
+                    }
                 });
                 if (grocery_list[i].checked){
                     checked.push(grocery_list[i]);

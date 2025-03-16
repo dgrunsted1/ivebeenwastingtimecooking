@@ -2,7 +2,8 @@
     import DeleteIcon from "/src/lib/icons/DeleteIcon.svelte";
     import EditIcon from "/src/lib/icons/EditIcon.svelte";
     import CheckMark from "/src/lib/icons/CheckMark.svelte";
-    import { delete_grocery_item, ingrs_to_string } from '/src/lib/groceries.js'
+    import { delete_grocery_item, ingrs_to_string, update_grocery_item } from '/src/lib/groceries.js'
+    import { combine } from '/src/lib/merge_ingredients.js'
     import { pb, currentUser } from '/src/lib/pocketbase';
     import Plus from "/src/lib/icons/Plus.svelte";
 
@@ -14,7 +15,6 @@
         status = $bindable(), 
         grocery_list_id,
         list_owner,
-        update_grocery_item,
         reset_grocery_list,
         check_grocery_item
     } = $props();
@@ -25,6 +25,8 @@
     let new_item = $state({qty: null, unit: "", name: ""});
     let interactable = true;
     let is_owner = ($currentUser && $currentUser.id == list_owner);
+    let dragged_item = $state(null);
+    let dragged_over = $state(null);
 
     const copy_to_clipboard = () => {
         let copy_text = "";
@@ -140,6 +142,64 @@
         navigator.clipboard.writeText(share_link);
         e.currentTarget.parentNode.parentNode.blur();
     }
+
+    const drag_over = (e) => {
+        dragged_item = e.currentTarget.getElementsByTagName("input")[0].id;
+    }
+
+    const drag_start = (e) => {
+        dragged_over = e.currentTarget.getElementsByTagName("input")[0].id;
+    }
+
+    const drag_end = (e) => {
+        if (dragged_item == dragged_over) return;
+        add_item_modal();
+        let drag = {};
+        let drag_over = {};
+        for (let i = 0; i < grocery_list.length; i++){
+            if (grocery_list[i].id == dragged_item){
+                drag = grocery_list[i];
+            }
+            if (grocery_list[i].id == dragged_over){
+                drag_over = grocery_list[i];
+            }
+        }
+        
+        try{
+            const combine_result = combine(drag, drag_over);
+            new_item = {
+                qty: combine_result.amount,
+                unit: combine_result.unit,
+                name: `${drag_over.name}  |  ${drag.name}`
+            };
+        } catch (error){
+            new_item = {
+                qty: `${drag_over.qty}  |  ${drag.qty}`,
+                unit: `${drag_over.unit}  |  ${drag.unit}`,
+                name: `${drag_over.name}  |  ${drag.name}`
+            };
+        }
+    }
+
+    const merge_items = async () => {
+        let new_index = 0;
+        const curr_dragged_item = grocery_list.filter(item => item.id == dragged_item)[0];
+        let drag_over_item = {...grocery_list.filter(item => item.id == dragged_over)[0]};
+        drag_over_item.ingrs = curr_dragged_item.ingrs.concat(drag_over_item.ingrs);
+        drag_over_item.qty = new_item.qty;
+        drag_over_item.unit = new_item.unit;
+        drag_over_item.name = new_item.name;
+        drag_over_item.checked = (curr_dragged_item.checked && drag_over_item.checked);
+        await update_grocery_item(drag_over_item);
+        delete_grocery_item(dragged_item);
+    }
+
+    const merge_disabled = () => {
+        if (new_item.name.includes('|')) return true;
+        if (new_item.unit.includes('|')) return true;
+        if (!(!isNaN(parseFloat(new_item.qty)) && isFinite(new_item.qty))) return true;
+        return false;
+    }
 </script>
 
 <div id="list" class="flex flex-col w-full">
@@ -175,9 +235,10 @@
                             {#if status != "none"}<button class="btn btn-sm p-1 btn-accent" onclick={() => remove_item(item.id)}><DeleteIcon/></button>{/if}
                         </div>
                     {:else}
-                        <div class="grocery_item flex space-x-3 justify-end md:justify-start items-center">
+                        <!-- svelte-ignore a11y_no_static_element_interactions -->
+                        <div class="grocery_item flex space-x-3 justify-end md:justify-start items-center" draggable="true" ondragover={drag_over} ondragstart={drag_start} ondragend={drag_end}>
                             {#if status != "none"}<input type="checkbox" class="hidden md:flex checkbox checkbox-primary checkbox-lg p-1" id={item.id} bind:checked={item.checked} onchange={check_item_handle}>{/if}
-                            <div class="flex md:tooltip {(i > 2) ? "tooltip-top": "tooltip-bottom"}" data-tip={tool_tip_string(item)}>
+                            <div class="flex">
                                 <p class="text">{ingrs_to_string([item])}</p>
                             </div>
                             {#if status != "none"}<input type="checkbox" class="md:hidden checkbox checkbox-primary checkbox-lg p-1" id={item.id} bind:checked={item.checked} onchange={check_item_handle}>{/if}
@@ -235,17 +296,23 @@
 <!-- <button class="btn" onclick="my_modal_1.showModal()">open modal</button> -->
 <dialog id="my_modal_1" class="modal">
     <div class="modal-box flex flex-col space-y-2">
-        <input id="modal_ingr" type="text" class="input input-bordered w-full input-sm" placeholder="ingredient" bind:value={new_item.name}>
+        <input id="modal_ingr" type="text" class="input input-bordered w-full input-sm{new_item.name.includes('|') ? ' bg-error/50' : ''}" placeholder="ingredient" bind:value={new_item.name}>
         <input  type="text" class="input input-bordered w-full input-sm" placeholder="quantity" bind:value={new_item.qty}>
         <input type="text" class="input input-bordered w-full input-sm" placeholder="unit" bind:value={new_item.unit}>
         <div class="flex items-center m-2 justify-end space-x-1">
             <div class="modal-action mt-0">
                 <form method="dialog">
                     <!-- if there is a button in form, it will close the modal -->
-                    <button class="btn btn-sm btn-primary" onclick={add_new_item}>Add & Close</button>
+                    {#if !dragged_item}
+                        <button class="btn btn-sm btn-primary" onclick={add_new_item}>Add & Close</button>
+                    {:else}
+                        <button class="btn btn-sm btn-primary" onclick={merge_items} disabled={merge_disabled()}>Merge</button>
+                    {/if}
                 </form>
             </div>
-            <button class="btn btn-primary btn-sm" onclick={add_new_item}>add</button>
+            {#if !dragged_item}
+                <button class="btn btn-primary btn-sm" onclick={add_new_item}>add</button>
+            {/if}
         </div>
     </div>
 </dialog>
