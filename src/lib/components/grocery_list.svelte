@@ -84,7 +84,8 @@
         const id = e.currentTarget.parentNode.id;
         clearTimeout(delay_timer);
         delay_timer = setTimeout(function() {
-            update_grocery_item({id: id});
+            const updated_item = grocery_list.filter(item => item.id == id)[0];
+            update_grocery_item(updated_item);
         }, 500);
     }
 
