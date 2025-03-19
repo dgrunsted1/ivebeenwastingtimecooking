@@ -266,6 +266,12 @@
                             ondragend={drag_end}
                             ontouchstart={(e) => {
                                 e.preventDefault();
+                                const dragStartEvent = new DragEvent('dragstart', {
+                                    bubbles: true,
+                                    cancelable: true,
+                                    view: window,
+                                    dataTransfer: dataTransfer || new DataTransfer()
+                                });
                                 e.currentTarget.parentNode.classList.add("touch-none");
                                 dragged_item = e.currentTarget.getElementsByTagName("input")[0].id;
                             }}
