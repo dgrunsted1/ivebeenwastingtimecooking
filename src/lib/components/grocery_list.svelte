@@ -153,7 +153,11 @@
     }
 
     const drag_end = (e) => {
-        if (dragged_item == dragged_over) return;
+        if (dragged_item == dragged_over){
+            dragged_item = null;
+            dragged_over = null;
+            return;
+        }
         add_item_modal();
         let drag = {};
         let drag_over = {};
@@ -165,19 +169,19 @@
                 drag_over = grocery_list[i];
             }
         }
-        
+        const merge_name = (drag_over.name === drag.name) ? drag_over.name : `${drag_over.name}  |  ${drag.name}`;
         try{
             const combine_result = combine(drag, drag_over);
             new_item = {
                 qty: combine_result.amount,
                 unit: combine_result.unit,
-                name: `${drag_over.name}  |  ${drag.name}`
+                name: merge_name
             };
         } catch (error){
             new_item = {
                 qty: `${drag_over.qty}  |  ${drag.qty}`,
                 unit: `${drag_over.unit}  |  ${drag.unit}`,
-                name: `${drag_over.name}  |  ${drag.name}`
+                name: merge_name
             };
         }
     }
@@ -192,7 +196,11 @@
         drag_over_item.name = new_item.name;
         drag_over_item.checked = (curr_dragged_item.checked && drag_over_item.checked);
         await update_grocery_item(drag_over_item);
-        delete_grocery_item(dragged_item);
+        setTimeout(async () => {
+            dragged_over = null;
+            await delete_grocery_item(dragged_item);
+            dragged_item = null;
+        }, 1000);
     }
 
     const merge_disabled = () => {
@@ -201,6 +209,20 @@
         if (!(!isNaN(parseFloat(new_item.qty)) && isFinite(new_item.qty))) return true;
         return false;
     }
+
+    const handle_modal_enter = (e) => {
+        if (e.key == "Enter" && !merge_disabled()){
+            if (dragged_item){
+                merge_items(e);
+            } else {
+                add_new_item(e);
+            }  
+            my_modal_1.close();
+        } else if (e.key == "Escape"){
+            dragged_over = null;
+            dragged_item = null;
+        }
+    } 
 </script>
 
 <div id="list" class="flex flex-col w-full">
@@ -237,7 +259,7 @@
                         </div>
                     {:else}
                         <!-- svelte-ignore a11y_no_static_element_interactions -->
-                        <div class="grocery_item flex space-x-3 justify-end md:justify-start items-center {item.id == dragged_over ? `border border-primary rounded-lg p-1` : ``}"
+                        <div class="grocery_item flex space-x-3 justify-end md:justify-start items-center {item.id == dragged_item && item.id != dragged_over ? `border border-error rounded-lg p-1` : ``} {item.id == dragged_over ? `border border-primary rounded-lg p-1` : ``}"
                             draggable="true"
                             ondragover={drag_over}
                             ondragstart={drag_start}
@@ -260,7 +282,7 @@
                             }}>
                             {#if status != "none"}<input type="checkbox" class="hidden md:flex checkbox checkbox-primary checkbox-lg p-1" id={item.id} bind:checked={item.checked} onchange={check_item_handle}>{/if}
                             <div class="flex">
-                                <p class="text">{ingrs_to_string([item])}</p>
+                                <p class="text {item.id == dragged_item || item.id == dragged_over ? `text-xl` : ``}">{ingrs_to_string([item])}</p>
                             </div>
                             {#if status != "none"}<input type="checkbox" class="md:hidden checkbox checkbox-primary checkbox-lg p-1" id={item.id} bind:checked={item.checked} onchange={check_item_handle}>{/if}
                         </div>
@@ -314,20 +336,20 @@
         {/if}
     </div>
 </div>
-<!-- <button class="btn" onclick="my_modal_1.showModal()">open modal</button> -->
-<dialog id="my_modal_1" class="modal">
+<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+<dialog id="my_modal_1" class="modal" onkeydown={handle_modal_enter}>
     <div class="modal-box flex flex-col space-y-2">
         <input id="modal_ingr" type="text" class="input input-bordered w-full input-sm{new_item.name.includes('|') ? ' bg-error/50' : ''}" placeholder="ingredient" bind:value={new_item.name}>
-        <input  type="text" class="input input-bordered w-full input-sm" placeholder="quantity" bind:value={new_item.qty}>
-        <input type="text" class="input input-bordered w-full input-sm" placeholder="unit" bind:value={new_item.unit}>
+        <input  type="text" class="input input-bordered w-full input-sm{(!(!isNaN(parseFloat(new_item.qty)) && isFinite(new_item.qty))) ? ' bg-error/50' : ''}" placeholder="quantity" bind:value={new_item.qty}>
+        <input type="text" class="input input-bordered w-full input-sm{new_item.unit.includes('|') ? ' bg-error/50' : ''}" placeholder="unit" bind:value={new_item.unit}>
         <div class="flex items-center m-2 justify-end space-x-1">
             <div class="modal-action mt-0">
                 <form method="dialog">
                     <!-- if there is a button in form, it will close the modal -->
                     {#if !dragged_item}
-                        <button class="btn btn-sm btn-primary" onclick={add_new_item}>Add & Close</button>
+                        <button id="enter_click" class="btn btn-sm btn-primary" onclick={add_new_item}>Add & Close</button>
                     {:else}
-                        <button class="btn btn-sm btn-primary" onclick={merge_items} disabled={merge_disabled()}>Merge</button>
+                        <button id="enter_click" class="btn btn-sm btn-primary" onclick={merge_items} disabled={merge_disabled()}>Merge</button>
                     {/if}
                 </form>
             </div>
