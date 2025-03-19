@@ -266,7 +266,7 @@
                             ondragend={drag_end}
                             ontouchstart={(e) => {
                                 e.preventDefault();
-                                e.currentTarget.classList.add("touch-none");
+                                e.currentTarget.parentNode.classList.add("touch-none");
                                 dragged_item = e.currentTarget.getElementsByTagName("input")[0].id;
                             }}
                             ontouchmove={(e) => {
@@ -280,7 +280,7 @@
                             ontouchend={(e) => {
                                 e.preventDefault();
                                 drag_end(e);
-                                e.currentTarget.classList.remove("touch-none");
+                                e.currentTarget.parentNode.classList.remove("touch-none");
                             }}>
                             {#if status != "none"}<input type="checkbox" class="hidden md:flex checkbox checkbox-primary checkbox-lg p-1" id={item.id} bind:checked={item.checked} onchange={check_item_handle}>{/if}
                             <div class="flex">
