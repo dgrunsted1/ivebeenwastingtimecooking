@@ -237,7 +237,27 @@
                         </div>
                     {:else}
                         <!-- svelte-ignore a11y_no_static_element_interactions -->
-                        <div class="grocery_item flex space-x-3 justify-end md:justify-start items-center" draggable="true" ondragover={drag_over} ondragstart={drag_start} ondragend={drag_end}>
+                        <div class="grocery_item flex space-x-3 justify-end md:justify-start items-center"
+                            draggable="true"
+                            ondragover={drag_over}
+                            ondragstart={drag_start}
+                            ondragend={drag_end}
+                            ontouchstart={(e) => {
+                                e.preventDefault();
+                                dragged_item = e.currentTarget.getElementsByTagName("input")[0].id;
+                            }}
+                            ontouchmove={(e) => {
+                                e.preventDefault();
+                                const touch = e.touches[0];
+                                const element = document.elementFromPoint(touch.clientX, touch.clientY);
+                                if (element?.closest('.grocery_item')) {
+                                    dragged_over = element.closest('.grocery_item').getElementsByTagName("input")[0].id;
+                                }
+                            }}
+                            ontouchend={(e) => {
+                                e.preventDefault();
+                                drag_end(e);
+                            }}>
                             {#if status != "none"}<input type="checkbox" class="hidden md:flex checkbox checkbox-primary checkbox-lg p-1" id={item.id} bind:checked={item.checked} onchange={check_item_handle}>{/if}
                             <div class="flex">
                                 <p class="text">{ingrs_to_string([item])}</p>
