@@ -237,7 +237,7 @@
                         </div>
                     {:else}
                         <!-- svelte-ignore a11y_no_static_element_interactions -->
-                        <div class="grocery_item select-none flex space-x-3 justify-end md:justify-start items-center {item.id == dragged_over ? `border border-primary rounded-lg p-1` : ``}"
+                        <div class="grocery_item flex space-x-3 justify-end md:justify-start items-center {item.id == dragged_over ? `border border-primary rounded-lg p-1` : ``}"
                             draggable="true"
                             ondragover={drag_over}
                             ondragstart={drag_start}
