@@ -145,11 +145,11 @@
     }
 
     const drag_over = (e) => {
-        dragged_item = e.currentTarget.getElementsByTagName("input")[0].id;
+        dragged_over = e.currentTarget.getElementsByTagName("input")[0].id;
     }
 
     const drag_start = (e) => {
-        dragged_over = e.currentTarget.getElementsByTagName("input")[0].id;
+        dragged_item = e.currentTarget.getElementsByTagName("input")[0].id;
     }
 
     const drag_end = (e) => {
@@ -237,7 +237,7 @@
                         </div>
                     {:else}
                         <!-- svelte-ignore a11y_no_static_element_interactions -->
-                        <div class="grocery_item flex space-x-3 justify-end md:justify-start items-center"
+                        <div class="grocery_item flex space-x-3 justify-end md:justify-start items-center {item.id == dragged_over ? `border border-primary rounded-lg p-1` : ``}"
                             draggable="true"
                             ondragover={drag_over}
                             ondragstart={drag_start}
