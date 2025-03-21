@@ -223,6 +223,36 @@
             dragged_item = null;
         }
     } 
+
+    const touch_start = (e) => {
+        console.log("start", e);
+        e.preventDefault();
+        const dragStartEvent = new DragEvent('dragstart', {
+            bubbles: true,
+            cancelable: true,
+            view: window,
+            dataTransfer: dataTransfer || new DataTransfer()
+        });
+        e.currentTarget.parentNode.classList.add("touch-none");
+        dragged_item = e.currentTarget.getElementsByTagName("input")[0].id;
+    }
+
+    const touch_move = (e) => {
+        console.log("move", e);
+        e.preventDefault();
+        const touch = e.touches[0];
+        const element = document.elementFromPoint(touch.clientX, touch.clientY);
+        if (element?.closest('.grocery_item')) {
+            dragged_over = element.closest('.grocery_item').getElementsByTagName("input")[0].id;
+        }
+    }
+
+    const touch_end = (e) => {
+        console.log("end", e);
+        e.preventDefault();
+        drag_end(e);
+        e.currentTarget.parentNode.classList.remove("touch-none");
+    }
 </script>
 
 <div id="list" class="flex flex-col w-full">
@@ -259,35 +289,19 @@
                         </div>
                     {:else}
                         <!-- svelte-ignore a11y_no_static_element_interactions -->
-                        <div class="grocery_item select-none flex space-x-3 justify-end md:justify-start items-center {item.id == dragged_item && item.id != dragged_over ? `border border-error rounded-lg p-1` : ``} {item.id == dragged_over ? `border border-primary rounded-lg p-1` : ``}"
+                        <div class="grocery_item select-none hidden md:flex space-x-3 justify-end md:justify-start items-center {item.id == dragged_item && item.id != dragged_over ? `border border-error rounded-lg p-1` : ``} {item.id == dragged_over ? `border border-primary rounded-lg p-1` : ``}"
                             draggable="true"
                             ondragover={drag_over}
                             ondragstart={drag_start}
                             ondragend={drag_end}
-                            ontouchstart={(e) => {
-                                e.preventDefault();
-                                const dragStartEvent = new DragEvent('dragstart', {
-                                    bubbles: true,
-                                    cancelable: true,
-                                    view: window,
-                                    dataTransfer: dataTransfer || new DataTransfer()
-                                });
-                                e.currentTarget.parentNode.classList.add("touch-none");
-                                dragged_item = e.currentTarget.getElementsByTagName("input")[0].id;
-                            }}
-                            ontouchmove={(e) => {
-                                e.preventDefault();
-                                const touch = e.touches[0];
-                                const element = document.elementFromPoint(touch.clientX, touch.clientY);
-                                if (element?.closest('.grocery_item')) {
-                                    dragged_over = element.closest('.grocery_item').getElementsByTagName("input")[0].id;
-                                }
-                            }}
-                            ontouchend={(e) => {
-                                e.preventDefault();
-                                drag_end(e);
-                                e.currentTarget.parentNode.classList.remove("touch-none");
-                            }}>
+                        >
+                            {#if status != "none"}<input type="checkbox" class="hidden md:flex checkbox checkbox-primary checkbox-lg p-1" id={item.id} bind:checked={item.checked} onchange={check_item_handle}>{/if}
+                            <div class="flex">
+                                <p class="text {item.id == dragged_item || item.id == dragged_over ? `text-xl` : ``}">{ingrs_to_string([item])}</p>
+                            </div>
+                            {#if status != "none"}<input type="checkbox" class="md:hidden checkbox checkbox-primary checkbox-lg p-1" id={item.id} bind:checked={item.checked} onchange={check_item_handle}>{/if}
+                        </div>
+                        <div class="grocery_item select-none flex md:hidden space-x-3 justify-end md:justify-start items-center">
                             {#if status != "none"}<input type="checkbox" class="hidden md:flex checkbox checkbox-primary checkbox-lg p-1" id={item.id} bind:checked={item.checked} onchange={check_item_handle}>{/if}
                             <div class="flex">
                                 <p class="text {item.id == dragged_item || item.id == dragged_over ? `text-xl` : ``}">{ingrs_to_string([item])}</p>
