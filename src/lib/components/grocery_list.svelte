@@ -226,6 +226,7 @@
 
     const touch_start = (e) => {
         console.log("start", e);
+        disableScroll();
         e.preventDefault();
         const dragStartEvent = new DragEvent('dragstart', {
             bubbles: true,
@@ -252,6 +253,26 @@
         e.preventDefault();
         drag_end(e);
         e.currentTarget.parentNode.classList.remove("touch-none");
+    }
+
+    function disableScroll() {
+            // Get the current page scroll position
+        const scrollTop =
+            window.scrollY ||
+            document.documentElement.scrollTop;
+        const scrollLeft =
+            window.scrollX ||
+            document.documentElement.scrollLeft;
+
+            // if any scroll is attempted,
+            // set this to the previous value
+            window.onscroll = function () {
+                window.scrollTo(scrollLeft, scrollTop);
+            };
+    }
+
+    function enableScroll() {
+        window.onscroll = function () { };
     }
 </script>
 
@@ -301,7 +322,10 @@
                             </div>
                             {#if status != "none"}<input type="checkbox" class="md:hidden checkbox checkbox-primary checkbox-lg p-1" id={item.id} bind:checked={item.checked} onchange={check_item_handle}>{/if}
                         </div>
-                        <div class="grocery_item select-none flex md:hidden space-x-3 justify-end md:justify-start items-center">
+                        <div class="grocery_item select-none flex md:hidden space-x-3 justify-end md:justify-start items-center"
+                            ontouchstart={touch_start}
+                            ontouchmove={touch_move}
+                            ontouchend={touch_end}>
                             {#if status != "none"}<input type="checkbox" class="hidden md:flex checkbox checkbox-primary checkbox-lg p-1" id={item.id} bind:checked={item.checked} onchange={check_item_handle}>{/if}
                             <div class="flex">
                                 <p class="text {item.id == dragged_item || item.id == dragged_over ? `text-xl` : ``}">{ingrs_to_string([item])}</p>
