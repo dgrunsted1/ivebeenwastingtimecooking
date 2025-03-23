@@ -27,6 +27,10 @@
     let is_owner = ($currentUser && $currentUser.id == list_owner);
     let dragged_item = $state(null);
     let dragged_over = $state(null);
+    const LONG_PRESS_DURATION = 500;
+    let longPressTimer;
+    let initialTouchY = null;
+    let initialScrollTop = null;
 
     const copy_to_clipboard = () => {
         let copy_text = "";
@@ -225,54 +229,114 @@
     } 
 
     const touch_start = (e) => {
-        console.log("start", e);
-        disableScroll();
-        e.preventDefault();
-        const dragStartEvent = new DragEvent('dragstart', {
-            bubbles: true,
-            cancelable: true,
-            view: window,
-            dataTransfer: dataTransfer || new DataTransfer()
-        });
-        e.currentTarget.parentNode.classList.add("touch-none");
-        dragged_item = e.currentTarget.getElementsByTagName("input")[0].id;
+        // Store the initial touch position
+        initialTouchY = e.touches[0].clientY;
+        
+        // Start the long press timer
+        longPressTimer = setTimeout(() => {
+            // Only after long press, start drag operation
+            console.log("Long press detected - initiating drag");
+            disableScroll();
+            e.target.parentNode.classList.add("touch-none");
+            dragged_item = e.target.closest('.grocery_item').getElementsByTagName("input")[0].id;
+            console.log("Dragged item:", dragged_item);
+        }, LONG_PRESS_DURATION);
     }
 
     const touch_move = (e) => {
-        console.log("move", e);
+        // If no drag operation has started yet
+        if (!dragged_item) {
+            // If moved significantly, cancel the long press timer
+            const currentY = e.touches[0].clientY;
+            if (Math.abs(currentY - initialTouchY) > 10) {
+                clearTimeout(longPressTimer);
+                console.log("Move detected before long press - canceling long press");
+            }
+            return; // Allow normal scrolling
+        }
+        
+        // We're in drag mode - prevent default behavior
         e.preventDefault();
+        e.stopPropagation();
+        
         const touch = e.touches[0];
         const element = document.elementFromPoint(touch.clientX, touch.clientY);
+        
         if (element?.closest('.grocery_item')) {
-            dragged_over = element.closest('.grocery_item').getElementsByTagName("input")[0].id;
+            const newDraggedOver = element.closest('.grocery_item').getElementsByTagName("input")[0].id;
+            if (dragged_over !== newDraggedOver) {
+                dragged_over = newDraggedOver;
+                console.log("Now dragging over:", dragged_over);
+            }
         }
     }
 
     const touch_end = (e) => {
-        console.log("end", e);
+        // Always clear the timer to prevent delayed triggers
+        clearTimeout(longPressTimer);
+        
+        // If we never started dragging, allow normal touch events
+        if (!dragged_item) {
+            return;
+        }
+        
+        // Otherwise handle the drag end operation
         e.preventDefault();
         drag_end(e);
-        e.currentTarget.parentNode.classList.remove("touch-none");
+        e.target.parentNode.classList.remove("touch-none");
+        enableScroll(); // Don't forget to re-enable scrolling
     }
 
     function disableScroll() {
-            // Get the current page scroll position
-        const scrollTop =
-            window.scrollY ||
-            document.documentElement.scrollTop;
-        const scrollLeft =
-            window.scrollX ||
-            document.documentElement.scrollLeft;
+        // Get the list element
+        const scrollView = document.getElementById('list');
+        
+        // Save current scroll position
+        initialScrollTop = scrollView.scrollTop;
+        
+        // Apply CSS to prevent scrolling
+        document.body.classList.add('overflow-hidden');
+        scrollView.classList.add('overflow-hidden');
+        
+        // Add an event listener to prevent scroll events
+        scrollView.addEventListener('scroll', preventScroll);
+        
+        console.log("Scroll disabled at position:", initialScrollTop);
+    }
 
-            // if any scroll is attempted,
-            // set this to the previous value
-            window.onscroll = function () {
-                window.scrollTo(scrollLeft, scrollTop);
-            };
+    function preventScroll(e) {
+        const scrollView = document.getElementById('list');
+        if (scrollView) {
+            scrollView.scrollTop = initialScrollTop;
+        }
     }
 
     function enableScroll() {
-        window.onscroll = function () { };
+        // Get the list element
+        const scrollView = document.getElementById('list');
+        
+        // Remove the event listener
+        scrollView.removeEventListener('scroll', preventScroll);
+        
+        // Remove CSS that prevents scrolling
+        document.body.classList.remove('overflow-hidden');
+        scrollView.classList.remove('overflow-hidden');
+        
+        // Reset variables
+        initialTouchY = null;
+        initialScrollTop = null;
+        
+        console.log("Scroll re-enabled");
+    }
+
+    const touch_cancel = (e) => {
+        clearTimeout(longPressTimer);
+        if (dragged_item) {
+            e.currentTarget.parentNode.classList.remove("touch-none");
+            dragged_item = null;
+            dragged_over = null;
+            enableScroll();
+        }
     }
 </script>
 
@@ -298,7 +362,7 @@
         {/if}
     </div>
     <div class="md:mx-3">
-        <div class="grocery_list h-[calc(100svh-150px)] md:h-[calc(100svh-105px)] overflow-y-auto px-2 py-4">
+        <div id="list" class="grocery_list h-[calc(100svh-150px)] md:h-[calc(100svh-105px)] overflow-y-auto px-2 py-4">
             {#if grocery_list.length > 0}
                 {#each grocery_list as item, i}
                     {#if edit}
@@ -322,12 +386,13 @@
                             </div>
                             {#if status != "none"}<input type="checkbox" class="md:hidden checkbox checkbox-primary checkbox-lg p-1" id={item.id} bind:checked={item.checked} onchange={check_item_handle}>{/if}
                         </div>
-                        <div class="grocery_item select-none flex md:hidden space-x-3 justify-end md:justify-start items-center"
-                            ontouchstart={touch_start}
-                            ontouchmove={touch_move}
-                            ontouchend={touch_end}>
+                        <div class="grocery_item select-none flex md:hidden space-x-3 justify-end md:justify-start items-center">
                             {#if status != "none"}<input type="checkbox" class="hidden md:flex checkbox checkbox-primary checkbox-lg p-1" id={item.id} bind:checked={item.checked} onchange={check_item_handle}>{/if}
-                            <div class="flex">
+                            <div class="flex"
+                                ontouchstart={touch_start}
+                                ontouchmove={touch_move}
+                                ontouchend={touch_end}
+                                ontouchcancel={touch_cancel}>
                                 <p class="text {item.id == dragged_item || item.id == dragged_over ? `text-xl` : ``}">{ingrs_to_string([item])}</p>
                             </div>
                             {#if status != "none"}<input type="checkbox" class="md:hidden checkbox checkbox-primary checkbox-lg p-1" id={item.id} bind:checked={item.checked} onchange={check_item_handle}>{/if}
@@ -405,3 +470,14 @@
         </div>
     </div>
 </dialog>
+
+<style>
+    .overflow-hidden {
+        overflow: hidden !important;
+        position: relative !important;
+    }
+    
+    .touch-none {
+        touch-action: none !important;
+    }
+</style>
