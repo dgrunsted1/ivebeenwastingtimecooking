@@ -6,6 +6,7 @@
     import { combine } from '/src/lib/merge_ingredients.js'
     import { pb, currentUser } from '/src/lib/pocketbase';
     import Plus from "/src/lib/icons/Plus.svelte";
+    import Clear from "/src/lib/icons/Clear.svelte";
 
 
 
@@ -235,11 +236,9 @@
         // Start the long press timer
         longPressTimer = setTimeout(() => {
             // Only after long press, start drag operation
-            console.log("Long press detected - initiating drag");
             disableScroll();
             e.target.parentNode.classList.add("touch-none");
             dragged_item = e.target.closest('.grocery_item').getElementsByTagName("input")[0].id;
-            console.log("Dragged item:", dragged_item);
         }, LONG_PRESS_DURATION);
     }
 
@@ -250,7 +249,6 @@
             const currentY = e.touches[0].clientY;
             if (Math.abs(currentY - initialTouchY) > 10) {
                 clearTimeout(longPressTimer);
-                console.log("Move detected before long press - canceling long press");
             }
             return; // Allow normal scrolling
         }
@@ -266,7 +264,6 @@
             const newDraggedOver = element.closest('.grocery_item').getElementsByTagName("input")[0].id;
             if (dragged_over !== newDraggedOver) {
                 dragged_over = newDraggedOver;
-                console.log("Now dragging over:", dragged_over);
             }
         }
     }
@@ -300,8 +297,6 @@
         
         // Add an event listener to prevent scroll events
         scrollView.addEventListener('scroll', preventScroll);
-        
-        console.log("Scroll disabled at position:", initialScrollTop);
     }
 
     function preventScroll(e) {
@@ -325,8 +320,6 @@
         // Reset variables
         initialTouchY = null;
         initialScrollTop = null;
-        
-        console.log("Scroll re-enabled");
     }
 
     const touch_cancel = (e) => {
@@ -386,7 +379,7 @@
                             </div>
                             {#if status != "none"}<input type="checkbox" class="md:hidden checkbox checkbox-primary checkbox-lg p-1" id={item.id} bind:checked={item.checked} onchange={check_item_handle}>{/if}
                         </div>
-                        <div class="grocery_item select-none flex md:hidden space-x-3 justify-end md:justify-start items-center">
+                        <div class="grocery_item select-none flex md:hidden space-x-3 justify-end md:justify-start items-center {item.id == dragged_item && item.id != dragged_over ? `border border-error rounded-lg p-1` : ``} {item.id == dragged_over ? `border border-primary rounded-lg p-1` : ``}">
                             {#if status != "none"}<input type="checkbox" class="hidden md:flex checkbox checkbox-primary checkbox-lg p-1" id={item.id} bind:checked={item.checked} onchange={check_item_handle}>{/if}
                             <div class="flex"
                                 ontouchstart={touch_start}
@@ -455,11 +448,12 @@
         <input type="text" class="input input-bordered w-full input-sm{new_item.unit.includes('|') ? ' bg-error/50' : ''}" placeholder="unit" bind:value={new_item.unit}>
         <div class="flex items-center m-2 justify-end space-x-1">
             <div class="modal-action mt-0">
-                <form method="dialog">
+                <form method="dialog" class="flex">
                     <!-- if there is a button in form, it will close the modal -->
                     {#if !dragged_item}
                         <button id="enter_click" class="btn btn-sm btn-primary" onclick={add_new_item}>Add & Close</button>
                     {:else}
+                        <button class="btn btn-sm" onclick={() => {dragged_item = null; dragged_over = null; my_modal_1.close()}}><Clear size="w-7 h-7"/></button>
                         <button id="enter_click" class="btn btn-sm btn-primary" onclick={merge_items} disabled={merge_disabled()}>Merge</button>
                     {/if}
                 </form>
@@ -470,14 +464,3 @@
         </div>
     </div>
 </dialog>
-
-<style>
-    .overflow-hidden {
-        overflow: hidden !important;
-        position: relative !important;
-    }
-    
-    .touch-none {
-        touch-action: none !important;
-    }
-</style>
