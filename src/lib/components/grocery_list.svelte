@@ -32,6 +32,10 @@
     let longPressTimer;
     let initialTouchY = null;
     let initialScrollTop = null;
+    let scrollSpeed = $state(0);
+    let scrollInterval = null;
+    const EDGE_THRESHOLD = 60; // Distance from edge to trigger scrolling
+    const MAX_SCROLL_SPEED = 10; // Maximum scroll speed
 
     const copy_to_clipboard = () => {
         let copy_text = "";
@@ -266,11 +270,75 @@
                 dragged_over = newDraggedOver;
             }
         }
+        
+        // Handle edge scrolling
+        const scrollView = document.getElementById('list');
+        const scrollRect = scrollView.getBoundingClientRect();
+        const touchY = touch.clientY;
+        console.log(scrollRect.top, touchY, scrollRect.bottom);
+        console.log(scrollView, scrollRect, touchY);
+        // Clear any existing scroll interval
+        if (scrollInterval) {
+            clearInterval(scrollInterval);
+            scrollInterval = null;
+        }
+        
+        // Check if touch is near the top edge
+        if (touchY < scrollRect.top + EDGE_THRESHOLD) {
+            console.log("top", scrollView.scrollTop, scrollView);
+            // Calculate scroll speed based on distance from edge (faster as you get closer)
+            scrollSpeed = Math.min(MAX_SCROLL_SPEED, (EDGE_THRESHOLD - (touchY - scrollRect.top)) / 5);
+            console.log({scrollSpeed});
+            // Start scrolling up
+            let isAutoScrolling = true;
+            scrollInterval = setInterval(() => {
+                scrollView.scrollBy({
+                    top: -scrollSpeed,
+                    behavior: 'auto' // Use 'auto' for immediate scrolling without animation
+                });
+                
+                // Stop if we've reached the top
+                if (scrollView.scrollTop <= 0) {
+                    clearInterval(scrollInterval);
+                    scrollInterval = null;
+                    isAutoScrolling = false;
+                }
+            }, 16); // ~60fps
+        }
+        // Check if touch is near the bottom edge
+        else if (touchY > scrollRect.bottom - EDGE_THRESHOLD) {
+            console.log("bottom");
+            // Calculate scroll speed based on distance from edge
+            scrollSpeed = Math.min(MAX_SCROLL_SPEED, (EDGE_THRESHOLD - (scrollRect.bottom - touchY)) / 5);
+            
+            // Start scrolling down
+            // Start scrolling up using scrollBy
+            let isAutoScrolling = true;
+            scrollInterval = setInterval(() => {
+                scrollView.scrollBy({
+                    top: scrollSpeed,
+                    behavior: 'auto' // Use 'auto' for immediate scrolling without animation
+                });
+                
+                // Stop if we've reached the top
+                if (scrollView.scrollTop >= (scrollView.scrollHeight - scrollView.clientHeight - 1)) {
+                    clearInterval(scrollInterval);
+                    scrollInterval = null;
+                    isAutoScrolling = false;
+                }
+            }, 16); // ~60fps
+        }
     }
 
     const touch_end = (e) => {
         // Always clear the timer to prevent delayed triggers
         clearTimeout(longPressTimer);
+        
+        // Clear any scrolling interval
+        if (scrollInterval) {
+            clearInterval(scrollInterval);
+            scrollInterval = null;
+        }
         
         // If we never started dragging, allow normal touch events
         if (!dragged_item) {
@@ -310,8 +378,11 @@
         // Get the list element
         const scrollView = document.getElementById('list');
         
-        // Remove the event listener
-        scrollView.removeEventListener('scroll', preventScroll);
+        // Clear any scrolling interval
+        if (scrollInterval) {
+            clearInterval(scrollInterval);
+            scrollInterval = null;
+        }
         
         // Remove CSS that prevents scrolling
         document.body.classList.remove('overflow-hidden');
@@ -320,10 +391,18 @@
         // Reset variables
         initialTouchY = null;
         initialScrollTop = null;
+        scrollSpeed = 0;
     }
 
     const touch_cancel = (e) => {
         clearTimeout(longPressTimer);
+        
+        // Clear any scrolling interval
+        if (scrollInterval) {
+            clearInterval(scrollInterval);
+            scrollInterval = null;
+        }
+        
         if (dragged_item) {
             e.currentTarget.parentNode.classList.remove("touch-none");
             dragged_item = null;
