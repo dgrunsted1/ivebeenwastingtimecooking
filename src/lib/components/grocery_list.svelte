@@ -276,7 +276,7 @@
         const scrollRect = scrollView.getBoundingClientRect();
         const touchY = touch.clientY;
         console.log(scrollRect.top, touchY, scrollRect.bottom);
-        console.log(scrollView, scrollRect, touchY);
+        console.log(scrollView);
         // Clear any existing scroll interval
         if (scrollInterval) {
             clearInterval(scrollInterval);
@@ -296,12 +296,13 @@
                     top: -scrollSpeed,
                     behavior: 'auto' // Use 'auto' for immediate scrolling without animation
                 });
-                
+                console.log("scrolling up");
                 // Stop if we've reached the top
                 if (scrollView.scrollTop <= 0) {
                     clearInterval(scrollInterval);
                     scrollInterval = null;
                     isAutoScrolling = false;
+                    console.log("reached top");
                 }
             }, 16); // ~60fps
         }
@@ -319,12 +320,13 @@
                     top: scrollSpeed,
                     behavior: 'auto' // Use 'auto' for immediate scrolling without animation
                 });
-                
+                console.log("scrolling down");
                 // Stop if we've reached the top
                 if (scrollView.scrollTop >= (scrollView.scrollHeight - scrollView.clientHeight - 1)) {
                     clearInterval(scrollInterval);
                     scrollInterval = null;
                     isAutoScrolling = false;
+                    console.log("reached bottom");
                 }
             }, 16); // ~60fps
         }
