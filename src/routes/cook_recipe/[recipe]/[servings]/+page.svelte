@@ -282,13 +282,13 @@
             </div>
         </div>
         <div class="ingr_directions_container flex flex-col md:flex-row justify-center w-full items-center">
-            <div id="ingredient_list" class="flex flex-col h-fit w-full md:w-2/5 m-2 mb-0 max-h-[calc(40vh)] md:max-h-[calc(64vh)] overflow-y-auto border border-primary rounded-md pt-5 md:py-4">
+            <div id="ingredient_list" class="flex flex-col h-fit w-full md:w-2/5 m-2 mb-0 max-h-[calc(40vh)] md:max-h-[calc(64vh)] overflow-y-auto border border-primary rounded-md py-5 md:py-4">
                 {#if ingrs}
                     {#each ingrs as ingr}
                         {#if ingr}
                             <button class="ingr_row flex items-center ml-2 md:ml-4 mr-1 gap-x-1 md:gap-x-2" onclick={(e) => {e.currentTarget.classList.toggle('blur'); }}>
-                                <div class="ingr_amount text-sm text-center">{ingr.quantity}</div>
-                                <div class="ingr_unit text-center text-sm">{ingr.unit}</div>
+                                {#if ingr.quantity}<div class="ingr_amount text-sm text-center">{ingr.quantity}</div>{/if}
+                                {#if ingr.unit}<div class="ingr_unit text-center text-sm">{ingr.unit}</div>{/if}
                                 <div class="ingr_name text-center text-sm">{ingr.ingredient}</div>
                             </button>
                             {#if ingrs[ingrs.length-1] != ingr}
