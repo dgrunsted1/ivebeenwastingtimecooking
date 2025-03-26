@@ -5,6 +5,7 @@
     import ThumbUp from "/src/lib/icons/ThumbUp.svelte";
     import Heart from "/src/lib/icons/Heart.svelte";
     import Edit from "/src/lib/icons/EditIcon.svelte";
+    import Grip from "/src/lib/icons/Grip.svelte";
     import { onMount } from 'svelte';
     import { update_fav_made, update_notes } from '/src/lib/save_recipe.js';
     import { update_made, log_made } from '/src/lib/groceries.js'
@@ -235,7 +236,7 @@
         <meta property="og:type" content="website" />
     </svelte:head>
 
-    <div id="cook_recipe" class="flex flex-col md:m-2 pb-4 md:pb-10">
+    <div id="cook_recipe" class="flex flex-col md:m-2 md:pb-10">
         <div class="img_info_container flex flex-col md:flex-row items-center justify-center">
             <div class="img_container w-full md:w-auto flex flex-col">
                 <img src={recipe.image} alt={recipe.title} class="max-h-52 max-w-52 md:max-w-96 md:max-h-96 rounded-xl m-auto"/>
@@ -281,7 +282,7 @@
             </div>
         </div>
         <div class="ingr_directions_container flex flex-col md:flex-row justify-center w-full items-center">
-            <div id="ingredient_list" class="flex flex-col h-fit w-full md:w-2/5 m-2 max-h-[calc(40vh)] md:max-h-[calc(64vh)] overflow-y-auto border border-primary rounded-md py-5 md:py-4">
+            <div id="ingredient_list" class="flex flex-col h-fit w-full md:w-2/5 m-2 mb-0 max-h-[calc(40vh)] md:max-h-[calc(64vh)] overflow-y-auto border border-primary rounded-md pt-5 md:py-4">
                 {#if ingrs}
                     {#each ingrs as ingr}
                         {#if ingr}
@@ -297,7 +298,7 @@
                     {/each}
                 {/if}
             </div>
-        
+            <div class="flex md:hidden"><Grip/></div>
             <div class="flex flex-col directions_list md:w-3/5 h-fit  max-h-[calc(40vh)] md:max-h-[calc(64vh)] overflow-y-auto border border-primary rounded-md cursor-pointer py-5">
                 {#each recipe.directions as curr, i}
                 <div class="flex justify-between items-center mr-2">
