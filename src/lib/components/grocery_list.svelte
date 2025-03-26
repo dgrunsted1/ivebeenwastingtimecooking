@@ -212,10 +212,22 @@
     }
 
     const merge_disabled = () => {
-        if (new_item.name.includes('|')) return true;
-        if (new_item.unit.includes('|')) return true;
-        if (!(!isNaN(parseFloat(new_item.qty)) && isFinite(new_item.qty))) return true;
+        if (!is_valid_unit) return true;
+        if (!is_valid_name) return true;
+        if (!is_valid_qty) return true;
         return false;
+    }
+
+    const is_valid_qty = () => {
+        return !((!(!isNaN(parseFloat(new_item.qty)) && isFinite(new_item.qty))) && new_item.qty)
+    }
+
+    const is_valid_name = () => {
+        return !new_item.name.includes('|')
+    }
+
+    const is_valid_unit = () => {
+        return !new_item.unit.includes('|')
     }
 
     const handle_modal_enter = (e) => {
@@ -360,6 +372,13 @@
             enableScroll();
         }
     }
+
+    const close_modal = () => {
+        dragged_item = null;
+        dragged_over = null;
+        my_modal_1.close();
+        new_item = {qty: null, unit: "", name: ""};
+    }
 </script>
 
 <div id="list" class="flex flex-col w-full">
@@ -457,32 +476,32 @@
                         edit
                     </button>
                 {/if}
-                    <button id="copy" class="btn btn-sm btn-primary cursor-copy" onclick={copy_to_clipboard}>
-                        {#if just_copied}
-                            <CheckMark color=""/>
-                        {:else}
-                            copy
-                        {/if}
-                    </button>
-                    <button id="add" class="btn btn-sm btn-primary" onclick={add_item_modal}><Plus/></button>
+                <button id="copy" class="btn btn-sm btn-primary cursor-copy" onclick={copy_to_clipboard}>
+                    {#if just_copied}
+                        <CheckMark color=""/>
+                    {:else}
+                        copy
+                    {/if}
+                </button>
+                <button id="add" class="btn btn-sm btn-primary" onclick={add_item_modal}><Plus/></button>
             </div>
         {/if}
     </div>
 </div>
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-<dialog id="my_modal_1" class="modal" onkeydown={handle_modal_enter}>
-    <div class="modal-box flex flex-col space-y-2">
-        <input id="modal_ingr" type="text" class="input input-bordered w-full input-sm{new_item.name.includes('|') ? ' bg-error/50' : ''}" placeholder="ingredient" bind:value={new_item.name}>
-        <input  type="text" class="input input-bordered w-full input-sm{(!(!isNaN(parseFloat(new_item.qty)) && isFinite(new_item.qty))) ? ' bg-error/50' : ''}" placeholder="quantity" bind:value={new_item.qty}>
-        <input type="text" class="input input-bordered w-full input-sm{new_item.unit.includes('|') ? ' bg-error/50' : ''}" placeholder="unit" bind:value={new_item.unit}>
+<dialog id="my_modal_1" class="modal modal-top md:modal-middle" onkeydown={handle_modal_enter}>
+    <div class="modal-box flex flex-col space-y-2 p-2 md:p-5">
+        <input id="modal_ingr" type="text" class="input input-bordered w-full input-sm{!is_valid_name() ? ' bg-error/50' : ''}" placeholder="ingredient" bind:value={new_item.name}>
+        <input  type="text" class="input input-bordered w-full input-sm{!is_valid_qty() ? ' bg-error/50' : ''}" placeholder="quantity" bind:value={new_item.qty}>
+        <input type="text" class="input input-bordered w-full input-sm{!is_valid_unit() ? ' bg-error/50' : ''}" placeholder="unit" bind:value={new_item.unit}>
         <div class="flex items-center m-2 justify-end space-x-1">
-            <div class="modal-action mt-0">
-                <form method="dialog" class="flex">
+            <div class="modal-action mt-0 w-full">
+                <form method="dialog" class="flex w-full justify-between items-center">
                     <!-- if there is a button in form, it will close the modal -->
+                    <button class="btn btn-sm btn-circle content-center" onclick={close_modal}><Clear size="w-10 h-10" color="fill-error/75"/></button>
                     {#if !dragged_item}
                         <button id="enter_click" class="btn btn-sm btn-primary" onclick={add_new_item}>Add & Close</button>
                     {:else}
-                        <button class="btn btn-sm" onclick={() => {dragged_item = null; dragged_over = null; my_modal_1.close()}}><Clear size="w-7 h-7"/></button>
                         <button id="enter_click" class="btn btn-sm btn-primary" onclick={merge_items} disabled={merge_disabled()}>Merge</button>
                     {/if}
                 </form>

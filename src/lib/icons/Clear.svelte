@@ -1,10 +1,12 @@
 <script>
-    let { size } = $props();
+    let { size,
+        color = "fill-current"
+     } = $props();
 </script>
 <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
 viewBox="0 0 225.000000 225.000000"
 preserveAspectRatio="xMidYMid meet"
-class=" primary pointer-events-none {size} fill-current">
+class=" primary pointer-events-none {size} {color}">
 
     <g transform="translate(0.000000,225.000000) scale(0.100000,-0.100000)" stroke="none">
     <path d="M836 2225 c-307 -78 -574 -290 -718 -572 -98 -190 -122 -306 -116
