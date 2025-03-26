@@ -248,16 +248,6 @@
                 <div class="description_container m-auto w-5/6">
                     <div class="desc text-xs md:text-sm" >{recipe.description}</div>
                 </div>
-                <div class="misc flex justify-evenly content-center">
-                    <div class="content-center">{recipe.author}</div>
-                    <div class="content-center">{recipe.time}</div>
-                    <div class="content-center"><input type="text" class="input input-primary input-sm w-10 p-1 mx-2 text-center" bind:value={servings} />servings</div>
-                </div>
-                <div class="flex justify-evenly">
-                    <div class="content-center">{recipe.category}</div>
-                    <div class="content-center">{recipe.cuisine}</div>
-                    <div class="content-center">{recipe.country}</div>
-                </div>
                 <div class="flex justify-evenly items-center">
                     {#if recipe.url}
                         <div class=" flex justify-center mt-1"><a class="btn btn-primary btn-xs md:btn-sm" href={recipe.url} target="_blank">original recipe</a></div>
@@ -278,7 +268,17 @@
                     {:else if $currentUser}
                         <input type="checkbox" class="checkbox checkbox-primary checkbox-lg p-1" id={recipe.id} onclick={stopPropagation(log_made(recipe.id, $currentUser.id))}>
                     {/if}
-                </div>    
+                </div>
+                <div class="flex justify-evenly">
+                    <div class="content-center">{recipe.category}</div>
+                    <div class="content-center">{recipe.cuisine}</div>
+                    <div class="content-center">{recipe.country}</div>
+                </div>
+                <div class="misc flex justify-evenly content-center">
+                    <div class="content-center">{recipe.author}</div>
+                    <div class="content-center">{recipe.time}</div>
+                    <div class="content-center"><input type="text" class="input input-primary input-sm w-10 p-1 mx-2 text-center" bind:value={servings} onclick={(e) => {e.currentTarget.select()}}/>servings</div>
+                </div>   
             </div>
         </div>
         <div class="ingr_directions_container flex flex-col md:flex-row justify-center w-full items-center">
