@@ -56,7 +56,7 @@
         </div>
     {:else}
         <!-- svelte-ignore a11y_no_static_element_interactions-->
-        <div id={menu.id} class="card card-bordered border-primary bg-base-200 h-[100vw] md:h-[30vw] mx-1 cursor-pointer" onclick={handle_click} onkeypress={handle_click}>
+        <div id={menu.id} class="card bg-base-200 h-[100vw] md:h-[30vw] mx-1 cursor-pointer" onclick={handle_click} onkeypress={handle_click}>
             <figure class="h-full absolute w-full shrink-0 flex overflow-hidden">
                 {#each menu.expand.recipes.slice(0,6) as recipe, j}
                     {#if menu.expand.recipes[j].image}

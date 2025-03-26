@@ -113,7 +113,7 @@
                     <h2 id={recipe.id} class="card-title text-sm text-ellipsis overflow-hidden line-clamp-2">{recipe.title}</h2>
                     {#if edit_serv}
                         <div class="flex items-center space-x-1">
-                            <input type="text" name="servings" class="input input-xs input-bordered input-primary w-12 text-center p-0" value={servings} onblur={handle_servings}/><label for="servings" class="text-sm ">servings</label>
+                            <input type="text" name="servings" class="input input-xs input-bordered input-primary w-12 text-center p-0" value={servings} onblur={handle_servings} onclick={(e) => {e.currentTarget.select()}}/><label for="servings" class="text-sm ">servings</label>
                         </div>
                     {/if}
                     <div class="flex w-full">
@@ -189,7 +189,7 @@
                             {/if}
                             {#if edit_serv}
                                 <div class="flex items-center">
-                                    <input type="text" name="servings" class="input input-bordered input-primary w-12 text-center p-0" value={servings} onblur={handle_servings}/><label for="servings" class="text-base text-white bg-black/50 px-1 rounded-lg">servings</label>
+                                    <input type="text" name="servings" class="input input-bordered input-primary w-12 text-center p-0" value={servings} onblur={handle_servings} onclick={(e) => {e.currentTarget.select()}}/><label for="servings" class="text-base text-white bg-black/50 px-1 rounded-lg">servings</label>
                                 </div>
                             {/if}
                         </div>
