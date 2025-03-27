@@ -240,7 +240,7 @@
                     {/each}
                 {/if}
             </div>
-            <div class="flex md:hidden justify-between">
+            <div class="flex md:hidden justify-between mx-1">
                 <div class="flex w-fit space-x-6 items-center">
                     <SearchInput 
                         {update_search}
