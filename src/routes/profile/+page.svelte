@@ -33,6 +33,7 @@
     let fave = $state({});
     let avg_recipes = $state(0);
     let month_menus = $state(0);
+    let tab = $state("info"); // info, stats, recipe, menu
 
     onMount(async () => {
         if (!$currentUser){
@@ -50,7 +51,6 @@
             expand: `recipe`,
             sort: `-created`
         });
-        console.log(recipe_log_result.items);
         fave = getMostFrequent(recipe_log_result.items);
         avg_recipes = get_avg_recipes(recipe_log_result.items);
         const menu_log_result = await pb.collection('menu_log').getList(1, 250, {
@@ -87,10 +87,8 @@
         start.setMonth(start.getMonth() - 6);
         const a = new Date(list[0].created);
         let cnt = 1;
-        console.log({start})
         for (let i = 1; i < list.length; i++){
             cnt++;
-            console.log(list[i].created)
             if (new Date(list[i].created) < start){
                 break;
             }
@@ -180,140 +178,173 @@
             is_compact: !$flagsStore.is_compact
         });
     }
+
+    function switch_tab(e){
+        tab = e.target.id;
+    }
 </script>
 
 <div class="flex flex-col items-center space-y-6">
     <h1>Profile</h1>
-    <div class="flex space-x-4 flex-col items-center md:flex-row">
-        {#if !$currentUser}
-            <div class="flex h-[215px]"><span class="loading loading-bars loading-lg"></span></div>
-        {:else}
-            <div class="flex flex-col w-24 md:w-56">
-                {#if $currentUser.avatar != ""}
-                    <img src={$currentUser.avatar} alt="avatar" class="" />
-                {:else}
-                    <img src="https://db.ivebeenwastingtime.com/api/files/716b9n2y44y92zp/w27w7eusm0jjeb4/unknown_3_sc7jpHPrHp.png?token=" alt="avatar" class="profile-avatar border rounded-xl" />
-                {/if}
-            </div>
-            <div class="flex flex-col md:flex-row md:space-x-4 items-center">
-                <div class="flex flex-col space-y-2 w-full md:w-auto m-1 md:my-5">
-                    {#if !edit_profile}
-                        <div class="text">name: {$currentUser.name}</div>
-                        <div class="text">email: {$currentUser.email}</div>
-                        <div class="text">username: {$currentUser.username}</div>
-                        <div class="text">user since: {get_local_time($currentUser.created)}</div>
-                        {#if $currentUser.verified}
-                            <div class="text flex space-x-2 items-center"><CheckMark color="fill-primary"/><p>Email Verified</p></div>
+    <div class="flex w-full">
+        <div class="flex space-x-4 flex-col items-center md:flex-row">
+            {#if !$currentUser}
+                <div class="flex h-[215px]"><span class="loading loading-bars loading-lg"></span></div>
+            {:else}
+                <!-- info -->
+                <div class="flex flex-col h-[calc(100svh-135px)] md:h-[calc(100svh-75px)] overflow-y-auto w-full m-2 {tab == 'info' ? '' : 'hidden'}">
+                    <div class="flex flex-col w-24 md:w-56">
+                        {#if $currentUser.avatar != ""}
+                            <img src={$currentUser.avatar} alt="avatar" class="" />
                         {:else}
-                            <div class="text flex justify-center self-end"><button class="btn btn-primary btn-xs" onclick={send_verify_email} onkeydown={send_verify_email}>resend verification email</button></div>
+                            <img src="https://db.ivebeenwastingtime.com/api/files/716b9n2y44y92zp/w27w7eusm0jjeb4/unknown_3_sc7jpHPrHp.png?token=" alt="avatar" class="profile-avatar border rounded-xl" />
                         {/if}
-                        <button class="btn btn-primary btn-xs self-end" onclick={() => {edit_profile = true}} onkeydown={() => {edit_profile = true}}>edit profile</button>
-                    {:else}
-                        <div class="flex space-x-2"><label for="name">name:</label><input type="text" name="name" bind:value={$currentUser.name} class="input input-bordered input-xs w-full"/></div>
-                        <div class="flex space-x-2"><label for="email">email:</label><input type="text" name="email" bind:value={$currentUser.email} class="input input-bordered input-xs w-full"/></div>
-                        <div class="flex space-x-2"><label for="username">username:</label><input type="text" name="username" bind:value={$currentUser.username} class="input input-bordered input-xs w-full"/></div>
-                        <button class="btn btn-primary btn-xs self-end" onclick={save_profile_edits} onkeydown={save_profile_edits}>save</button>
-                    {/if}
+                    </div>
+                    <div class="flex flex-col md:flex-row md:space-x-4 items-center">
+                        <div class="flex flex-col space-y-2 w-full md:w-auto m-1 md:my-5">
+                            {#if !edit_profile}
+                                <div class="text">name: {$currentUser.name}</div>
+                                <div class="text">email: {$currentUser.email}</div>
+                                <div class="text">username: {$currentUser.username}</div>
+                                <div class="text">user since: {get_local_time($currentUser.created)}</div>
+                                {#if $currentUser.verified}
+                                    <div class="text flex space-x-2 items-center"><CheckMark color="fill-primary"/><p>Email Verified</p></div>
+                                {:else}
+                                    <div class="text flex justify-center self-end"><button class="btn btn-primary btn-xs" onclick={send_verify_email} onkeydown={send_verify_email}>resend verification email</button></div>
+                                {/if}
+                                <button class="btn btn-primary btn-xs self-end" onclick={() => {edit_profile = true}} onkeydown={() => {edit_profile = true}}>edit profile</button>
+                            {:else}
+                                <div class="flex space-x-2"><label for="name">name:</label><input type="text" name="name" bind:value={$currentUser.name} class="input input-bordered input-xs w-full"/></div>
+                                <div class="flex space-x-2"><label for="email">email:</label><input type="text" name="email" bind:value={$currentUser.email} class="input input-bordered input-xs w-full"/></div>
+                                <div class="flex space-x-2"><label for="username">username:</label><input type="text" name="username" bind:value={$currentUser.username} class="input input-bordered input-xs w-full"/></div>
+                                <button class="btn btn-primary btn-xs self-end" onclick={save_profile_edits} onkeydown={save_profile_edits}>save</button>
+                            {/if}
+                        </div>
+                    </div>
                 </div>
-                <div class="flex flex-col space-y-2 my-5 h-full min-w-56 items-center justify-center">
-                    {#if !$currentUser.subscribed}
-                            <a href="https://buy.stripe.com/00gdUb2g90fc4Tu4gg" class="btn btn-primary btn-md w-36">Subscribe</a>
-                    {:else}
-                        <div class="text">next bill: {get_local_time($currentUser.last_bill_date)}</div>
-                        <div class="text">last bill: {get_local_time($currentUser.last_bill_date)}</div>
-                        <div class="flex space-x-2"><label for="credit_card_num">credit card:</label><input type="text" name="username" value="************0006" class="input input-bordered input-xs"/></div>
-                    {/if}
+                <!-- settings -->
+                <div class="flex h-[calc(100svh-135px)] md:h-[calc(100svh-75px)] overflow-y-auto {tab == 'settings' ? '' : 'hidden'}">
                     <label class="label cursor-pointer space-x-2">
                         <input type="checkbox" class="toggle toggle-primary" bind:checked={$flagsStore.is_compact} onclick={toggle_compact}/>
                         <span class="label-text">compact cards</span>
                     </label>
                 </div>
-                <div class="flex flex-col space-y-2 my-5 h-full min-w-56 items-center justify-center">
-                    {#if fave.item}
-                        <p>favorite recipe: {fave.item.expand.recipe.title} ({fave.cnt})</p>
-                    {/if}
-                    <p>you average {avg_recipes} recipes per week</p>
-                    <p>you have completed {month_menus} menus in the last month</p>
-                </div>
-            </div>
-        {/if}
-    </div>
-    {#if recipes.length > 5}
-        <div class="flex md:space-x-4 flex-col items-center w-full">
-            <p class="text-4xl text-primary">What to cook</p>
-            <div class="flex justify-evenly flex-col md:flex-row w-full">
-                {#if loading.recipe}
-                    <div class="flex flex-col items-center justify-center md:w-2/5 h-[500px]"><span class="loading loading-bars loading-lg"></span></div>
-                {:else}
-                    <div id="cook_recipe" class="flex flex-col md:m-2 pb-4 md:pb-10 md:w-2/5">
-                        <div class="img_info_container flex flex-col items-center justify-center w-full">
-                            <div class="img_container w-full md:w-auto flex flex-col">
-                                <img src={recipe_rec.image} alt={recipe_rec.title} class="max-h-52 max-w-52 md:max-w-96 md:max-h-96 rounded-xl m-auto"/>
-                            </div>
-                            <div class="info_container w-full flex flex-col m-1 space-y-2 md:space-y-4">
-                                <div class="title_container mx-auto my-2">
-                                    <div class="title w-full text-sm md:text-xl">{recipe_rec.title}</div>
-                                </div>
-                                <div class="description_container m-auto w-5/6">
-                                    <div class="desc text-xs md:text-sm" >{recipe_rec.description}</div>
-                                </div>
-                                <div class="misc flex justify-evenly">
-                                    <div class="author_container text-center w-1/3 text-xs md:text-sm">
-                                        <div class="auth">{recipe_rec.author}</div>
-                                    </div>
-                                    <div class="time_container text-center w-1/3 text-xs md:text-sm">
-                                        <div class="time">{recipe_rec.time}</div>
-                                    </div>
-                                    <div class="servings text-center w-1/3 text-xs md:text-sm">
-                                        <div>{recipe_rec.servings} servings</div>
-                                    </div>
-                                </div>
-                                <div class="misc flex justify-evenly">
-                                    <div class="author_container text-center w-1/3 text-xs md:text-sm">
-                                        <div class="cat">{recipe_rec.category}</div>
-                                    </div>
-                                    <div class="time_container text-center w-1/3 text-xs md:text-sm">
-                                        <div class="cuisine">{recipe_rec.cuisine}</div>
-                                    </div>
-                                    <div class="servings text-center w-1/3 text-xs md:text-sm">
-                                        <div class="country">{recipe_rec.country}</div>
-                                    </div>
-                                </div>
-                                <div class="flex justify-evenly items-center space-x-2">
-                                    {#if recipe_rec.url}
-                                        <div class=" flex justify-center mt-1"><a class="btn btn-primary btn-xs" href={recipe_rec.url} target="_blank">original recipe</a></div>
-                                    {/if}    
-                                    <div class=" flex justify-center mt-1"><button class="btn btn-primary btn-xs" onclick={window.location = `/cook_recipe/${recipe_rec.url_id}/${recipe_rec.servings}`} onkeydown={window.location = `/cook_recipe/${recipe_rec.url_id}/${recipe_rec.servings}`}>cook</button></div>
-                                    <div class=" flex justify-center mt-1"><button class="btn btn-primary btn-xs" onclick={window.location = `/menu/${recipe_rec.id}`} onkeydown={window.location = `/cook_recipe/${recipe_rec.url_id}/${recipe_rec.servings}`}>create menu</button></div>
-                                </div>    
-                            </div>
-                        </div>
-                        <div class="notes_container form-control m-2 md:mt-5 md:mx-5 space-y-2 flex items-center">
-                            {#if recipe_rec.expand.notes}
-                                {#each recipe_rec.expand.notes as note, i}
-                                    <p class="m-2 text-xs md:text-base">{note.content}</p>
-                                {/each}
-                            {/if}
-                        </div>
-                    </div>
-                {/if}
-                <div class="flex md:w-2/5 justify-center">
-                    {#if loading.menu}
-                        <div class="flex h-[500px] items-center"><span class="loading loading-bars loading-lg"></span></div>
-                    {:else}
-                        {#if menu_rec.length}
-                            <Menu 
-                                bind:menu_title={menu_title} 
-                                menu={menu_rec} 
-                                mults={rec_mults} 
-                                {update_mult} 
-                                {update_title} 
-                                {total_servings}/>
+                <!-- stats -->
+                <div class="flex h-[calc(100svh-135px)] md:h-[calc(100svh-75px)] overflow-y-auto {tab == 'stats' ? '' : 'hidden'}">
+                    <div class="flex flex-col space-y-2 my-5 h-full min-w-56 items-center justify-center">
+                        {#if fave.item}
+                            <p>favorite recipe: {fave.item.expand.recipe.title} ({fave.cnt})</p>
                         {/if}
+                        <p>you average {avg_recipes} recipes per week</p>
+                        <p>you have completed {month_menus} menus in the last month</p>
+                    </div>
+                </div>
+                <!-- Recipe -->
+                <div class="flex h-[calc(100svh-135px)] md:h-[calc(100svh-75px)] overflow-y-auto {tab == 'recipe' ? '' : 'hidden'}">
+                    {#if recipes.length > 5}
+                        <div class="flex md:space-x-4 flex-col items-center  w-full space-y-2">
+                            <p class="text-4xl text-primary">What to cook</p>
+                            <div class="flex justify-evenly flex-col md:flex-row w-full">
+                                {#if loading.recipe}
+                                    <div class="flex flex-col items-center justify-center md:w-2/5 h-[500px]"><span class="loading loading-bars loading-lg"></span></div>
+                                {:else}
+                                    <div id="cook_recipe" class="flex flex-col md:m-2 pb-4 md:pb-10 md:w-2/5">
+                                        <div class="img_info_container flex flex-col items-center justify-center w-full">
+                                            <div class="img_container w-full md:w-auto flex flex-col">
+                                                <img src={recipe_rec.image} alt={recipe_rec.title} class="max-h-52 max-w-52 md:max-w-96 md:max-h-96 rounded-xl m-auto"/>
+                                            </div>
+                                            <div class="info_container w-full flex flex-col m-1 space-y-2 md:space-y-4">
+                                                <div class="title_container mx-auto my-2">
+                                                    <div class="title w-full text-sm md:text-xl">{recipe_rec.title}</div>
+                                                </div>
+                                                <div class="description_container m-auto w-5/6">
+                                                    <div class="desc text-xs md:text-sm" >{recipe_rec.description}</div>
+                                                </div>
+                                                <div class="misc flex justify-evenly">
+                                                    <div class="author_container text-center w-1/3 text-xs md:text-sm">
+                                                        <div class="auth">{recipe_rec.author}</div>
+                                                    </div>
+                                                    <div class="time_container text-center w-1/3 text-xs md:text-sm">
+                                                        <div class="time">{recipe_rec.time}</div>
+                                                    </div>
+                                                    <div class="servings text-center w-1/3 text-xs md:text-sm">
+                                                        <div>{recipe_rec.servings} servings</div>
+                                                    </div>
+                                                </div>
+                                                <div class="misc flex justify-evenly">
+                                                    <div class="author_container text-center w-1/3 text-xs md:text-sm">
+                                                        <div class="cat">{recipe_rec.category}</div>
+                                                    </div>
+                                                    <div class="time_container text-center w-1/3 text-xs md:text-sm">
+                                                        <div class="cuisine">{recipe_rec.cuisine}</div>
+                                                    </div>
+                                                    <div class="servings text-center w-1/3 text-xs md:text-sm">
+                                                        <div class="country">{recipe_rec.country}</div>
+                                                    </div>
+                                                </div>
+                                                <div class="flex justify-evenly items-center space-x-2">
+                                                    {#if recipe_rec.url}
+                                                        <div class=" flex justify-center mt-1"><a class="btn btn-primary btn-xs" href={recipe_rec.url} target="_blank">original recipe</a></div>
+                                                    {/if}    
+                                                    <div class=" flex justify-center mt-1"><button class="btn btn-primary btn-xs" onclick={window.location = `/cook_recipe/${recipe_rec.url_id}/${recipe_rec.servings}`} onkeydown={window.location = `/cook_recipe/${recipe_rec.url_id}/${recipe_rec.servings}`}>cook</button></div>
+                                                    <div class=" flex justify-center mt-1"><button class="btn btn-primary btn-xs" onclick={window.location = `/menu/${recipe_rec.id}`} onkeydown={window.location = `/cook_recipe/${recipe_rec.url_id}/${recipe_rec.servings}`}>create menu</button></div>
+                                                </div>    
+                                            </div>
+                                        </div>
+                                        <div class="notes_container form-control m-2 md:mt-5 md:mx-5 space-y-2 flex items-center">
+                                            {#if recipe_rec.expand.notes}
+                                                {#each recipe_rec.expand.notes as note, i}
+                                                    <p class="m-2 text-xs md:text-base">{note.content}</p>
+                                                {/each}
+                                            {/if}
+                                        </div>
+                                    </div>
+                                {/if}
+                            </div>
+                        </div>   
                     {/if}
                 </div>
-            </div>
+                <!-- menu -->
+                <div class="flex h-[calc(100svh-135px)] md:h-[calc(100svh-75px)] overflow-y-auto {tab == 'menu' ? '' : 'hidden'}">
+                    <div class="flex md:w-2/5 justify-center">
+                        {#if loading.menu}
+                            <div class="flex h-[500px] items-center"><span class="loading loading-bars loading-lg"></span></div>
+                        {:else}
+                            {#if menu_rec.length}
+                                <Menu 
+                                    bind:menu_title={menu_title} 
+                                    menu={menu_rec} 
+                                    mults={rec_mults} 
+                                    {update_mult} 
+                                    {update_title} 
+                                    {total_servings}/>
+                            {/if}
+                        {/if}
+                    </div>
+                </div>
+                <!-- payment -->
+                <div class="flex h-[calc(100svh-135px)] md:h-[calc(100svh-75px)] overflow-y-auto {tab == 'payment' ? '' : 'hidden'}">
+                    <div class="flex flex-col space-y-2 my-5 h-full min-w-56 items-center justify-center">
+                        {#if !$currentUser.subscribed}
+                                <a href="https://buy.stripe.com/00gdUb2g90fc4Tu4gg" class="btn btn-primary btn-md w-36">Subscribe</a>
+                        {:else}
+                            <div class="text">next bill: {get_local_time($currentUser.last_bill_date)}</div>
+                            <div class="text">last bill: {get_local_time($currentUser.last_bill_date)}</div>
+                            <div class="flex space-x-2"><label for="credit_card_num">credit card:</label><input type="text" name="username" value="************0006" class="input input-bordered input-xs"/></div>
+                        {/if}
+                    </div>
+                </div>
+            {/if}
         </div>
-    {/if}
+        
+    </div>
+    <div class="tabs tabs-boxed w-full mx-auto flex items-center bg-base-300 md:bg-base-200 md:hidden m-1 justify-evenly">
+        <button id="info" class="tab tab-xs px-1 {(tab == "info") ? "tab-active" : ""}" onclick={switch_tab}>Info</button>
+        <button id="settings" class="tab tab-xs px-1 {(tab == "settings") ? "tab-active" : ""}" onclick={switch_tab}>Settings</button>
+        <button id="stats" class="tab px-1 {(tab == "stats") ? "tab-active" : ""} tab-xs" onclick={switch_tab}>Stats</button>
+        <button id="recipe" class="tab px-1 {(tab == "recipe") ? "tab-active" : ""} tab-xs" onclick={switch_tab}>Recipe</button>
+        <button id="menu" class="tab px-1 {(tab == "menu") ? "tab-active" : ""} tab-xs" onclick={switch_tab}>Menu</button>
+        <button id="payment" class="tab px-1 {(tab == "payment") ? "tab-active" : ""} tab-xs" onclick={switch_tab}>Payment</button>
+    </div>
     <Alerts msg={alert.msg} type={alert.type} bind:show={alert.show} title={alert.title}/>
 </div>
