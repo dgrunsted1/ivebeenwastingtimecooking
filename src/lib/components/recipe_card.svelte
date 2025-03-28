@@ -162,8 +162,8 @@
                 {/if}
                 {#if fave_btn || thumb_btn}
                     <div class="flex flex-w-fit space-x-1">
-                        {#if fave_btn}<button class="btn btn-xs p-1 favorite flex content-center" onclick={toggle_favorite}><Heart color={(recipe.favorite) ? "fill-primary" : "fill-neutral"}/></button>{/if}
-                        {#if thumb_btn}<button class="btn btn-xs  p-1 made flex content-center" onclick={handle_thumb}><ThumbUp color={(recipe.made) ? "fill-primary" : "fill-neutral"}/></button>{/if}
+                        {#if fave_btn}<button class="btn btn-sm p-1 favorite flex content-center" onclick={toggle_favorite}><Heart color={(recipe.favorite) ? "fill-primary" : "fill-neutral"}/></button>{/if}
+                        {#if thumb_btn}<button class="btn btn-sm  p-1 made flex content-center" onclick={handle_thumb}><ThumbUp color={(recipe.made) ? "fill-primary" : "fill-neutral"}/></button>{/if}
                     </div>
                 {/if}
                 {#if delete_btn || check_box}
