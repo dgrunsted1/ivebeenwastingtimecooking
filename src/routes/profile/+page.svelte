@@ -184,24 +184,24 @@
     }
 </script>
 
-<div class="flex flex-col items-center space-y-6">
+<div class="flex flex-col items-center h-full">
     <h1>Profile</h1>
     <div class="flex w-full">
-        <div class="flex space-x-4 flex-col items-center md:flex-row">
+        <div class="flex flex-col items-center md:flex-row w-full">
             {#if !$currentUser}
-                <div class="flex h-[215px]"><span class="loading loading-bars loading-lg"></span></div>
+                <div class="flex h-[calc(100svh-100px)] md:h-[calc(100svh-75px)]"><span class="loading loading-bars loading-lg"></span></div>
             {:else}
                 <!-- info -->
-                <div class="flex flex-col h-[calc(100svh-135px)] md:h-[calc(100svh-75px)] overflow-y-auto w-full m-2 {tab == 'info' ? '' : 'hidden'}">
-                    <div class="flex flex-col w-24 md:w-56">
+                <div class="flex flex-col h-[calc(100svh-100px)] md:h-[calc(100svh-75px)] overflow-y-auto w-full {tab == 'info' ? '' : 'hidden'}">
+                    <div class="flex flex-col h-1/3 md:w-56 mx-auto my-2">
                         {#if $currentUser.avatar != ""}
                             <img src={$currentUser.avatar} alt="avatar" class="" />
                         {:else}
                             <img src="https://db.ivebeenwastingtime.com/api/files/716b9n2y44y92zp/w27w7eusm0jjeb4/unknown_3_sc7jpHPrHp.png?token=" alt="avatar" class="profile-avatar border rounded-xl" />
                         {/if}
                     </div>
-                    <div class="flex flex-col md:flex-row md:space-x-4 items-center">
-                        <div class="flex flex-col space-y-2 w-full md:w-auto m-1 md:my-5">
+                    <div class="flex flex-col md:flex-row md:space-x-4 items-center m-2 h-full justify-end">
+                        <div class="flex flex-col space-y-2 w-full md:w-auto space-y-5 md:my-5">
                             {#if !edit_profile}
                                 <div class="text">name: {$currentUser.name}</div>
                                 <div class="text">email: {$currentUser.email}</div>
@@ -223,15 +223,15 @@
                     </div>
                 </div>
                 <!-- settings -->
-                <div class="flex h-[calc(100svh-135px)] md:h-[calc(100svh-75px)] overflow-y-auto {tab == 'settings' ? '' : 'hidden'}">
-                    <label class="label cursor-pointer space-x-2">
+                <div class="flex h-[calc(100svh-100px)] md:h-[calc(100svh-75px)] overflow-y-auto w-full {tab == 'settings' ? '' : 'hidden'}">
+                    <label class="label cursor-pointer space-x-2 mx-2">
                         <input type="checkbox" class="toggle toggle-primary" bind:checked={$flagsStore.is_compact} onclick={toggle_compact}/>
                         <span class="label-text">compact cards</span>
                     </label>
                 </div>
                 <!-- stats -->
-                <div class="flex h-[calc(100svh-135px)] md:h-[calc(100svh-75px)] overflow-y-auto {tab == 'stats' ? '' : 'hidden'}">
-                    <div class="flex flex-col space-y-2 my-5 h-full min-w-56 items-center justify-center">
+                <div class="flex h-[calc(100svh-100px)] md:h-[calc(100svh-75px)] overflow-y-auto w-full {tab == 'stats' ? '' : 'hidden'}">
+                    <div class="flex flex-col space-y-5 my-5 h-full min-w-56 items-start justify-center mx-2">
                         {#if fave.item}
                             <p>favorite recipe: {fave.item.expand.recipe.title} ({fave.cnt})</p>
                         {/if}
@@ -240,27 +240,26 @@
                     </div>
                 </div>
                 <!-- Recipe -->
-                <div class="flex h-[calc(100svh-135px)] md:h-[calc(100svh-75px)] overflow-y-auto {tab == 'recipe' ? '' : 'hidden'}">
+                <div class="flex h-[calc(100svh-100px)] md:h-[calc(100svh-75px)] overflow-y-auto w-full {tab == 'recipe' ? '' : 'hidden'}">
                     {#if recipes.length > 5}
-                        <div class="flex md:space-x-4 flex-col items-center  w-full space-y-2">
-                            <p class="text-4xl text-primary">What to cook</p>
-                            <div class="flex justify-evenly flex-col md:flex-row w-full">
+                        <div class="flex md:space-x-4 flex-col items-center h-full w-full">
+                            <div class="flex justify-evenly flex-col md:flex-row h-full w-full">
                                 {#if loading.recipe}
                                     <div class="flex flex-col items-center justify-center md:w-2/5 h-[500px]"><span class="loading loading-bars loading-lg"></span></div>
                                 {:else}
-                                    <div id="cook_recipe" class="flex flex-col md:m-2 pb-4 md:pb-10 md:w-2/5">
-                                        <div class="img_info_container flex flex-col items-center justify-center w-full">
-                                            <div class="img_container w-full md:w-auto flex flex-col">
-                                                <img src={recipe_rec.image} alt={recipe_rec.title} class="max-h-52 max-w-52 md:max-w-96 md:max-h-96 rounded-xl m-auto"/>
+                                    <div id="cook_recipe" class="flex flex-col md:m-2 md:pb-10 md:w-2/5 h-full">
+                                        <div class="img_info_container flex flex-col items-center justify-evenly h-full">
+                                            <div class="img_container md:w-auto h-1/2 mx-2">
+                                                <img src={recipe_rec.image} alt={recipe_rec.title} class="h-full rounded-xl object-cover" />
                                             </div>
                                             <div class="info_container w-full flex flex-col m-1 space-y-2 md:space-y-4">
                                                 <div class="title_container mx-auto my-2">
-                                                    <div class="title w-full text-sm md:text-xl">{recipe_rec.title}</div>
+                                                    <div class="title w-full text-lg md:text-xl mx-2">{recipe_rec.title}</div>
                                                 </div>
                                                 <div class="description_container m-auto w-5/6">
-                                                    <div class="desc text-xs md:text-sm" >{recipe_rec.description}</div>
+                                                    <div class="desc text-xs md:text-sm line-clamp-5" >{recipe_rec.description}</div>
                                                 </div>
-                                                <div class="misc flex justify-evenly">
+                                                <div class="misc flex justify-evenly items-center">
                                                     <div class="author_container text-center w-1/3 text-xs md:text-sm">
                                                         <div class="auth">{recipe_rec.author}</div>
                                                     </div>
@@ -271,7 +270,7 @@
                                                         <div>{recipe_rec.servings} servings</div>
                                                     </div>
                                                 </div>
-                                                <div class="misc flex justify-evenly">
+                                                <div class="misc flex justify-evenly items-center">
                                                     <div class="author_container text-center w-1/3 text-xs md:text-sm">
                                                         <div class="cat">{recipe_rec.category}</div>
                                                     </div>
@@ -305,8 +304,8 @@
                     {/if}
                 </div>
                 <!-- menu -->
-                <div class="flex h-[calc(100svh-135px)] md:h-[calc(100svh-75px)] overflow-y-auto {tab == 'menu' ? '' : 'hidden'}">
-                    <div class="flex md:w-2/5 justify-center">
+                <div class="flex h-[calc(100svh-100px)] md:h-[calc(100svh-75px)] overflow-y-auto w-full {tab == 'menu' ? '' : 'hidden'}">
+                    <div class="flex md:w-2/5 justify-center w-full">
                         {#if loading.menu}
                             <div class="flex h-[500px] items-center"><span class="loading loading-bars loading-lg"></span></div>
                         {:else}
@@ -317,13 +316,15 @@
                                     mults={rec_mults} 
                                     {update_mult} 
                                     {update_title} 
-                                    {total_servings}/>
+                                    {total_servings}
+                                    height={"h-[calc(100svh-200px)] md:h-[calc(100svh-160px)]"}
+                                />
                             {/if}
                         {/if}
                     </div>
                 </div>
                 <!-- payment -->
-                <div class="flex h-[calc(100svh-135px)] md:h-[calc(100svh-75px)] overflow-y-auto {tab == 'payment' ? '' : 'hidden'}">
+                <div class="flex h-[calc(100svh-100px)] md:h-[calc(100svh-75px)] overflow-y-auto w-full {tab == 'payment' ? '' : 'hidden'}">
                     <div class="flex flex-col space-y-2 my-5 h-full min-w-56 items-center justify-center">
                         {#if !$currentUser.subscribed}
                                 <a href="https://buy.stripe.com/00gdUb2g90fc4Tu4gg" class="btn btn-primary btn-md w-36">Subscribe</a>
@@ -336,7 +337,6 @@
                 </div>
             {/if}
         </div>
-        
     </div>
     <div class="tabs tabs-boxed w-full mx-auto flex items-center bg-base-300 md:bg-base-200 md:hidden m-1 justify-evenly">
         <button id="info" class="tab tab-xs px-1 {(tab == "info") ? "tab-active" : ""}" onclick={switch_tab}>Info</button>

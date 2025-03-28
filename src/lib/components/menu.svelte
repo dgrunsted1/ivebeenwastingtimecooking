@@ -25,7 +25,8 @@
         total_servings = $bindable(),
         update_mult,
         update_title,
-        remove_from_menu
+        remove_from_menu,
+        height = "h-[calc(100svh-210px)] md:h-[calc(100svh-160px)]"
     } = $props();
 
     let tab = $state("recipe_list");
@@ -226,7 +227,7 @@
     }
 </script>
 
-<div id="menu" class="h-3/4 md:h-full w-full cursor-default">
+<div id="menu" class="md:h-full w-full cursor-default">
     <div class="flex items-center p-3 justify-between">
         <input type="text" class="input input-bordered border-primary input-xs w-2/3" value={menu_title} onblur={handle_title}/>
         {#if $page.url.pathname == "/menu" || $page.url.pathname == "/profile"}
@@ -273,7 +274,7 @@
     </div>
     
     {#if tab == "recipe_list"}
-        <div class="h-[calc(100svh-210px)] md:h-[calc(100svh-160px)] overflow-y-auto flex flex-col space-y-2 p-1">
+        <div class="{height} overflow-y-auto flex flex-col space-y-2 p-1">
             {#if menu.length}    
                 {#each menu as recipe}
                     {#if !recipe.is_sub_recipe}
