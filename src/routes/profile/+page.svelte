@@ -186,21 +186,29 @@
 
 <div class="flex flex-col items-center h-full">
     <h1>Profile</h1>
+    <div class="tabs tabs-boxed mx-auto hidden items-center bg-base-300 md:bg-base-200 md:flex m-1 justify-center">
+        <button id="info" class="tab tab-xs {(tab == "info") ? "tab-active" : ""}" onclick={switch_tab}>Info</button>
+        <button id="settings" class="tab tab-xs {(tab == "settings") ? "tab-active" : ""}" onclick={switch_tab}>Settings</button>
+        <button id="stats" class="tab {(tab == "stats") ? "tab-active" : ""} tab-xs" onclick={switch_tab}>Stats</button>
+        <button id="recipe" class="tab {(tab == "recipe") ? "tab-active" : ""} tab-xs" onclick={switch_tab}>Recipe</button>
+        <button id="menu" class="tab {(tab == "menu") ? "tab-active" : ""} tab-xs" onclick={switch_tab}>Menu</button>
+        <button id="payment" class="tab {(tab == "payment") ? "tab-active" : ""} tab-xs" onclick={switch_tab}>Payment</button>
+    </div>
     <div class="flex w-full">
         <div class="flex flex-col items-center md:flex-row w-full">
             {#if !$currentUser}
                 <div class="flex h-[calc(100svh-100px)] md:h-[calc(100svh-75px)]"><span class="loading loading-bars loading-lg"></span></div>
             {:else}
                 <!-- info -->
-                <div class="flex flex-col h-[calc(100svh-100px)] md:h-[calc(100svh-75px)] overflow-y-auto w-full {tab == 'info' ? '' : 'hidden'}">
-                    <div class="flex flex-col h-1/3 md:w-56 mx-auto my-2">
+                <div class="flex flex-col md:flex-row h-[calc(100svh-100px)] md:h-[calc(100svh-75px)] overflow-y-auto w-full justify-center md:gap-x-5 md:m-5 {tab == 'info' ? '' : 'hidden'}">
+                    <div class="flex flex-col h-1/3 mx-auto md:mx-0 my-2">
                         {#if $currentUser.avatar != ""}
                             <img src={$currentUser.avatar} alt="avatar" class="" />
                         {:else}
                             <img src="https://db.ivebeenwastingtime.com/api/files/716b9n2y44y92zp/w27w7eusm0jjeb4/unknown_3_sc7jpHPrHp.png?token=" alt="avatar" class="profile-avatar border rounded-xl" />
                         {/if}
                     </div>
-                    <div class="flex flex-col md:flex-row md:space-x-4 items-center m-2 h-full justify-end">
+                    <div class="flex flex-col md:flex-row md:space-x-4 items-center m-2 h-full md:h-fit justify-end">
                         <div class="flex flex-col space-y-2 w-full md:w-auto space-y-5 md:my-5">
                             {#if !edit_profile}
                                 <div class="text">name: {$currentUser.name}</div>
@@ -223,14 +231,14 @@
                     </div>
                 </div>
                 <!-- settings -->
-                <div class="flex h-[calc(100svh-100px)] md:h-[calc(100svh-75px)] overflow-y-auto w-full {tab == 'settings' ? '' : 'hidden'}">
+                <div class="flex h-[calc(100svh-100px)] md:max-h-[300px] overflow-y-auto w-full md:max-w-[600px] md:m-auto {tab == 'settings' ? '' : 'hidden'}">
                     <label class="label cursor-pointer space-x-2 mx-2">
                         <input type="checkbox" class="toggle toggle-primary" bind:checked={$flagsStore.is_compact} onclick={toggle_compact}/>
                         <span class="label-text">compact cards</span>
                     </label>
                 </div>
                 <!-- stats -->
-                <div class="flex h-[calc(100svh-100px)] md:h-[calc(100svh-75px)] overflow-y-auto w-full {tab == 'stats' ? '' : 'hidden'}">
+                <div class="flex h-[calc(100svh-100px)] md:h-[300px] overflow-y-auto w-full md:max-w-[600px] m-auto {tab == 'stats' ? '' : 'hidden'}">
                     <div class="flex flex-col space-y-5 my-5 h-full min-w-56 items-start justify-center mx-2">
                         {#if fave.item}
                             <p>favorite recipe: {fave.item.expand.recipe.title} ({fave.cnt})</p>
@@ -304,8 +312,8 @@
                     {/if}
                 </div>
                 <!-- menu -->
-                <div class="flex h-[calc(100svh-100px)] md:h-[calc(100svh-75px)] overflow-y-auto w-full {tab == 'menu' ? '' : 'hidden'}">
-                    <div class="flex md:w-2/5 justify-center w-full">
+                <div class="flex h-[calc(100svh-100px)] md:h-[calc(100svh-110px)] overflow-y-auto w-full {tab == 'menu' ? '' : 'hidden'}">
+                    <div class="flex justify-center w-full md:max-w-[600px] m-auto">
                         {#if loading.menu}
                             <div class="flex h-[500px] items-center"><span class="loading loading-bars loading-lg"></span></div>
                         {:else}
@@ -317,7 +325,7 @@
                                     {update_mult} 
                                     {update_title} 
                                     {total_servings}
-                                    height={"h-[calc(100svh-200px)] md:h-[calc(100svh-160px)]"}
+                                    height={"h-[calc(100svh-220px)] md:h-[calc(100svh-250px)]"}
                                 />
                             {/if}
                         {/if}
