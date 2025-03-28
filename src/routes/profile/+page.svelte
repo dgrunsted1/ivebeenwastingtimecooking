@@ -197,7 +197,7 @@
     <div class="flex w-full">
         <div class="flex flex-col items-center md:flex-row w-full">
             {#if !$currentUser}
-                <div class="flex h-[calc(100svh-100px)] md:h-[calc(100svh-75px)]"><span class="loading loading-bars loading-lg"></span></div>
+                <div class="flex h-[calc(100svh-100px)] md:h-[calc(100svh-125px)] justify-center w-full"><span class="loading loading-bars loading-lg"></span></div>
             {:else}
                 <!-- info -->
                 <div class="flex flex-col md:flex-row h-[calc(100svh-100px)] md:h-[calc(100svh-75px)] overflow-y-auto w-full justify-center md:gap-x-5 md:m-5 {tab == 'info' ? '' : 'hidden'}">
