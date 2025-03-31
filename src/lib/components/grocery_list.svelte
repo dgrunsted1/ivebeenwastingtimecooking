@@ -26,8 +26,8 @@
     let new_item = $state({qty: null, unit: "", name: ""});
     let interactable = true;
     let is_owner = ($currentUser && $currentUser.id == list_owner);
-    let dragged_item = $state(null);
-    let dragged_over = $state(null);
+    let dragged_item = $state("");
+    let dragged_over = $state("");
     const LONG_PRESS_DURATION = 500;
     let longPressTimer;
     let initialTouchY = null;
@@ -162,8 +162,8 @@
 
     const drag_end = (e) => {
         if (dragged_item == dragged_over){
-            dragged_item = null;
-            dragged_over = null;
+            dragged_item = "";
+            dragged_over = "";
             return;
         }
         add_item_modal();
@@ -205,9 +205,9 @@
         drag_over_item.checked = (curr_dragged_item.checked && drag_over_item.checked);
         await update_grocery_item(drag_over_item);
         setTimeout(async () => {
-            dragged_over = null;
+            dragged_over = "";
             await delete_grocery_item(dragged_item);
-            dragged_item = null;
+            dragged_item = "";
         }, 1000);
     }
 
@@ -239,8 +239,8 @@
             }  
             my_modal_1.close();
         } else if (e.key == "Escape"){
-            dragged_over = null;
-            dragged_item = null;
+            dragged_over = "";
+            dragged_item = "";
         }
     } 
 
@@ -367,15 +367,15 @@
         }
         if (dragged_item) {
             e.currentTarget.parentNode.classList.remove("touch-none");
-            dragged_item = null;
-            dragged_over = null;
+            dragged_item = "";
+            dragged_over = "";
             enableScroll();
         }
     }
 
     const close_modal = () => {
-        dragged_item = null;
-        dragged_over = null;
+        dragged_item = "";
+        dragged_over = "";
         my_modal_1.close();
         new_item = {qty: null, unit: "", name: ""};
     }
