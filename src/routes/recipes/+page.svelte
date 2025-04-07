@@ -69,15 +69,7 @@
         if (search_val){
             
             //get recipes with title
-            const recipes = await pb.collection('recipes').getList(page, page_size/2, {
-                filter: get_filter(),
-                expand: `notes, ingr_list`,
-                sort: get_sort()
-            });
-            
-            recipes_have_more = page < recipes.totalPages; 
-            const ingr_recipes = await get_ingr_recipes(search_val);
-
+            const recipes = await search_recipes();
             
             // compile both lists of recipes
             let final_recipes = [];
@@ -86,12 +78,6 @@
                 if (!final_recipe_ids.includes(recipes.items[i].id)){
                     final_recipe_ids.push(recipes.items[i].id);
                     final_recipes.push(recipes.items[i]);
-                }
-            }
-            for (let i = 0; i < ingr_recipes.items.length; i++){
-                if (!final_recipe_ids.includes(ingr_recipes.items[i].id)){
-                    final_recipe_ids.push(ingr_recipes.items[i].id);
-                    final_recipes.push(ingr_recipes.items[i]);
                 }
             }
             
@@ -396,6 +382,32 @@
 
     function scroll_to_top(){
         document.getElementById('recipes').scrollTop = 0;
+    }
+
+    async function search_recipes(){
+        const body = JSON.stringify({
+                    search_val,
+                    sort_val,
+                    page,
+                    selected_categories,
+                    selected_countries,
+                    selected_cuisines,
+                    selected_authors,
+                    per_page: 20
+                });
+            console.log(body);
+        try {
+            const response = await fetch('http://127.0.0.1:8090/api/search', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: body
+            });
+            console.log(response);
+        } catch (error) {
+            console.log(error);
+        }
     }
 </script>
 <svelte:head>
