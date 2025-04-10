@@ -4,7 +4,7 @@
     import { pb, currentUser, auth_refresh } from '/src/lib/pocketbase.js';
     import InfiniteScroll from "/src/lib/components/infinite_scroll.svelte";
     import Alerts from "../../lib/components/alerts.svelte";
-    import RecipeCard from "../../lib/components/recipe_card.svelte";
+    import RecipeCard from "../../lib/components/search_recipe_card.svelte";
     import SearchInput from "../../lib/components/search.svelte";
     import Sort from "../../lib/components/sort.svelte";
     import SkeletonCard from "../../lib/components/skeleton_card.svelte";
@@ -66,101 +66,36 @@
     let flags = $state({});
 
 	async function fetchData() {
-        if (search_val){
+        // if (search_val){
             
             //get recipes with title
-            const recipes = await search_recipes();
-            
+            const result = await search_recipes();
+            console.log(result);
             // compile both lists of recipes
-            let final_recipes = [];
-            let final_recipe_ids = [];
-            for (let i = 0; i < recipes.items.length; i++){
-                if (!final_recipe_ids.includes(recipes.items[i].id)){
-                    final_recipe_ids.push(recipes.items[i].id);
-                    final_recipes.push(recipes.items[i]);
-                }
-            }
             
-            if (!final_recipes && has_more){
+            
+            if (!result.recipes && has_more){
                 page++;
                 fetchData();
             }
-            total_recipes_num = ingr_recipes.totalItems ? ingr_recipes.totalItems : recipes.totalItems;
-            if (final_recipes.length > total_recipes_num) total_recipes_num = final_recipes.length;
-            newBatch = final_recipes;
+            total_recipes_num = result.count;
+            newBatch = result.recipes;
             data = [...data, ...newBatch];
-        } else {
-            ingr_has_more = false;
-            const recipes = await pb.collection('recipes').getList(page, page_size, {
-                filter: get_filter(),
-                expand: `notes, ingr_list`,
-                sort: get_sort()
-            });
+        // } else {
+        //     ingr_has_more = false;
+        //     const recipes = await pb.collection('recipes').getList(page, page_size, {
+        //         filter: get_filter(),
+        //         expand: `notes, ingr_list`,
+        //         sort: get_sort()
+        //     });
             
-            recipes_have_more = page < recipes.totalPages; 
+        //     recipes_have_more = page < recipes.totalPages; 
             
-            total_recipes_num = recipes.totalItems;
-            newBatch = recipes.items;
-            data = [...data, ...newBatch];1
-        }
+        //     total_recipes_num = recipes.totalItems;
+        //     newBatch = recipes.items;
+        //     data = [...data, ...newBatch];1
+        // }
 	};
-
-    async function get_ingr_recipes(){ 
-        const ingredients = await pb.collection('ingredients').getList(page, page_size, {
-            expand: `recipe, recipe.ingr_list`,
-            filter: `ingredient~"${search_val}" && recipe:length > 0`,
-            sort: `-created`
-        });
-        ingr_has_more = page < ingredients.totalPages;
-        
-
-        
-
-        const recipe_ids = getUniqueIds(data, 'id');
-
-        let ingr_recipes = [];
-        for (let i = 0; i < ingredients.items.length; i++){
-            if (ingredients.items[i].expand.recipe){
-                
-                for (let j = 0; j < ingredients.items[i].expand.recipe.length; j++){
-                    
-                    if (!ingr_recipes.includes(ingredients.items[i].expand.recipe[j]) && !recipe_ids.includes(ingredients.items[i].expand.recipe[j].id)){
-                        // TODO
-                        // if ((!selected_category || ingredients.items[i].expand.recipe[j].category == selected_category) &&
-                        //     (!selected_country || ingredients.items[i].expand.recipe[j].country == selected_country) &&
-                        //     (!selected_cuisine || ingredients.items[i].expand.recipe[j].cuisine == selected_cuisine) &&
-                        //     (!selected_author || ingredients.items[i].expand.recipe[j].author == selected_author) &&
-                        //     ingredients.items[i].expand.recipe[j]){
-                        //     ingr_recipes.push(ingredients.items[i].expand.recipe[j]);
-                        // }
-                    }
-                }
-            }
-        }
-
-        if (ingr_recipes) return {items: ingr_recipes, totalItems: ingredients.totalItems};
-        else return {items: [], totalItems: 0};
-    }
-
-    function getUniqueIds(objects, idKey) {
-        // Create a new Set to store unique IDs
-        const uniqueIdSet = new Set();
-
-        // Filter the objects and add their IDs to the Set
-        const uniqueObjects = objects.filter(obj => {
-            const id = obj[idKey];
-            if (!uniqueIdSet.has(id)) {
-            uniqueIdSet.add(id);
-            return true;
-            }
-            return false;
-        });
-
-        // Map the unique objects to their IDs
-        const uniqueIds = uniqueObjects.map(obj => obj[idKey]);
-
-        return uniqueIds;
-    }
 
     function get_filter(){
         // TODO
@@ -187,17 +122,6 @@
             if (i == selected.length - 1) curr_string += ")";
         }
         return curr_string;
-    }
-
-    function get_sort(){
-        if (sort_val == "Least Recent") return `+created`;
-        else if (sort_val == "Most Ingredients") return `-ingr_num`;
-        else if (sort_val == "Least Servings") return `+servings`;
-        else if (sort_val == "Most Servings") return `-servings`;
-        else if (sort_val == "Least Time") return `+time_new`;
-        else if (sort_val == "Most Time") return `-time_new`;
-        else if (sort_val == "Least Ingredients") return `+ingr_num`;
-        else  return `-created`;
     }
 	
 	onMount(async ()=> {
@@ -404,7 +328,8 @@
                 },
                 body: body
             });
-            console.log(response);
+            const data = await response.json();
+            return data;
         } catch (error) {
             console.log(error);
         }
