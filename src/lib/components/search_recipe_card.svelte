@@ -116,55 +116,38 @@
                             <input type="text" name="servings" class="input input-xs input-bordered input-primary w-12 text-center p-0" value={servings} onblur={handle_servings} onclick={(e) => {e.currentTarget.select()}}/><label for="servings" class="text-sm ">servings</label>
                         </div>
                     {/if}
-                    <div class="flex flex-col">
-                        <div class="flex w-full">
-                            <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow  rounded-tl">
-                                {recipe.author}
+                    <div class="flex w-full">
+                        {#if !edit_serv}
+                            <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow rounded-bl">
+                                {#if isNaN(recipe.servings)}
+                                    {servings}
+                                {:else}
+                                    {servings} servings
+                                {/if}
                             </div>
                             <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow">
-                                {recipe.category}
+                                {#if recipe.time}
+                                    {recipe.time}
+                                {:else}
+                                    no time
+                                {/if}
                             </div>
-                            <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow">
-                                {recipe.cuisine}
+                        {:else}
+                            <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow rounded-bl">
+                                {#if recipe.time}
+                                    {recipe.time}
+                                {:else}
+                                    no time
+                                {/if}
                             </div>
-                            <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow rounded-tr">
-                                {recipe.country}
-                            </div>
+                        {/if}
+                        <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow">
+                            {recipe.ingr_list} ingredients
                         </div>
-                        <div class="flex w-full">
-                            {#if !edit_serv}
-                                <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow rounded-bl">
-                                    {#if isNaN(recipe.servings)}
-                                        {servings}
-                                    {:else}
-                                        {servings} servings
-                                    {/if}
-                                </div>
-                                <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow">
-                                    {#if recipe.time}
-                                        {recipe.time}
-                                    {:else}
-                                        no time
-                                    {/if}
-                                </div>
-                            {:else}
-                                <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow rounded-bl">
-                                    {#if recipe.time}
-                                        {recipe.time}
-                                    {:else}
-                                        no time
-                                    {/if}
-                                </div>
-                            {/if}
-                            <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow">
-                                {recipe.ingr_list} ingredients
-                            </div>
-                            <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow rounded-br">
-                                {recipe.directions} steps
-                            </div>
+                        <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow rounded-br">
+                            {recipe.directions} steps
                         </div>
-                    </div>
-                    
+                    </div>                    
                 </div>
             </div>
             <div class="card-actions flex flex-col justify-evenly items-end items-center py-1 pr-1 max-w-1/4">
