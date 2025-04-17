@@ -18,7 +18,8 @@
         card_click,
         delete_recipe,
         toggle_thumb,
-        edit_servings
+        edit_servings,
+        add_click
     } = $props();
 
     let just_copied = $state(false);
@@ -34,49 +35,54 @@
         card_click({id: recipe.id});
     }
 
-    async function add_recipe(e){
+    const handle_add = (e) => {
         e.stopPropagation();
-        if (!$currentUser){
-            if (window.confirm("you must login to add this recipe to your list. Do you want to sign in?")) {
-                window.open(`/login`, "Thanks for Visiting!");
-            }
-        } else if (!$currentUser.verified){
-            show_alert("Please verify your email to add recipes", "error", "Please verify your email");
-            return;
-        } else {
-            const recipe_to_add = data.filter((curr) => curr.id == e.currentTarget.id)[0];
-            
-            const recipe_in = {
-                "title": recipe_to_add.title,
-                "description": recipe_to_add.description,
-                "url": recipe_to_add.url,
-                "author": recipe_to_add.author,
-                "time": recipe_to_add.time,
-                "directions": recipe_to_add.directions,
-                "user": $currentUser.id,
-                "image": recipe_to_add.image,
-                "servings": recipe_to_add.servings,
-                "cuisine": recipe_to_add.cuisine,
-                "country": recipe_to_add.country,
-                "notes": recipe_to_add.notes,
-                "ingr_list": recipe_to_add.ingr_list,
-                "category": recipe_to_add.category,
-                "url_id": recipe_to_add.url_id,
-                "made": false,
-                "favorite": false,
-                "time_new": recipe_to_add.time_new,
-                "ingr_num": recipe_to_add.ingr_num
-            };
-            
-            let recipe_result = await pb.collection('recipes').create(recipe_in);
-            
-            just_copied = recipe_to_add.id;
-            clearTimeout(delay_timer);
-            delay_timer = setTimeout(function() {
-                just_copied = false;
-            }, 2000);
-        }
+        add_click({id: recipe.id});
     }
+
+    // async function add_recipe(e){
+    //     e.stopPropagation();
+    //     if (!$currentUser){
+    //         if (window.confirm("you must login to add this recipe to your list. Do you want to sign in?")) {
+    //             window.open(`/login`, "Thanks for Visiting!");
+    //         }
+    //     } else if (!$currentUser.verified){
+    //         show_alert("Please verify your email to add recipes", "error", "Please verify your email");
+    //         return;
+    //     } else {
+    //         const recipe_to_add = data.filter((curr) => curr.id == e.currentTarget.id)[0];
+            
+    //         const recipe_in = {
+    //             "title": recipe_to_add.title,
+    //             "description": recipe_to_add.description,
+    //             "url": recipe_to_add.url,
+    //             "author": recipe_to_add.author,
+    //             "time": recipe_to_add.time,
+    //             "directions": recipe_to_add.directions,
+    //             "user": $currentUser.id,
+    //             "image": recipe_to_add.image,
+    //             "servings": recipe_to_add.servings,
+    //             "cuisine": recipe_to_add.cuisine,
+    //             "country": recipe_to_add.country,
+    //             "notes": recipe_to_add.notes,
+    //             "ingr_list": recipe_to_add.ingr_list,
+    //             "category": recipe_to_add.category,
+    //             "url_id": recipe_to_add.url_id,
+    //             "made": false,
+    //             "favorite": false,
+    //             "time_new": recipe_to_add.time_new,
+    //             "ingr_num": recipe_to_add.ingr_num
+    //         };
+            
+    //         let recipe_result = await pb.collection('recipes').create(recipe_in);
+            
+    //         just_copied = recipe_to_add.id;
+    //         clearTimeout(delay_timer);
+    //         delay_timer = setTimeout(function() {
+    //             just_copied = false;
+    //         }, 2000);
+    //     }
+    // }
 
     const toggle_made = (e) => {
         e.stopPropagation();
@@ -152,7 +158,7 @@
             </div>
             <div class="card-actions flex flex-col justify-evenly items-end items-center py-1 pr-1 max-w-1/4">
                 {#if add_btn && (!$currentUser || $currentUser.id != recipe.user)}
-                    <button id={recipe.id} class="btn btn-primary btn-xs h-8 m-1 md:m-3" onclick={add_recipe} onkeydown={add_recipe}>
+                    <button id={recipe.id} class="btn btn-primary btn-xs h-8 m-1 md:m-3" onclick={handle_add} onkeydown={handle_add}>
                         {#if just_copied == recipe.id}
                             <CheckMark color=""/>
                         {:else}
@@ -195,7 +201,7 @@
                         </div>
                         <div class="card-actions flex flex-col justify-evenly items-end items-center py-1 pr-1 max-w-1/4">
                             {#if add_btn && (!$currentUser || $currentUser.id != recipe.user)}
-                                <button id={recipe.id} class="btn btn-primary btn-sm h-8 m-1 md:m-3" onclick={add_recipe} onkeydown={add_recipe}>
+                                <button id={recipe.id} class="btn btn-primary btn-sm h-8 m-1 md:m-3" onclick={handle_add} onkeydown={handle_add}>
                                     {#if just_copied == recipe.id}
                                         <CheckMark color=""/>
                                     {:else}

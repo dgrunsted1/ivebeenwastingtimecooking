@@ -1,7 +1,7 @@
 <script>
   
 	import {onMount} from "svelte";
-    import { pb, currentUser, auth_refresh } from '/src/lib/pocketbase.js';
+    import { pb, currentUser, auth_refresh, pb_url } from '/src/lib/pocketbase.js';
     import InfiniteScroll from "/src/lib/components/infinite_scroll.svelte";
     import Alerts from "../../lib/components/alerts.svelte";
     import RecipeCard from "../../lib/components/search_recipe_card.svelte";
@@ -215,7 +215,7 @@
                     per_page: 20
                 });
         try {
-            const response = await fetch('http://127.0.0.1:8090/api/search', {
+            const response = await fetch(`${pb_url}/api/search`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -226,6 +226,36 @@
             return data;
         } catch (error) {
             console.log(error);
+        }
+    }
+
+    async function copy_recipe(e){
+        console.log($currentUser);
+        if (!$currentUser){
+            if (window.confirm("you must login to add this recipe to your list. Do you want to sign in?")) {
+                window.open(`/login`, "Thanks for Visiting!");
+            }
+        } else if (!$currentUser.verified){
+            show_alert("Please verify your email to add recipes", "error", "Please verify your email");
+            return;
+        } else {
+            const body = JSON.stringify({
+                        recipe_id: e.id,
+                        user_id: $currentUser.id
+                    });
+            try {
+                const response = await fetch(`${pb_url}/api/copy`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: body
+                });
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.log(error);
+            }
         }
     }
 </script>
@@ -282,6 +312,7 @@
                                 servings={item.servings}
                                 {flags}
                                 card_click={cook_recipe}
+                                add_click={copy_recipe}
                             />
                         {/each}
                         <div class="flex w-full h-full justify-center">
