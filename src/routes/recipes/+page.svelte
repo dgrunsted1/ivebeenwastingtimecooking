@@ -251,8 +251,7 @@
                     },
                     body: body
                 });
-                const data = await response.json();
-                return data;
+                return;
             } catch (error) {
                 console.log(error);
             }
