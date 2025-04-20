@@ -31,6 +31,7 @@
             const verify_result = await pb.collection('users').requestVerification(createdUser.email);
             const user = await pb.collection('users').authWithPassword(createdUser.username, password);
             is_user = true;
+            pb.collection('flags').create({user: createdUser.id, is_compact: false});
         } catch (err) {
             for (let key in err.data.data) {
                 const element = err.data.data[key];
