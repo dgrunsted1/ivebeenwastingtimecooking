@@ -33,6 +33,7 @@
     let authors = $state([]);
     let display_authors = $state([]);
     let delay_timer;
+    let just_copied = $state("");
 
 
     let selected_categories = $state([]);
@@ -251,6 +252,11 @@
                     },
                     body: body
                 });
+                just_copied = e.id;
+                clearTimeout(delay_timer);
+                delay_timer = setTimeout(async () => {
+                    just_copied = "";
+                }, 2000);
                 return;
             } catch (error) {
                 console.log(error);
@@ -312,6 +318,7 @@
                                 {flags}
                                 card_click={cook_recipe}
                                 add_click={copy_recipe}
+                                {just_copied}
                             />
                         {/each}
                         <div class="flex w-full h-full justify-center">

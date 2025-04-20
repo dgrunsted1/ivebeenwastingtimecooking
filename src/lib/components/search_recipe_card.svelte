@@ -13,6 +13,7 @@
         checked = $bindable(),
         servings = $bindable(),
         type = $bindable(),
+        just_copied = $bindable(),
         toggle_check_box,
         toggle_heart,
         card_click,
@@ -22,7 +23,7 @@
         add_click
     } = $props();
 
-    let just_copied = $state(false);
+    // let just_copied = $state(false);
     let fave_btn = $derived(!$page.params.user_name && (type == "today" || type == "menu") && (!$page.url.pathname.includes("/today") && type == "menu"));
     let check_box = $derived(type == "today" || (type == "menu" && !$page.url.pathname.includes("/today")));
     let add_btn = $derived(type == "recipes");
