@@ -180,7 +180,6 @@
             data = [];
             await fetchData();
             refresh_loading = false;
-            document.activeElement.blur();
         }, 500);
     }
 
