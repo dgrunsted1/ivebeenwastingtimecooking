@@ -2,7 +2,7 @@
     import { onMount } from 'svelte';
     import { currentUser, pb, auth_refresh } from '/src/lib/pocketbase.js';
     import { get_servings, get_total_time } from '/src/lib/recipe_util.js';
-    import EditRecipe from "/src/lib/components/edit_recipe.svelte";
+    import EditRecipe from "/src/lib/components/edit_recipe_v2.svelte";
     import DisplayRecipe from "/src/lib/components/display_recipe.svelte";
     import RecipeList from "/src/lib/components/recipe_list.svelte";
     import Menu from "/src/lib/components/menu.svelte";
@@ -189,7 +189,6 @@
                                 {#if edit_modal_recipe}
                                     <EditRecipe
                                         recipe={edit_recipe}
-                                        {update_recipe}
                                         done_editing={() => edit_modal_recipe = false}
                                     />
                                 {:else}
