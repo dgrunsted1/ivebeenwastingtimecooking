@@ -178,7 +178,7 @@ async function get_nyt_data(page){
         let time = article.querySelector("dd").textContent;
 
         let ingr_list = article.querySelector("div:nth-child(8) > div");
-        let servings = ingr_list.querySelector("div > div > span:nth-child(2)").textContent;
+        let servings = ingr_list.querySelector("div > span:nth-child(2)").textContent;
 
         let ingredient_list = ingr_list.querySelectorAll("div > ul > *");
         let ingredients_top = [];
