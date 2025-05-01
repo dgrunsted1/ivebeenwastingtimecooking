@@ -1,7 +1,7 @@
 import PocketBase from 'pocketbase';
 import { writable } from 'svelte/store';
-export const pb_url = "https://db.ivebeenwastingtime.com";
-// export const pb_url = "http://127.0.0.1:8090";
+// export const pb_url = "https://db.ivebeenwastingtime.com";
+export const pb_url = "http://127.0.0.1:8090";
 
 
 export const pb = new PocketBase(pb_url);
@@ -28,5 +28,21 @@ export const auth_refresh = async function() {
             url: window.location.href
         });
         return {error: true, msg: err.message};
+    }
+}
+
+export const post = async function(data_in, url_str) {
+    try {
+        const data = JSON.stringify(data_in);
+        const response = await fetch(`${pb_url}/${url_str}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: data
+        });
+        return true;
+    } catch (error) {
+        console.log(error);
     }
 }

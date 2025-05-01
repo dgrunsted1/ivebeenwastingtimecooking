@@ -1,4 +1,4 @@
-import { pb } from '/src/lib/pocketbase';
+import { pb, post } from '/src/lib/pocketbase';
  
 export async function save_recipe(e, recipe, user, new_note) {
     e.srcElement.disabled = true;
@@ -292,4 +292,17 @@ export const update_recipe_image = async function(image, recipe_id){
     } else {
         return null;
     }
+}
+
+export const save_recipe_new = async function(e, recipe, user_id, new_note){
+    e.srcElement.disabled = true;
+    const data = {
+        ...recipe,
+        user_id: user_id,
+        note: new_note
+    };
+    console.log(data);
+    const result = post(data, `api/save_recipe`);
+    e.srcElement.innerHTML = "saved";
+    return true;
 }

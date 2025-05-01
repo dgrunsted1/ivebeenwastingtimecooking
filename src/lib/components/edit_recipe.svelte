@@ -4,7 +4,7 @@
     import { currentUser, pb } from '/src/lib/pocketbase';
     import { onMount } from 'svelte';
     import { page } from '$app/stores';
-    import { save_recipe, update_image_upload } from '/src/lib/save_recipe.js';
+    import { save_recipe, save_recipe_new, update_image_upload } from '/src/lib/save_recipe.js';
     import { process_ingr, process_directions } from '/src/lib/process_recipe.js';
     import ThumbUp from "/src/lib/icons/ThumbUp.svelte";
     import Heart from "/src/lib/icons/Heart.svelte";
@@ -108,7 +108,8 @@
         save = false;
         reset_checks();
         document.getElementById("new_note").value = "";
-        const recipe_result = await save_recipe(e, edited_recipe, $currentUser, document.getElementById("new_note").value);
+        console.log(e, edited_recipe, $currentUser.id, document.getElementById("new_note").value);
+        const recipe_result = await save_recipe_new(e, edited_recipe, $currentUser.id, document.getElementById("new_note").value);
         update_recipe({recipe: recipe_result});
     }
 
