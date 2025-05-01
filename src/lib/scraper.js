@@ -172,13 +172,13 @@ async function get_nyt_data(page){
         let article = document.querySelector("main > div > div");
 
         let title = article.querySelector("h1").textContent;
-        let author = document.querySelector("h2 > a").textContent;
+        let author = article.querySelector("h2 > a").textContent;
         let description = article.querySelector("div:nth-child(4)").textContent;
         let img = article.querySelector("img").src;
         let time = article.querySelector("dd").textContent;
 
         let ingr_list = article.querySelector("div:nth-child(8) > div");
-        let servings = (ingr_list.querySelector("div > div > span:nth-child(2)")) ? ingr_list.querySelector("div > div > span:nth-child(2)").textContent : null;
+        let servings = ingr_list.querySelector("div > div > span:nth-child(2)").textContent;
 
         let ingredient_list = ingr_list.querySelectorAll("div > ul > *");
         let ingredients_top = [];
