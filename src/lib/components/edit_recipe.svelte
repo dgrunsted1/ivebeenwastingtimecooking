@@ -1,15 +1,12 @@
 <script>
-    import { run, preventDefault } from 'svelte/legacy';
-
     import { currentUser, pb } from '/src/lib/pocketbase';
     import { onMount } from 'svelte';
     import { page } from '$app/stores';
-    import { save_recipe, save_recipe_new, update_image_upload } from '/src/lib/save_recipe.js';
+    import { save_recipe_new, update_image_upload } from '/src/lib/save_recipe.js';
     import { process_ingr, process_directions } from '/src/lib/process_recipe.js';
     import ThumbUp from "/src/lib/icons/ThumbUp.svelte";
     import Heart from "/src/lib/icons/Heart.svelte";
     import Edit from "/src/lib/icons/EditIcon.svelte";
-    import { update_fav_made } from '/src/lib/save_recipe.js';
 
 
 
@@ -288,12 +285,6 @@
                                 <label for="recipe_servings" class="mx-1 label p-0"><span class="label-text-alt p-0">servings</span></label>
                                 <input type="text" name="recipe_servings" id="recipe_servings" class="recipe_servings input input-bordered p-1 input-xs" bind:value={edited_recipe.servings} min=1>
                             </div>
-                            {#if $page.url.pathname == "/prep"}
-                                <div class="form-control w-1/2">
-                                    <label for="recipe_servings" class="mx-1 label p-0"><span class="label-text-alt p-0">desired servings</span></label>
-                                    <input type="text" name="desired_servings" id="desired_servings" class="desired_servings input input-bordered p-1 input-xs" bind:value={edited_recipe.servings} min=1 >
-                                </div>
-                            {/if}
                         </div>
                         <div class="flex justify-evenly content-center w-full my-1 space-x-1 flex-wrap">
                             <div class="flex w-full justify-around space-x-2 p-1">
@@ -369,7 +360,7 @@
                         <textarea class="w-full textarea textarea-bordered" bind:value={ingr_input}></textarea>
                     </div>
                     <div class="flex justify-center mt-2">
-                        <button class="btn btn-primary btn-xs" onclick={preventDefault(parse_ingredients)}>parse ingredients</button>
+                        <button class="btn btn-primary btn-xs" onclick={parse_ingredients}>parse ingredients</button>
                     </div>
                 {/if}
             {:else}
@@ -400,7 +391,7 @@
                         <textarea class="w-full textarea textarea-bordered" bind:value={dir_input}></textarea>
                     </div>
                     <div class="flex justify-center mt-2">
-                        <button class="btn btn-primary btn-xs" onclick={preventDefault(parse_directions)}>parse directions</button>
+                        <button class="btn btn-primary btn-xs" onclick={parse_directions}>parse directions</button>
                     </div>
                 {/if}
                 {#if edited_recipe.directions && edited_recipe.directions.length}
