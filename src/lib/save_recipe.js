@@ -1,61 +1,4 @@
-import { pb } from '/src/lib/pocketbase';
- 
-export async function save_recipe(e, recipe, user, new_note) {
-    e.srcElement.disabled = true;
-    e.srcElement.innerHTML = "validating";
-
-    let validate_err = validate(recipe);
-    if (validate_err){
-        let ans = alert(`${validate_err}`);
-        e.srcElement.disabled = false;
-        e.srcElement.innerHTML = "save recipe";
-        return;
-    }
-    e.srcElement.innerHTML = "uploading ingredients";
-
-    let ingr_ids = await get_ingr_ids(recipe);
-    e.srcElement.innerHTML = "uploading notes";
-    let note_ids = [];
-    note_ids = await get_note_ids(recipe);
-    note_ids = await add_new_note(note_ids, new_note);
-    e.srcElement.innerHTML = "uploading recipe";
-    let data = {
-        "title": recipe.title,
-        "description": recipe.description,
-        "author": recipe.author,
-        "time": recipe.time,
-        "time_new": get_mins(recipe.time),
-        "directions": JSON.stringify(recipe.directions),
-        "servings": recipe.servings,
-        "image": recipe.image,
-        "category": recipe.category,
-        "cuisine": recipe.cuisine,
-        "country": recipe.country,
-        "ingr_list": ingr_ids,
-        "ingr_num": ingr_ids.length,
-        "url_id": (recipe.url_id) ? recipe.url_id : await get_url_id(recipe),
-        "made": recipe.made,
-        "favorite": recipe.favorite,
-        "url": recipe.url
-    };
-    if (note_ids.length) data.notes = note_ids;
-    let recipe_result;
-    if (recipe.id){
-        recipe_result = await pb.collection('recipes').update(recipe.id, data, {expand: "notes,ingr_list"});
-    }else {
-        data.user = user.id;
-        // data.url = recipe.url;
-        recipe = await pb.collection('recipes').create(data, {expand: "notes,ingr_list"});
-        e.srcElement.innerHTML = "updating ingredients";
-        for (let curr_ingr_id of ingr_ids){
-            let update_ingr = await pb.collection('ingredients').update(curr_ingr_id, {"recipe+": recipe.id});
-        }
-    }
-    
-    
-    e.srcElement.innerHTML = "saved";
-    return recipe_result;
-}
+import { pb, post } from '/src/lib/pocketbase';
 
 function get_mins(time_in){
     if (!time_in) return 0;
@@ -292,4 +235,23 @@ export const update_recipe_image = async function(image, recipe_id){
     } else {
         return null;
     }
+}
+
+export const save_recipe_new = async function(e, recipe, user_id, new_note){
+    e.srcElement.disabled = true;
+    const data = {
+        ...recipe,
+        user_id: user_id,
+        note: new_note
+    };
+    const result = await post(data, `api/save_recipe`);
+    return result;
+}
+
+export const update_ingr = function(id, data){
+    pb.collection('ingredients').update(id, data);
+}
+
+export const update_recipe_data = function(id, data){
+    pb.collection('recipes').update(id, data);
 }

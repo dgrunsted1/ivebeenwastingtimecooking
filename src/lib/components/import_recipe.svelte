@@ -1,29 +1,24 @@
 <script>
     import { currentUser, pb } from '/src/lib/pocketbase';
     import { onMount } from 'svelte';
-    import { page } from '$app/stores';
-    import { update_image_upload, update_ingr, update_recipe_data, update_fav_made } from '/src/lib/save_recipe.js';
+    import { save_recipe_new, update_image_upload } from '/src/lib/save_recipe.js';
     import { process_ingr, process_directions } from '/src/lib/process_recipe.js';
     import ThumbUp from "/src/lib/icons/ThumbUp.svelte";
     import Heart from "/src/lib/icons/Heart.svelte";
     import Edit from "/src/lib/icons/EditIcon.svelte";
-    import Delete from "/src/lib/icons/DeleteIcon.svelte";
 
 
 
     /**
      * @typedef {Object} Props
      * @property {any} recipe
-     * @property {boolean} [save]
      * @property {any} show_alert
      */
 
     /** @type {Props} */
     let {
         recipe,
-        save = $bindable(false),
         show_alert,
-        done_editing
     } = $props();
     let categories = $state([]);
     
@@ -64,7 +59,6 @@
 
     let ingr_input = $state("");
     let dir_input = $state("");
-    let delay_timer;
 
     onMount(async () => {
         let cuisines_result = await pb.collection('recipes').getList(1, 1000, {field: `cuisine`});
@@ -87,7 +81,6 @@
             let save_btns = document.getElementsByClassName("save_btn");
             for (let i = 0; i < save_btns.length; i++) {
                 save_btns[i].disabled = false;
-                save_btns[i].innerHTML = "save recipe";
             }
         }else {
             let save_btns = document.getElementsByClassName("save_btn");
@@ -96,6 +89,25 @@
             }
         }
     });
+
+    async function save_recipe_v2(e){
+        reset_checks();
+        document.getElementById("new_note").value = "";
+        const recipe_result = await save_recipe_new(e, recipe, $currentUser.id, document.getElementById("new_note").value);
+        if (recipe_result){
+            show_alert("Recipe Saved", "success", "Success")
+        } else if (recipe_result.status == 400) {
+            show_alert(recipe_result.message, "error", "Error")
+        } else {
+            show_alert("Error Saving Recipe", "error", "Error")
+        }
+    }
+
+    function reset_checks(){
+        Array.from(document.querySelectorAll(".removed input[type='checkbox']")).forEach(curr => {
+            curr.checked = false;
+        });
+    }
 
     function check_item(e){
         let ingr;
@@ -126,8 +138,6 @@
 
     function add_dir(e){
         recipe.directions = recipe.directions.toSpliced(e.srcElement.id, 0, "");
-        const data = {directions: recipe.directions};
-        update_recipe_data(recipe.id, data)
     }
 
     function remove_dir(e){
@@ -136,8 +146,6 @@
             if (i != e.srcElement.id) output.push(recipe.directions[i]);
         }
         recipe.directions = output;
-        const data = {directions: recipe.directions};
-        update_recipe_data(recipe.id, data)
     }
 
     function remove_note(e){
@@ -159,7 +167,7 @@
     function resizeIt(element) {
         let str = element.value;
         if (!str) return;
-        let cols = ($page.url.pathname == "/add_recipe") ? element.cols * 10 : element.cols * 2.8;
+        let cols = element.cols * 10;
         element.rows = Math.ceil( str.length / cols ) + 1;
     };
 
@@ -205,46 +213,14 @@
     const handle_done = function(){
         done_editing();
     }
-
-    const handle_update_recipe_data = function(e){
-        clearTimeout(delay_timer);
-        delay_timer = setTimeout(() => {
-            const data = {[e.target.id]: e.target.value};
-            update_recipe_data(recipe.id, data);
-        }, 1000);
-        
-    }
-
-    const handle_update_ingr_data = function(e){
-        clearTimeout(delay_timer);
-        delay_timer = setTimeout(() => {
-            console.log(e.target);
-            console.log(e.target.dataset.type);
-            const data = {[e.target.dataset.type]: e.target.value};
-            console.log(data);
-            update_ingr(e.target.id, data);
-        }, 1000);
-        
-    }
-
-    const handle_update_directions = function(e){
-        clearTimeout(delay_timer);
-        delay_timer = setTimeout(() => {
-            let tmp = [];
-            for (let i = 0; i < recipe.directions.length; i++){
-                if (e.target.id == i){
-                    tmp.push(e.target.value);
-                } else {
-                    tmp.push(recipe.directions[i]);
-                }
-            }
-            const data = {directions: tmp};
-            update_recipe_data(recipe.id, data);
-        }, 1000);
-    }
 </script>
 
-<div id="recipe" class="flex flex-col pt-10">
+<div id="recipe" class="flex flex-col">
+    <div class="save_btn_container flex flex-col items-center mb-5 mt-1">
+        <button class="save_btn btn btn-primary btn-xs md:btn-md w-1/3" disabled={true} onclick={save_recipe_v2}>
+            save recipe
+        </button>
+    </div>
     <div class="img_info_container flex flex-col md:flex-row w-full content-center justify-around">
         <div class="img_container flex md:w-1/2 content-center">
             <div class="w-full flex flex-col space-y-2">
@@ -261,60 +237,58 @@
                     {/if}
                     <div id="status"></div>
                 </div>
-                <input placeholder="Link to image" name="url" type="text" class="input input-bordered input-xs w-full text-center input-accent" value={recipe.image}/>
+                <input placeholder="Link to image" name="url" type="text" class="input input-bordered input-xs w-full text-center input-accent" bind:value={recipe.image}/>
             </div>
         </div>
         <div class="info_container md:w-1/2 mx-1">
             <div class="title_container form-control">
                 <label for="title" class="label p-0"><span class="label-text-alt p-0">Title</span></label>
-                <input id="title" type="text" class="title input input-bordered input-xs" value={recipe.title} oninput={handle_update_recipe_data}/>
+                <input type="text" class="title input input-bordered input-xs" bind:value={recipe.title}/>
             </div>
             <div class="decription_container form-control w-full">
                 <label for="desc" class="label p-0"><span class="label-text-alt p-0">Description</span></label>
-                <textarea id="description" class="desc textarea textarea-bordered" type="text" value={recipe.description} oninput={handle_update_recipe_data}></textarea>
+                <textarea class="desc textarea textarea-bordered" type="text" bind:value={recipe.description}></textarea>
             </div>
             <div class="title_container form-control">
                 <label for="title" class="label p-0"><span class="label-text-alt p-0">link</span></label>
-                <input id="url" type="text" class="title input input-bordered input-xs" value={recipe.url} oninput={handle_update_recipe_data}/>
+                <input type="text" class="title input input-bordered input-xs" bind:value={recipe.url}/>
             </div>
             <div class="misc w-full">
                 <div class="flex flex-row">
                     <div class="author_container form-control w-1/2">
                         <label for="auth" class="label p-0"><span class="label-text-alt p-0">Author</span></label>
-                        <input id="author" class="auth input input-bordered input-xs px-1 mr-1" type="text" value={recipe.author} oninput={handle_update_recipe_data}>
+                        <input class="auth input input-bordered input-xs px-1 mr-1" type="text" bind:value={recipe.author}>
                     </div>
                     <div class="time_container form-control w-1/2">
                         <label for="time" class="label p-0"><span class="label-text-alt p-0">Time</span></label>
-                        <!-- TODO handle multiple time columns -->
-                        <input id="time" class="time input input-bordered input-xs px-1" type="text" value={recipe.time} oninput={handle_update_recipe_data}>
+                        <input class="time input input-bordered input-xs px-1" type="text" bind:value={recipe.time}>
                     </div>
                 </div>
                 <div>
                     <div id="servings" class="flex flex-row justify-center content-center">
                         <div class="mr-1 form-control w-1/2">
                             <label for="recipe_servings" class="mx-1 label p-0"><span class="label-text-alt p-0">servings</span></label>
-                            <input type="text" name="recipe_servings" id="servings" class="recipe_servings input input-bordered p-1 input-xs" value={recipe.servings} min=1 oninput={handle_update_recipe_data}>
+                            <input type="text" name="recipe_servings" id="recipe_servings" class="recipe_servings input input-bordered p-1 input-xs" bind:value={recipe.servings} min=1>
                         </div>
                     </div>
                     <div class="flex justify-evenly content-center w-full my-1 space-x-1 flex-wrap">
                         <div class="flex w-full justify-around space-x-2 p-1">
                             <div class="dropdown w-1/2">
-                                <!-- TODO figure out dropdowns -->
-                                <input type="text" id="cuisine" placeholder="cuisine" tabindex="0" class="input input-bordered input-xs m-1 w-full cursor-text" value={recipe.cuisine} oninput={filter_cuisines} onblur={handle_update_recipe_data}/>
+                                <input type="text" id="cuisine" placeholder="cuisine" tabindex="0" class="input input-bordered input-xs m-1 w-full cursor-text" bind:value={recipe.cuisine} oninput={filter_cuisines}/>
                                 <ul tabindex="-1" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box">
                                     <div class="flex flex-col max-w-52 max-h-[50svh] overflow-y-scroll">
                                         {#each display_cuisines as cuisine}
-                                            <button id="cuisine" class="cursor-pointer" onclick={(e)=>{e.target.parentElement.parentElement.previousElementSibling.value = cuisine; handle_update_recipe_data(e); document.activeElement.blur();}} value={cuisine}>{cuisine}</button>
+                                            <button class="cursor-pointer" onclick={()=>{recipe.cuisine = cuisine; document.activeElement.blur();}}>{cuisine}</button>
                                         {/each}
                                     </div>
                                 </ul>
                             </div>
                             <div class="dropdown dropdown-end w-1/2">
-                                <input type="text" id="country" placeholder="country" tabindex="0" class="input input-bordered input-xs m-1 cursor-text w-full" value={recipe.country} oninput={filter_countries} onblur={handle_update_recipe_data}/>
+                                <input type="text" id="country" placeholder="country" tabindex="0" class="input input-bordered input-xs m-1 cursor-text w-full" bind:value={recipe.country} oninput={filter_countries}/>
                                 <ul tabindex="-1" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box">
                                     <div class="flex flex-col max-w-52 max-h-[50svh] overflow-y-scroll">
                                         {#each display_countries as country}
-                                            <button id="country" class="cursor-pointer" onclick={(e)=>{e.target.parentElement.parentElement.previousElementSibling.value = country; handle_update_recipe_data(e); document.activeElement.blur();}} value={country}>{country}</button>
+                                            <button class="cursor-pointer" onclick={()=>{recipe.country = country; document.activeElement.blur();}}>{country}</button>
                                         {/each}
                                     </div>
                                 </ul>
@@ -322,25 +296,24 @@
                         </div>
                         <div class="flex items-center w-full justify-around">
                             <div class="dropdown w-1/2 flex">
-                                <input type="text" id="category" placeholder="category" tabindex="0" class="input input-bordered input-xs m-1 cursor-text w-full" value={recipe.category} oninput={filter_categories} onblur={handle_update_recipe_data}/>
+                                <input type="text" id="category" placeholder="category" tabindex="0" class="input input-bordered input-xs m-1 cursor-text w-full" bind:value={recipe.category} oninput={filter_categories}/>
                                 <ul tabindex="-1" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box mt-8">
                                     <div class="flex flex-col max-w-52 max-h-[50svh] overflow-y-scroll">
                                         {#each display_categories as category}
-                                            <button id="category" class="cursor-pointer" onclick={(e)=>{e.target.parentElement.parentElement.previousElementSibling.value = category; handle_update_recipe_data(e); document.activeElement.blur();}} value={category}>{category}</button>
+                                            <button class="cursor-pointer" onclick={()=>{recipe.category = category; document.activeElement.blur();}}>{category}</button>
                                         {/each}
                                     </div>
                                 </ul>
                             </div>
                             <div class="flex w-1/2 space-x-1 justify-evenly">
-                                <button class="btn btn-xs md:btn-sm p-1 btn-ghost flex content-center" onclick={() => {update_fav_made(recipe.id, "made", !recipe.made)}}><ThumbUp color={(recipe.made) ? "fill-primary" : "fill-black"}/></button>
-                                <button class="btn btn-xs md:btn-sm p-1 btn-ghost flex content-center" onclick={()=>{update_fav_made(recipe.id, "favorite", !recipe.favorite)}}><Heart color={(recipe.favorite) ? "fill-primary" : "fill-black"}/></button>
+                                <button class="btn btn-xs md:btn-sm p-1 btn-ghost flex content-center" onclick={()=>{recipe.made = !recipe.made}}><ThumbUp color={(recipe.made) ? "fill-primary" : "fill-black"}/></button>
+                                <button class="btn btn-xs md:btn-sm p-1 btn-ghost flex content-center" onclick={()=>{recipe.favorite = !recipe.favorite}}><Heart color={(recipe.favorite) ? "fill-primary" : "fill-black"}/></button>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="w-full flex justify-evenly mt-1">
                     {#if recipe.url}<a class="btn btn-primary btn-xs md:btn-sm" href={recipe.url} target="_blank">original recipe</a>{/if}
-                    {#if !$page.url.pathname.includes("cook_recipe")}<button class="btn btn-primary btn-xs md:btn-sm" onclick={handle_done}>done</button>{/if}
                 </div>
             </div>
         </div>
@@ -351,10 +324,10 @@
             {#if recipe.expand && recipe.expand.ingr_list && recipe.expand.ingr_list.length}
                 {#each recipe.expand.ingr_list as ingr, i}
                         <div class="ingr_row flex flex-row justify-center items-center mt-1 " class:removed={ingr.removed}>
-                            <input type="text" class="ingr_amount input input-bordered input-xs px-1 mr-1 w-10 text-center h-fit" id={recipe.expand.ingr_list[i].id} data-type="quantity" value={recipe.expand.ingr_list[i].quantity} oninput={handle_update_ingr_data}>
-                            <input type="text" class="ingr_unit input input-bordered input-xs px-1 mr-1 w-16 text-center h-fit" id={recipe.expand.ingr_list[i].id}  data-type="unit" value={recipe.expand.ingr_list[i].unit} oninput={handle_update_ingr_data}>
-                            <input type="text" class="ingr_name input input-bordered input-xs px-1 mr-1 w-80 h-fit" id={recipe.expand.ingr_list[i].id}  data-type="ingredient" value={recipe.expand.ingr_list[i].ingredient} oninput={handle_update_ingr_data}>
-                            <button id={recipe.expand.ingr_list[i].id} class="btn btn-xs w-6 p-0 btn-accent"><Delete size={4}/></button>
+                            <input type="text" class="ingr_amount input input-bordered input-xs px-1 mr-1 w-10 text-center h-fit" bind:value={recipe.expand.ingr_list[i].quantity}>
+                            <input type="text" class="ingr_unit input input-bordered input-xs px-1 mr-1 w-16 text-center h-fit" id="{recipe.expand.ingr_list[i].id}" bind:value={recipe.expand.ingr_list[i].unit}>
+                            <input type="text" class="ingr_name input input-bordered input-xs px-1 mr-1 w-80 h-fit" bind:value={recipe.expand.ingr_list[i].ingredient}>
+                            <input onclick={check_item} id={recipe.expand.ingr_list[i].ingredient} type="checkbox" class="checkbox checkbox-accent checkbox-sm"/>
                         </div>
                 {/each}
                 <div class="flex justify-center mt-2">
@@ -362,7 +335,7 @@
                 </div>
             {:else}
                 <div class="flex justify-center w-4/5 m-auto h-52">
-                    <textarea class="w-full textarea textarea-bordered" value={ingr_input}></textarea>
+                    <textarea class="w-full textarea textarea-bordered" bind:value={ingr_input}></textarea>
                 </div>
                 <div class="flex justify-center mt-2">
                     <button class="btn btn-primary btn-xs" onclick={parse_ingredients}>parse ingredients</button>
@@ -382,12 +355,12 @@
                                 <button id={i} class="btn btn-xs my-1 bg-transparent" onclick={remove_dir}>remove</button>
                             </div>
                         </label>
-                        <textarea id={i} class="directions w-full textarea textarea-bordered" value={recipe.directions[i]} oninput={handle_update_directions}></textarea>
+                        <textarea class="directions w-full textarea textarea-bordered" bind:value={recipe.directions[i]}></textarea>
                     </div>
                 {/each}
             {:else}
                 <div class="flex justify-center w-4/5 m-auto h-52">
-                    <textarea class="w-full textarea textarea-bordered" value={dir_input}></textarea>
+                    <textarea class="w-full textarea textarea-bordered" bind:value={dir_input}></textarea>
                 </div>
                 <div class="flex justify-center mt-2">
                     <button class="btn btn-primary btn-xs" onclick={parse_directions}>parse directions</button>
@@ -406,7 +379,7 @@
                 {#each recipe.expand.notes as note, i}
                     <div class="w-4/5">
                         <label for="directions" class="mx-1 label p-0 "><span class="label-text-alt p-0">{get_local_time(recipe.expand.notes[i].updated)}</span><button id={recipe.expand.notes[i].id} class="btn btn-xs my-1" onclick={remove_note}>remove</button></label>
-                        <textarea class="notes textarea w-full textarea-bordered" value={recipe.expand.notes[i].content}></textarea>
+                        <textarea class="notes textarea w-full textarea-bordered" bind:value={recipe.expand.notes[i].content}></textarea>
                     </div>
                 {/each}
             {/if}
@@ -414,6 +387,11 @@
                 <label for="directions" class="mx-1 label p-0 "><span class="label-text-alt p-0">New</span></label>
                 <textarea id="new_note" class="notes textarea w-full textarea-bordered"></textarea>
             </div>
+        </div>
+        <div class="save_btn_container flex flex-col items-center">
+            <button class="save_btn btn btn-primary btn-xs md:btn-md w-1/3" disabled={true} onclick={save_recipe_v2}>
+                save recipe
+            </button>
         </div>
     </div>
 </div>

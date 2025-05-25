@@ -1,6 +1,5 @@
 <script>
-    import { preventDefault } from 'svelte/legacy';
-    import EditRecipe from "/src/lib/components/edit_recipe.svelte";
+    import ImportRecipe from "/src/lib/components/import_recipe.svelte";
     import { currentUser, pb, auth_refresh } from '/src/lib/pocketbase.js';
     import { process_ingr, process_directions } from '/src/lib/process_recipe.js';
     import { deserialize } from '$app/forms';
@@ -100,7 +99,6 @@
             return false;
         }
     }
-
 </script>
 
 <svelte:head>
@@ -114,11 +112,11 @@
 <div class="flex flex-col max-w-5xl m-auto h-[95svh] px-2">
     {#if !edit}
         <div class="my-auto">
-            <form method='POST' oninput={preventDefault(fetch_recipe)} class="text-center w-full flex flex-col gap-5">
+            <form method='POST' oninput={fetch_recipe} class="text-center w-full flex flex-col gap-5">
                 <input placeholder="Link to recipe" name="url" type="text" class="input input-bordered input-xs text-center input-accent mx-2 no-underline"/>
                 {#if !loading}
                     <p>or</p>
-                    <button class="btn btn-primary btn-lg m-auto" onclick={edit = true}>Input Recipe</button>
+                    <button class="btn btn-primary btn-lg m-auto" onclick={()=>{edit = true}}>Input Recipe</button>
                 {:else}
                     <div class="flex h-[110px] w-full justify-center items-center">
                         <span id="loading" class="loading loading-bars loading-lg"></span>
@@ -127,13 +125,9 @@
             </form>
         </div>
     {:else}
-        <EditRecipe
+        <ImportRecipe
             {recipe}
-            index=0
-            save={true}
-            show_alert={alert.show}
-            {loading}
-            update_recipe={() => {show_alert("Recipe Saved", "success", "Success")}}
+            {show_alert}
         />
     {/if}
     <Alerts 

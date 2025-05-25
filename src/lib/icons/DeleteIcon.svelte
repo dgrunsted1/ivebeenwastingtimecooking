@@ -1,5 +1,11 @@
+<script>
+    let { 
+        size = 6
+    } = $props();
+    let width_height = $derived(`w-${size} h-${size}`);
+</script>
 <svg 
-    class=" primary pointer-events-none w-6 h-6 fill-current" 
+    class=" primary pointer-events-none {width_height} fill-current" 
     version="1.0" xmlns="http://www.w3.org/2000/svg"
   viewBox="0 0 700.000000 820.000000"
  preserveAspectRatio="xMidYMid meet">

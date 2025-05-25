@@ -230,7 +230,6 @@
     }
 
     async function copy_recipe(e){
-        console.log($currentUser);
         if (!$currentUser){
             if (window.confirm("you must login to add this recipe to your list. Do you want to sign in?")) {
                 window.open(`/login`, "Thanks for Visiting!");
