@@ -48,7 +48,6 @@
     }
 
     async function delete_recipe(e){
-        e.stopPropagation();
         let tmp = []
         for (let recipe of recipes){
             if (recipe.id == e.id) {
