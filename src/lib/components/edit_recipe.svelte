@@ -261,60 +261,60 @@
                     {/if}
                     <div id="status"></div>
                 </div>
-                <input placeholder="Link to image" name="url" type="text" class="input input-bordered input-xs w-full text-center input-accent" bind:value={recipe.image}/>
+                <input placeholder="Link to image" name="url" type="text" class="input input-bordered input-xs w-full text-center input-accent" value={recipe.image}/>
             </div>
         </div>
         <div class="info_container md:w-1/2 mx-1">
             <div class="title_container form-control">
                 <label for="title" class="label p-0"><span class="label-text-alt p-0">Title</span></label>
-                <input id="title" type="text" class="title input input-bordered input-xs" bind:value={recipe.title} oninput={handle_update_recipe_data}/>
+                <input id="title" type="text" class="title input input-bordered input-xs" value={recipe.title} oninput={handle_update_recipe_data}/>
             </div>
             <div class="decription_container form-control w-full">
                 <label for="desc" class="label p-0"><span class="label-text-alt p-0">Description</span></label>
-                <textarea id="description" class="desc textarea textarea-bordered" type="text" bind:value={recipe.description} oninput={handle_update_recipe_data}></textarea>
+                <textarea id="description" class="desc textarea textarea-bordered" type="text" value={recipe.description} oninput={handle_update_recipe_data}></textarea>
             </div>
             <div class="title_container form-control">
                 <label for="title" class="label p-0"><span class="label-text-alt p-0">link</span></label>
-                <input id="url" type="text" class="title input input-bordered input-xs" bind:value={recipe.url} oninput={handle_update_recipe_data}/>
+                <input id="url" type="text" class="title input input-bordered input-xs" value={recipe.url} oninput={handle_update_recipe_data}/>
             </div>
             <div class="misc w-full">
                 <div class="flex flex-row">
                     <div class="author_container form-control w-1/2">
                         <label for="auth" class="label p-0"><span class="label-text-alt p-0">Author</span></label>
-                        <input id="author" class="auth input input-bordered input-xs px-1 mr-1" type="text" bind:value={recipe.author} oninput={handle_update_recipe_data}>
+                        <input id="author" class="auth input input-bordered input-xs px-1 mr-1" type="text" value={recipe.author} oninput={handle_update_recipe_data}>
                     </div>
                     <div class="time_container form-control w-1/2">
                         <label for="time" class="label p-0"><span class="label-text-alt p-0">Time</span></label>
                         <!-- TODO handle multiple time columns -->
-                        <input id="time" class="time input input-bordered input-xs px-1" type="text" bind:value={recipe.time} oninput={handle_update_recipe_data}>
+                        <input id="time" class="time input input-bordered input-xs px-1" type="text" value={recipe.time} oninput={handle_update_recipe_data}>
                     </div>
                 </div>
                 <div>
                     <div id="servings" class="flex flex-row justify-center content-center">
                         <div class="mr-1 form-control w-1/2">
                             <label for="recipe_servings" class="mx-1 label p-0"><span class="label-text-alt p-0">servings</span></label>
-                            <input type="text" name="recipe_servings" id="servings" class="recipe_servings input input-bordered p-1 input-xs" bind:value={recipe.servings} min=1 oninput={handle_update_recipe_data}>
+                            <input type="text" name="recipe_servings" id="servings" class="recipe_servings input input-bordered p-1 input-xs" value={recipe.servings} min=1 oninput={handle_update_recipe_data}>
                         </div>
                     </div>
                     <div class="flex justify-evenly content-center w-full my-1 space-x-1 flex-wrap">
                         <div class="flex w-full justify-around space-x-2 p-1">
                             <div class="dropdown w-1/2">
                                 <!-- TODO figure out dropdowns -->
-                                <input type="text" id="cuisine" placeholder="cuisine" tabindex="0" class="input input-bordered input-xs m-1 w-full cursor-text" bind:value={recipe.cuisine} oninput={filter_cuisines}/>
+                                <input type="text" id="cuisine" placeholder="cuisine" tabindex="0" class="input input-bordered input-xs m-1 w-full cursor-text" value={recipe.cuisine} oninput={filter_cuisines} onblur={handle_update_recipe_data}/>
                                 <ul tabindex="-1" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box">
                                     <div class="flex flex-col max-w-52 max-h-[50svh] overflow-y-scroll">
                                         {#each display_cuisines as cuisine}
-                                            <button class="cursor-pointer" onclick={()=>{recipe.cuisine = cuisine; document.activeElement.blur();}}>{cuisine}</button>
+                                            <button id="cuisine" class="cursor-pointer" onclick={(e)=>{e.target.parentElement.parentElement.previousElementSibling.value = cuisine; handle_update_recipe_data(e); document.activeElement.blur();}} value={cuisine}>{cuisine}</button>
                                         {/each}
                                     </div>
                                 </ul>
                             </div>
                             <div class="dropdown dropdown-end w-1/2">
-                                <input type="text" id="country" placeholder="country" tabindex="0" class="input input-bordered input-xs m-1 cursor-text w-full" bind:value={recipe.country} oninput={filter_countries}/>
+                                <input type="text" id="country" placeholder="country" tabindex="0" class="input input-bordered input-xs m-1 cursor-text w-full" value={recipe.country} oninput={filter_countries} onblur={handle_update_recipe_data}/>
                                 <ul tabindex="-1" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box">
                                     <div class="flex flex-col max-w-52 max-h-[50svh] overflow-y-scroll">
                                         {#each display_countries as country}
-                                            <button class="cursor-pointer" onclick={()=>{recipe.country = country; document.activeElement.blur();}}>{country}</button>
+                                            <button id="country" class="cursor-pointer" onclick={(e)=>{e.target.parentElement.parentElement.previousElementSibling.value = country; handle_update_recipe_data(e); document.activeElement.blur();}} value={country}>{country}</button>
                                         {/each}
                                     </div>
                                 </ul>
@@ -322,11 +322,11 @@
                         </div>
                         <div class="flex items-center w-full justify-around">
                             <div class="dropdown w-1/2 flex">
-                                <input type="text" id="category" placeholder="category" tabindex="0" class="input input-bordered input-xs m-1 cursor-text w-full" bind:value={recipe.category} oninput={filter_categories}/>
+                                <input type="text" id="category" placeholder="category" tabindex="0" class="input input-bordered input-xs m-1 cursor-text w-full" value={recipe.category} oninput={filter_categories} onblur={handle_update_recipe_data}/>
                                 <ul tabindex="-1" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box mt-8">
                                     <div class="flex flex-col max-w-52 max-h-[50svh] overflow-y-scroll">
                                         {#each display_categories as category}
-                                            <button class="cursor-pointer" onclick={()=>{recipe.category = category; document.activeElement.blur();}}>{category}</button>
+                                            <button id="category" class="cursor-pointer" onclick={(e)=>{e.target.parentElement.parentElement.previousElementSibling.value = category; handle_update_recipe_data(e); document.activeElement.blur();}} value={category}>{category}</button>
                                         {/each}
                                     </div>
                                 </ul>
@@ -362,7 +362,7 @@
                 </div>
             {:else}
                 <div class="flex justify-center w-4/5 m-auto h-52">
-                    <textarea class="w-full textarea textarea-bordered" bind:value={ingr_input}></textarea>
+                    <textarea class="w-full textarea textarea-bordered" value={ingr_input}></textarea>
                 </div>
                 <div class="flex justify-center mt-2">
                     <button class="btn btn-primary btn-xs" onclick={parse_ingredients}>parse ingredients</button>
@@ -387,7 +387,7 @@
                 {/each}
             {:else}
                 <div class="flex justify-center w-4/5 m-auto h-52">
-                    <textarea class="w-full textarea textarea-bordered" bind:value={dir_input}></textarea>
+                    <textarea class="w-full textarea textarea-bordered" value={dir_input}></textarea>
                 </div>
                 <div class="flex justify-center mt-2">
                     <button class="btn btn-primary btn-xs" onclick={parse_directions}>parse directions</button>
@@ -406,7 +406,7 @@
                 {#each recipe.expand.notes as note, i}
                     <div class="w-4/5">
                         <label for="directions" class="mx-1 label p-0 "><span class="label-text-alt p-0">{get_local_time(recipe.expand.notes[i].updated)}</span><button id={recipe.expand.notes[i].id} class="btn btn-xs my-1" onclick={remove_note}>remove</button></label>
-                        <textarea class="notes textarea w-full textarea-bordered" bind:value={recipe.expand.notes[i].content}></textarea>
+                        <textarea class="notes textarea w-full textarea-bordered" value={recipe.expand.notes[i].content}></textarea>
                     </div>
                 {/each}
             {/if}
