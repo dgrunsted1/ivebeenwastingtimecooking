@@ -5,8 +5,6 @@
     import { onMount } from 'svelte';
     import { currentUser, pb } from '/src/lib/pocketbase.js';
     import { process_ingr } from '/src/lib/process_recipe.js';
-    import { save_recipe } from '/src/lib/save_recipe.js';
-    import { page } from '$app/stores';
 
 
 let scraper_test_result = $state([]);
@@ -293,14 +291,14 @@ function get_website_name(url){
     return url.match(/\w+\.\w+\.\w+/);
 }
 
-function update_recipe(e){
-    for (let i = 0; i < process_recipe_results.length; i++){
-        if (process_recipe_results[i].id = e.srcElement.id){
-            process_recipe_results[i].scrape_result.id = process_recipe_results[i].id;
-            save_recipe(e, process_recipe_results[i].scrape_result, null, null);
-        }
-    }
-}
+// function update_recipe(e){
+//     for (let i = 0; i < process_recipe_results.length; i++){
+//         if (process_recipe_results[i].id = e.srcElement.id){
+//             process_recipe_results[i].scrape_result.id = process_recipe_results[i].id;
+//             save_recipe(e, process_recipe_results[i].scrape_result, null, null);
+//         }
+//     }
+// }
 
 
 </script>
