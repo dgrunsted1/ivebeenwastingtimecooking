@@ -20,7 +20,7 @@
     }
 
     function edit_groceries(){
-        edit_recipe();
+        edit_recipe(recipe.id);
     }
 
     async function update_fav(e){

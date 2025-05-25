@@ -244,8 +244,14 @@ export const save_recipe_new = async function(e, recipe, user_id, new_note){
         user_id: user_id,
         note: new_note
     };
-    console.log(data);
     const result = await post(data, `api/save_recipe`);
-    console.log(result);
     return result;
+}
+
+export const update_ingr = function(id, data){
+    pb.collection('ingredients').update(id, data);
+}
+
+export const update_recipe_data = function(id, data){
+    pb.collection('recipes').update(id, data);
 }

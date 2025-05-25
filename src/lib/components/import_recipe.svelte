@@ -93,9 +93,7 @@
     async function save_recipe_v2(e){
         reset_checks();
         document.getElementById("new_note").value = "";
-        console.log(e, recipe, $currentUser.id, document.getElementById("new_note").value);
         const recipe_result = await save_recipe_new(e, recipe, $currentUser.id, document.getElementById("new_note").value);
-        console.log({recipe_result});
         if (recipe_result){
             show_alert("Recipe Saved", "success", "Success")
         } else if (recipe_result.status == 400) {

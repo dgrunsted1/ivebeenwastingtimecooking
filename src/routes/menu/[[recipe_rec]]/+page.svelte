@@ -103,6 +103,37 @@
         }
     }
 
+    function subscribe_n_edit(recipe_id){
+        pb.realtime.subscribe(`recipes/${edit_recipe.id}`, handle_recipe_update);
+        for (let i = 0; i < edit_recipe.expand.ingr_list.length; i++){
+            pb.realtime.subscribe(`ingredients/${edit_recipe.expand.ingr_list[i].id}`, handle_update_ingr)
+        }
+        edit_modal_recipe = true
+    }
+
+    async function handle_recipe_update(data){
+        for (let i = 0; i < user_recipes.length; i++){
+            if (user_recipes[i].id == data.record.id){
+                user_recipes[i] = {...data.record, expand:user_recipes[i].expand};
+                break;
+            }
+        }        
+    }
+
+    async function handle_update_ingr(data){   
+        console.log(data)
+        for (let i = 0; i < user_recipes.length; i++){
+            if (user_recipes[i].id == edit_id){
+                for (let j = 0; j < user_recipes[i].expand.ingr_list.length; j++){
+                    if (user_recipes[i].expand.ingr_list[j].id == data.record.id){
+                        user_recipes[i].expand.ingr_list[j] = {...data.record};
+                        console.log(user_recipes[i].expand.ingr_list[j]);
+                        break;
+                    }
+                }
+            }
+        }
+    }
     
 </script>
 
@@ -116,7 +147,7 @@
 
 <div id="main" class="p-1 md:p-3">
         {#if (user_recipes && user_recipes.length > 0) || loading}
-            <div id="content" class="flex flex-col md:flex-row   mt-0 md:space-x-3 md:w-full">
+            <div id="content" class="flex flex-col md:flex-row mt-0 md:space-x-3 md:w-full">
                 <div id="left_column" class="md:w-1/2">
                     <RecipeList 
                         recipes={user_recipes} 
@@ -196,7 +227,7 @@
                                     <DisplayRecipe
                                         recipe={edit_recipe}
                                         {update_recipe}
-                                        edit_recipe={()=>{edit_modal_recipe = true}}
+                                        edit_recipe={subscribe_n_edit}
                                     />
                                 {/if}
                             {/if}
