@@ -90,9 +90,15 @@
         }
     });
 
+    function validate_servings(){
+        if (recipe.servings != parseInt(recipe.servings).toString() && recipe.servings != "") return 'input-error';
+        else return "";
+    }
+
     async function save_recipe_v2(e){
         reset_checks();
         document.getElementById("new_note").value = "";
+        recipe.servings = parseInt(recipe.servings);
         const recipe_result = await save_recipe_new(e, recipe, $currentUser.id, document.getElementById("new_note").value);
         if (recipe_result){
             show_alert("Recipe Saved", "success", "Success")
@@ -268,7 +274,7 @@
                     <div id="servings" class="flex flex-row justify-center content-center">
                         <div class="mr-1 form-control w-1/2">
                             <label for="recipe_servings" class="mx-1 label p-0"><span class="label-text-alt p-0">servings</span></label>
-                            <input type="text" name="recipe_servings" id="recipe_servings" class="recipe_servings input input-bordered p-1 input-xs" bind:value={recipe.servings} min=1>
+                            <input type="text" name="recipe_servings" id="recipe_servings" class="recipe_servings {validate_servings()} input input-bordered p-1 input-xs" bind:value={recipe.servings} min=1>
                         </div>
                     </div>
                     <div class="flex justify-evenly content-center w-full my-1 space-x-1 flex-wrap">
