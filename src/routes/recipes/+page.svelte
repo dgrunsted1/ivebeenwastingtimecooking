@@ -81,12 +81,9 @@
 	onMount(async ()=> {
 		// load first batch onMount
         if ($currentUser){
-            const result = await auth_refresh;
+            const result = await auth_refresh();
             if (result.error){
                 show_error(e.message);
-            } else {
-                const flag_result = await pb.collection('flags').getFirstListItem(`user="${$currentUser.id}"`);
-                flags = flag_result;
             }
         }
 		await fetchData();
