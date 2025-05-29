@@ -27,6 +27,8 @@ export const auth_refresh = async function() {
             function: "auth_refresh",
             url: window.location.href
         });
+        pb.authStore.clear();
+        window.location.href = "/login";
         return {error: true, msg: err.message};
     }
 }

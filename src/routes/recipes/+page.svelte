@@ -79,7 +79,6 @@
 	};
 	
 	onMount(async ()=> {
-		// load first batch onMount
         if ($currentUser){
             const result = await auth_refresh();
             if (result.error){
