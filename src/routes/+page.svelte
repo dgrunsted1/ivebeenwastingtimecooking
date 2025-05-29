@@ -100,7 +100,7 @@
   <!-- Hero Section -->
   <section 
     bind:this={heroRef}
-    class="min-h-screen flex items-center justify-center text-center px-4 relative"
+    class="min-h-[100svh] flex items-center justify-center text-center px-4 relative"
     style="transform: translateY({scrollY * 0.5}px)"
   >
     <!-- Floating background elements -->
