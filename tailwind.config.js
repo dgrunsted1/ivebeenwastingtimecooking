@@ -18,9 +18,7 @@ export default {
           "success": "#1DD781",
           "warning": "#fde68a",     
           "error": "#f87272",
-          ".border-color": {
-            "border-color": "#262626"
-          }
+          "invbase": "#262626"
         },
       },
       {
@@ -32,9 +30,7 @@ export default {
           "base-100": "#262626",
           "success": "#1DD781",
           "warning": "#78350f",
-          ".border-color": {
-            "border-color": "#FCF8F4"
-          }
+          "invbase": "#FCF8F4"
         }
       }
     ], // true: all themes | false: only light + dark | array: specific themes like this ["light", "dark", "cupcake"]
