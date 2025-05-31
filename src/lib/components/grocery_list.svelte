@@ -456,7 +456,7 @@
                 {#if is_owner}
                     <div class="dropdown dropdown-top">
                         <label tabindex="-1" for="save_menu" class="btn btn-primary btn-sm md:btn-sm">options</label>
-                        <ul tabindex="-1" name="save_menu" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-max bg-primary">
+                        <ul tabindex="-1" name="save_menu" class="dropdown-content z-1 menu p-2 shadow-sm bg-base-100 rounded-box w-max bg-primary">
                             <li class="btn btn-sm btn-primary p-0"><button class="p-0" onclick={edit_groceries}>
                                 edit
                             </button></li>

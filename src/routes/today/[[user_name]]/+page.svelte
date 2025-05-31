@@ -315,7 +315,7 @@
                                                 <div class="flex justify-around items-center w-full">
                                                     <SubTask/>
                                                     <div class="card card-bordered sm:card-side {(todays_menu.made && todays_menu.made[curr_sub_recipe.id]) ? "bg-base-300" : "bg-base-200"} max-h-24 my-1.5 mx-1 w-4/5" onclick={window.location = `/cook_recipe/${curr_sub_recipe.url_id}/${todays_menu.servings[curr_sub_recipe.id]}`} onkeydown={window.location = `/cook_recipe/${curr_sub_recipe.url_id}/${todays_menu.servings[curr_sub_recipe.id]}`}>
-                                                        <figure class="md:w-3/5 {(todays_menu.made && todays_menu.made[curr_sub_recipe.id]) ? "blur-sm" : ""}"><img src={curr_sub_recipe.image} alt={curr_sub_recipe.title}/></figure>
+                                                        <figure class="md:w-3/5 {(todays_menu.made && todays_menu.made[curr_sub_recipe.id]) ? "blur-xs" : ""}"><img src={curr_sub_recipe.image} alt={curr_sub_recipe.title}/></figure>
                                                         <div class="card-body max-h-full flex flex-row p-2 items-center w-full">
                                                             <p id={i} class="w-1/2 text-xs">{curr_sub_recipe.title}</p>
                                                             <div class="card-actions flex flex-row justify-evenly items-center">

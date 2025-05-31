@@ -301,7 +301,7 @@
                             <div class="dropdown w-1/2">
                                 <!-- TODO figure out dropdowns -->
                                 <input type="text" id="cuisine" placeholder="cuisine" tabindex="0" class="input input-bordered input-xs m-1 w-full cursor-text" value={recipe.cuisine} oninput={filter_cuisines} onblur={handle_update_recipe_data}/>
-                                <ul tabindex="-1" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box">
+                                <ul tabindex="-1" class="dropdown-content z-1 menu p-2 shadow-sm bg-base-100 rounded-box">
                                     <div class="flex flex-col max-w-52 max-h-[50svh] overflow-y-scroll">
                                         {#each display_cuisines as cuisine}
                                             <button id="cuisine" class="cursor-pointer" onclick={(e)=>{e.target.parentElement.parentElement.previousElementSibling.value = cuisine; handle_update_recipe_data(e); document.activeElement.blur();}} value={cuisine}>{cuisine}</button>
@@ -311,7 +311,7 @@
                             </div>
                             <div class="dropdown dropdown-end w-1/2">
                                 <input type="text" id="country" placeholder="country" tabindex="0" class="input input-bordered input-xs m-1 cursor-text w-full" value={recipe.country} oninput={filter_countries} onblur={handle_update_recipe_data}/>
-                                <ul tabindex="-1" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box">
+                                <ul tabindex="-1" class="dropdown-content z-1 menu p-2 shadow-sm bg-base-100 rounded-box">
                                     <div class="flex flex-col max-w-52 max-h-[50svh] overflow-y-scroll">
                                         {#each display_countries as country}
                                             <button id="country" class="cursor-pointer" onclick={(e)=>{e.target.parentElement.parentElement.previousElementSibling.value = country; handle_update_recipe_data(e); document.activeElement.blur();}} value={country}>{country}</button>
@@ -323,7 +323,7 @@
                         <div class="flex items-center w-full justify-around">
                             <div class="dropdown w-1/2 flex">
                                 <input type="text" id="category" placeholder="category" tabindex="0" class="input input-bordered input-xs m-1 cursor-text w-full" value={recipe.category} oninput={filter_categories} onblur={handle_update_recipe_data}/>
-                                <ul tabindex="-1" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box mt-8">
+                                <ul tabindex="-1" class="dropdown-content z-1 menu p-2 shadow-sm bg-base-100 rounded-box mt-8">
                                     <div class="flex flex-col max-w-52 max-h-[50svh] overflow-y-scroll">
                                         {#each display_categories as category}
                                             <button id="category" class="cursor-pointer" onclick={(e)=>{e.target.parentElement.parentElement.previousElementSibling.value = category; handle_update_recipe_data(e); document.activeElement.blur();}} value={category}>{category}</button>

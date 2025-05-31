@@ -233,7 +233,7 @@
         {#if $page.url.pathname == "/menu" || $page.url.pathname == "/profile"}
             <div class="dropdown dropdown-end">
                 <label tabindex="-1" for="save_menu" class="btn m-1 btn-primary btn-xs md:btn-sm">save menu</label>
-                <ul tabindex="-1" name="save_menu" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-max bg-primary">
+                <ul tabindex="-1" name="save_menu" class="dropdown-content z-1 menu p-2 shadow-sm bg-base-100 rounded-box w-max bg-primary">
                     <li class="btn btn-xs btn-primary p-0"><button class="p-0" onclick={save_menu_handle}>
                         {#if save_menu_load}
                             <span class="loading loading-dots loading-md mx-7"></span>

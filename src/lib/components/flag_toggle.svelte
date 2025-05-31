@@ -22,7 +22,7 @@ let {
 <div>
     <button
       onclick={handle_func}
-      class="relative inline-flex h-8 w-12 items-center rounded-full bg-primary transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+      class="relative inline-flex h-8 w-12 items-center rounded-full bg-primary transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
       aria-pressed={value}
     >
       <span class="sr-only">{value ? 'Enabled' : 'Disabled'}</span>
