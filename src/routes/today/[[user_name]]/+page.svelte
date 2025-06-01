@@ -383,7 +383,7 @@
                 </div>
             {/if}
         </div>
-        <div class="tabs tabs-boxed w-fit mx-auto flex items-center bg-base-300 md:bg-base-200 md:hidden my-1">
+        <div class="tabs tabs-box w-fit mx-auto flex items-center bg-base-300 md:bg-base-200 md:hidden my-1">
             <button id="recipe_list" class="tab tab-xs {(tab == "recipe_list") ? "tab-active" : ""}" onclick={switch_tab}>Recipes</button>
             <button id="grocery_list" class="tab {(tab == "grocery_list") ? "tab-active" : ""} tab-xs" onclick={switch_tab}>Grocery List</button>
         </div>

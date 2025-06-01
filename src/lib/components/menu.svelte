@@ -261,7 +261,7 @@
         {/if}
     </div>
     <div class="flex content-center">
-        <div class="tabs tabs-boxed w-fit mx-auto flex items-center bg-base-300 md:bg-base-200">
+        <div class="tabs tabs-box w-fit mx-auto flex items-center bg-base-300 md:bg-base-200">
             <div id="recipe_list" class="tab tab-active tab-xs" onclick={switch_tab}>Recipes</div> 
             <div id="grocery_list" class="tab tab-xs" onclick={switch_tab}>Grocery List</div>
         </div>

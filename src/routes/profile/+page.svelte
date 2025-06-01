@@ -186,7 +186,7 @@
 
 <div class="flex flex-col items-center h-full">
     <h1>Profile</h1>
-    <div class="tabs tabs-boxed mx-auto hidden items-center bg-base-300 md:bg-base-200 md:flex m-1 justify-center">
+    <div class="tabs tabs-box mx-auto hidden items-center bg-base-300 md:bg-base-200 md:flex m-1 justify-center">
         <button id="info" class="tab tab-xs {(tab == "info") ? "tab-active" : ""}" onclick={switch_tab}>Info</button>
         <button id="settings" class="tab tab-xs {(tab == "settings") ? "tab-active" : ""}" onclick={switch_tab}>Settings</button>
         <button id="stats" class="tab {(tab == "stats") ? "tab-active" : ""} tab-xs" onclick={switch_tab}>Stats</button>
@@ -346,7 +346,7 @@
             {/if}
         </div>
     </div>
-    <div class="tabs tabs-boxed w-full mx-auto flex items-center bg-base-300 md:bg-base-200 md:hidden m-1 justify-evenly">
+    <div class="tabs tabs-box w-full mx-auto flex items-center bg-base-300 md:bg-base-200 md:hidden m-1 justify-evenly">
         <button id="info" class="tab tab-xs px-1 {(tab == "info") ? "tab-active" : ""}" onclick={switch_tab}>Info</button>
         <button id="settings" class="tab tab-xs px-1 {(tab == "settings") ? "tab-active" : ""}" onclick={switch_tab}>Settings</button>
         <button id="stats" class="tab px-1 {(tab == "stats") ? "tab-active" : ""} tab-xs" onclick={switch_tab}>Stats</button>
