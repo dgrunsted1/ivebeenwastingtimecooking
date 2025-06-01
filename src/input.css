@@ -1,7 +1,78 @@
 @import 'tailwindcss';
-@plugin "daisyui" {
-  themes: light --default, dark --prefersdark, cupcake;
+@plugin "daisyui";
+@plugin "daisyui/theme" {
+  name: "nord";
+  default: true; /* set as default */
+  prefersdark: false; /* set as default dark mode (prefers-color-scheme:dark) */
+  color-scheme: light; /* color of browser-provided UI */
+
+  --color-base-100: oklch(0.9811 0.0068 67.75);
+  --color-base-200: oklch(0.95 0.0068 67.75);
+  --color-base-300: oklch(0.90 0.0068 67.75);
+  --color-base-content: oklch(21% 0.006 285.885);
+  --color-primary: oklch(0.6741 0.1856 289.68);
+  --color-primary-content: oklch(93% 0.034 272.788);
+  --color-secondary: oklch(0.8758 0.0747 100.2);
+  --color-secondary-content: oklch(14% 0 0);
+  --color-accent: oklch(0.6979 0.0868 38.4);
+  --color-accent-content: oklch(38% 0.063 188.416);
+  --color-neutral: oklch(0.5478 0.0155 60.37);
+  --color-neutral-content: oklch(92% 0.004 286.32);
+  --color-info: oklch(0.7585 0.1374 231.62);
+  --color-info-content: oklch(29% 0.066 243.157);
+  --color-success: oklch(0.7749 0.1841 155.59);
+  --color-success-content: oklch(37% 0.077 168.94);
+  --color-warning: oklch(0.9243 0.1151 95.75);
+  --color-warning-content: oklch(41% 0.112 45.904);
+  --color-error: oklch(0.7122 0.1649 22.15);
+  --color-error-content: oklch(27% 0.105 12.094);
+  --radius-selector: 0.5rem;
+  --radius-field: 0.5rem;
+  --radius-box: 1rem;
+  --size-selector: 0.3125rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 1;
+  --noise: 1;
+
 }
+
+
+@plugin "daisyui/theme" {
+  name: "dim";
+  default: false;
+  prefersdark: true;
+  color-scheme: "dark";
+  --color-base-100: oklch(0.2686 0 0);
+  --color-base-200: oklch(0.2286 0 0);
+  --color-base-300: oklch(0.1886 0 0);
+  --color-base-content: oklch(82.901% 0.031 222.959);
+  --color-primary: oklch(0.6741 0.1856 289.68);
+  --color-primary-content: oklch(17.226% 0.028 139.549);
+  --color-secondary: oklch(0.8758 0.0747 100.2);
+  --color-secondary-content: oklch(14.675% 0.033 35.353);
+  --color-accent: oklch(0.6979 0.0868 38.4);
+  --color-accent-content: oklch(14.845% 0.026 311.379);
+  --color-neutral: oklch(0.5478 0.0155 60.37);
+  --color-neutral-content: oklch(82.901% 0.031 222.959);
+  --color-info: oklch(86.078% 0.142 206.182);
+  --color-info-content: oklch(17.215% 0.028 206.182);
+  --color-success: oklch(0.7749 0.1841 155.59);
+  --color-success-content: oklch(17.234% 0.028 166.534);
+  --color-warning: oklch(0.9243 0.1151 95.75);
+  --color-warning-content: oklch(17.232% 0.028 94.818);
+  --color-error: oklch(82.418% 0.099 33.756);
+  --color-error-content: oklch(16.483% 0.019 33.756);
+  --radius-selector: 0.5rem;
+  --radius-field: 0.5rem;
+  --radius-box: 1rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+}
+
 /*
   The default border color has changed to `currentcolor` in Tailwind CSS v4,
   so we've added these compatibility styles to make sure everything still
