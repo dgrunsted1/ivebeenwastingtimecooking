@@ -316,7 +316,7 @@ function get_website_name(url){
                     </form>
                     <div class="dropdown w-52">
                         <label tabindex="0" class="btn m-1 w-full" id="num_tests_label">Number of Recipes</label>
-                        <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box">
+                        <ul tabindex="0" class="dropdown-content z-1 menu p-2 shadow-sm bg-base-100 rounded-box">
                             {#each [1,3,5,7,10] as curr}
                                 <li class="cursor-pointer" onclick={handlers(()=>{num_tests = curr}, set_num_tests)}>{curr}</li>
                             {/each}
@@ -324,7 +324,7 @@ function get_website_name(url){
                     </div>
                     <div class="dropdown w-52">
                         <label tabindex="0" class="btn m-1 w-full" id="test_sites_label">site</label>
-                        <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box">
+                        <ul tabindex="0" class="dropdown-content z-1 menu p-2 shadow-sm bg-base-100 rounded-box">
                             {#each test_sites as curr}
                                 <li class="cursor-pointer" onclick={handlers(()=>{test_site = curr}, set_test_site)}>{curr}</li>
                             {/each}
@@ -348,7 +348,7 @@ function get_website_name(url){
                         <!-- <h3 class="text-center">NPM : MINE</h3> -->
                             {#each process_recipe_results as recipe}
                                 {#if recipe.passed == true}
-                                    <div class="bg-success-content text-success rounded text-center col-span-3">
+                                    <div class="bg-success-content text-success rounded-sm text-center col-span-3">
                                         <div>
                                             <div>{recipe.title}</div>
                                             <div>{recipe.scrape_time}</div>
@@ -359,7 +359,7 @@ function get_website_name(url){
                                         </div>
                                     </div>
                                 {:else}
-                                    <div class="bg-error-content text-error rounded text-center col-span-3">
+                                    <div class="bg-error-content text-error rounded-sm text-center col-span-3">
                                         <div>
                                             <div>{recipe.title}</div>
                                             <div>{recipe.scrape_time}</div>
@@ -376,29 +376,29 @@ function get_website_name(url){
                                     </div>
                                 {/if}
                                 <div class="flex flex-col space-x-1 w-full justify-center">
-                                    <div class="bg-content rounded text-center border-solid border border-black p-1 flex justify-evenly space-x-4"><div>Scraped</div><div>The Truth</div></div>
+                                    <div class="bg-content rounded-sm text-center border-solid border border-black p-1 flex justify-evenly space-x-4"><div>Scraped</div><div>The Truth</div></div>
                                     {#each recipe.data as curr}
                                         {#if curr.key == "image"}
                                             {#if curr.test == true}
-                                                <div class="bg-success-content text-success rounded text-center border-solid border border-black p-1 flex justify-evenly space-x-4"><img src={curr.val} alt={curr.val} class="w-1/3"/><img src={curr.test_val} alt={curr.test_val} class="w-1/3"/></div>
+                                                <div class="bg-success-content text-success rounded-sm text-center border-solid border border-black p-1 flex justify-evenly space-x-4"><img src={curr.val} alt={curr.val} class="w-1/3"/><img src={curr.test_val} alt={curr.test_val} class="w-1/3"/></div>
                                             {:else}
-                                                <div class="bg-error-content text-error rounded text-center border-solid border border-black p-1 flex justify-evenly space-x-4"><img src={curr.val} alt={curr.val} class="w-1/3"/><img src={curr.test_val} alt={curr.test_val} class="w-1/3"/></div>
+                                                <div class="bg-error-content text-error rounded-sm text-center border-solid border border-black p-1 flex justify-evenly space-x-4"><img src={curr.val} alt={curr.val} class="w-1/3"/><img src={curr.test_val} alt={curr.test_val} class="w-1/3"/></div>
                                             {/if}
                                         {:else if curr.key == "expand"}
                                             {#if curr.test == true}
-                                                <div class="bg-success-content text-success rounded text-center border-solid border border-black p-1 flex justify-evenly space-x-4"><div class="w-1/2">{curr.val.quantity} | {curr.val.unit} | {curr.val.ingredient}</div><div class="w-1/2">{curr.test_val.quantity} | {curr.test_val.unit} | {curr.test_val.ingredient}</div></div>
+                                                <div class="bg-success-content text-success rounded-sm text-center border-solid border border-black p-1 flex justify-evenly space-x-4"><div class="w-1/2">{curr.val.quantity} | {curr.val.unit} | {curr.val.ingredient}</div><div class="w-1/2">{curr.test_val.quantity} | {curr.test_val.unit} | {curr.test_val.ingredient}</div></div>
                                             {:else}
                                                 {#if !curr.test_val}
-                                                    <div class="bg-error-content text-error rounded text-center border-solid border border-black p-1 flex justify-evenly space-x-4"><div class="w-1/2">{curr.val.quantity} | {curr.val.unit} | {curr.val.ingredient}</div><div class="w-1/2">none</div></div>
+                                                    <div class="bg-error-content text-error rounded-sm text-center border-solid border border-black p-1 flex justify-evenly space-x-4"><div class="w-1/2">{curr.val.quantity} | {curr.val.unit} | {curr.val.ingredient}</div><div class="w-1/2">none</div></div>
                                                 {:else}
-                                                    <div class="bg-error-content text-error rounded text-center border-solid border border-black p-1 flex justify-evenly space-x-4"><div class="w-1/2">{curr.val.quantity} | {curr.val.unit} | {curr.val.ingredient}</div><div class="w-1/2">{curr.test_val.quantity} | {curr.test_val.unit} | {curr.test_val.ingredient}</div></div>
+                                                    <div class="bg-error-content text-error rounded-sm text-center border-solid border border-black p-1 flex justify-evenly space-x-4"><div class="w-1/2">{curr.val.quantity} | {curr.val.unit} | {curr.val.ingredient}</div><div class="w-1/2">{curr.test_val.quantity} | {curr.test_val.unit} | {curr.test_val.ingredient}</div></div>
                                                 {/if}
                                             {/if}
                                         {:else}
                                             {#if curr.test == true}
-                                                <div class="bg-success-content text-success rounded text-center border-solid border border-black p-1 flex justify-evenly space-x-4"><div>{curr.val}</div><div>{curr.test_val}</div></div>
+                                                <div class="bg-success-content text-success rounded-sm text-center border-solid border border-black p-1 flex justify-evenly space-x-4"><div>{curr.val}</div><div>{curr.test_val}</div></div>
                                             {:else}
-                                                <div class="bg-error-content text-error rounded text-center border-solid border border-black p-1 flex justify-evenly space-x-4"><div>{curr.val}</div><div>{curr.test_val}</div></div>
+                                                <div class="bg-error-content text-error rounded-sm text-center border-solid border border-black p-1 flex justify-evenly space-x-4"><div>{curr.val}</div><div>{curr.test_val}</div></div>
                                             {/if}
                                         {/if}
                                     {/each}
@@ -412,7 +412,7 @@ function get_website_name(url){
                         <!-- <h3 class="text-center">NPM : MINE</h3> -->
                             {#each process_recipe_results as recipe}
                                 {#if recipe.passed == true}
-                                    <div class="bg-success-content text-success rounded text-center col-span-3">
+                                    <div class="bg-success-content text-success rounded-sm text-center col-span-3">
                                         <div>
                                             <div>{recipe.title}</div>
                                             <div>{recipe.scrape_time}</div>
@@ -423,7 +423,7 @@ function get_website_name(url){
                                         </div>
                                     </div>
                                 {:else}
-                                    <div class="bg-error-content text-error rounded text-center col-span-3">
+                                    <div class="bg-error-content text-error rounded-sm text-center col-span-3">
                                         <div>
                                             <div>{recipe.title}</div>
                                             <div>{recipe.scrape_time}</div>
@@ -437,9 +437,9 @@ function get_website_name(url){
                                 <div class="flex flex-row space-x-1 w-full flex-wrap justify-center">
                                     {#each recipe.data as curr}
                                         {#if curr.test == true}
-                                            <div class="bg-success-content text-success rounded text-center border-solid border border-black p-1">{display_key(curr)}</div>
+                                            <div class="bg-success-content text-success rounded-sm text-center border-solid border border-black p-1">{display_key(curr)}</div>
                                         {:else}
-                                            <div class="bg-error-content text-error rounded text-center border-solid border border-black p-1">{display_key(curr)}</div>
+                                            <div class="bg-error-content text-error rounded-sm text-center border-solid border border-black p-1">{display_key(curr)}</div>
                                         {/if}
                                     {/each}
                                 </div>
