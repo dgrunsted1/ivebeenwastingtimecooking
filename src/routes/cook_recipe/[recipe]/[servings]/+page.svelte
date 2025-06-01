@@ -286,7 +286,7 @@
                 {#if ingrs}
                     {#each ingrs as ingr}
                         {#if ingr}
-                            <button class="ingr_row flex items-center ml-2 md:ml-4 mr-1 gap-x-1 md:gap-x-2" onclick={(e) => {e.currentTarget.classList.toggle('blur'); }}>
+                            <button class="ingr_row flex items-center ml-2 md:ml-4 mr-1 gap-x-1 md:gap-x-2" onclick={(e) => {e.currentTarget.classList.toggle('blur-sm'); }}>
                                 {#if ingr.quantity}<div class="ingr_amount text-sm text-center">{ingr.quantity}</div>{/if}
                                 {#if ingr.unit}<div class="ingr_unit text-center text-sm">{ingr.unit}</div>{/if}
                                 <div class="ingr_name text-center text-sm">{ingr.ingredient}</div>
@@ -302,7 +302,7 @@
             <div class="flex flex-col directions_list md:w-3/5 h-fit  max-h-[calc(40vh)] md:max-h-[calc(64vh)] overflow-y-auto border border-primary rounded-md cursor-pointer py-5">
                 {#each recipe.directions as curr, i}
                 <div class="flex justify-between items-center mr-2">
-                    <button class="step flex items-center justify-left gap-x-1 md:gap-x-3 md:mx-2 p-1 w-fit" onclick={(e) => {e.currentTarget.classList.toggle('blur'); }} onkeydown={(e) => {e.currentTarget.classList.toggle('blur'); }}>
+                    <button class="step flex items-center justify-left gap-x-1 md:gap-x-3 md:mx-2 p-1 w-fit" onclick={(e) => {e.currentTarget.classList.toggle('blur-sm'); }} onkeydown={(e) => {e.currentTarget.classList.toggle('blur-sm'); }}>
                         <label for="directions" class="flex md:text-right text-xs md:text-sm whitespace-nowrap">Step {i+1}</label>
                         <p class="directions flex m-1 p-1 text-sm border-l border-neutral md:pl-3 text-left{timers[i] && timers[i].sec ? " w-64 md:w-full" : ""}">{curr}</p>
                     </button>

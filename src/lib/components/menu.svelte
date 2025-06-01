@@ -233,7 +233,7 @@
         {#if $page.url.pathname == "/menu" || $page.url.pathname == "/profile"}
             <div class="dropdown dropdown-end">
                 <label tabindex="-1" for="save_menu" class="btn m-1 btn-primary btn-xs md:btn-sm">save menu</label>
-                <ul tabindex="-1" name="save_menu" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-max bg-primary">
+                <ul tabindex="-1" name="save_menu" class="dropdown-content z-1 menu p-2 shadow-sm bg-base-100 rounded-box w-max bg-primary">
                     <li class="btn btn-xs btn-primary p-0"><button class="p-0" onclick={save_menu_handle}>
                         {#if save_menu_load}
                             <span class="loading loading-dots loading-md mx-7"></span>
@@ -261,7 +261,7 @@
         {/if}
     </div>
     <div class="flex content-center">
-        <div class="tabs tabs-boxed w-fit mx-auto flex items-center bg-base-300 md:bg-base-200">
+        <div class="tabs tabs-box w-fit mx-auto flex items-center bg-base-300 md:bg-base-200">
             <div id="recipe_list" class="tab tab-active tab-xs" onclick={switch_tab}>Recipes</div> 
             <div id="grocery_list" class="tab tab-xs" onclick={switch_tab}>Grocery List</div>
         </div>

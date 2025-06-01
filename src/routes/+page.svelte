@@ -95,12 +95,12 @@
 
 <svelte:window bind:scrollY />
 
-<div class="min-h-screen bg-gradient-to-br from-primary  to-accent text-white overflow-x-hidden">
+<div class="min-h-screen bg-linear-to-br from-primary  to-accent text-white overflow-x-hidden">
 
   <!-- Hero Section -->
   <section 
     bind:this={heroRef}
-    class="min-h-[100svh] flex items-center justify-center text-center px-4 relative"
+    class="min-h-svh flex items-center justify-center text-center px-4 relative"
     style="transform: translateY({scrollY * 0.5}px)"
   >
     <!-- Floating background elements -->
@@ -110,14 +110,14 @@
     </div>
 
     <div class="max-w-4xl relative z-10">
-      <h1 class="text-6xl md:text-8xl font-black mb-6 bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent leading-tight">
+      <h1 class="text-6xl md:text-8xl font-black mb-6 bg-linear-to-r from-white to-blue-100 bg-clip-text text-transparent leading-tight">
         Cooking Made Effortless
       </h1>
       <p class="text-xl md:text-2xl mb-12 opacity-90 font-light">
         From scattered recipes to seamless meals. Plan your week, shop with ease, discover, organize, and cook with confidence.
       </p>
       <a href="/recipes">
-      <button class="bg-gradient-to-r from-orange-400 to-accent px-12 py-4 text-xl font-semibold rounded-full hover:scale-105 hover:-translate-y-1 transition-all duration-300 shadow-2xl shadow-red-500/30 hover:shadow-red-500/40">
+      <button class="bg-linear-to-r from-orange-400 to-accent px-12 py-4 text-xl font-semibold rounded-full hover:scale-105 hover:-translate-y-1 transition-all duration-300 shadow-2xl shadow-red-500/30 hover:shadow-red-500/40">
         Start Cooking Smart →
       </button>
       </a>
@@ -143,7 +143,7 @@
             class="feature-card bg-white/15 backdrop-blur-xl rounded-3xl p-8 border border-white/20 hover:-translate-y-2 transition-all duration-500 relative overflow-hidden group opacity-0 translate-y-8"
           >
             <!-- Shimmer effect -->
-            <div class="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+            <div class="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-linear-to-r from-transparent via-white/10 to-transparent"></div>
             
             <div class="relative z-10">
               <div class="text-5xl mb-6">{feature.icon}</div>
@@ -157,7 +157,7 @@
   </section>
 
   <!-- Value Proposition -->
-  <section class="py-20 bg-gradient-to-r from-accent to-orange-400 text-center">
+  <section class="py-20 bg-linear-to-r from-accent to-orange-400 text-center">
     <div class="max-w-4xl mx-auto px-4">
       <h2 class="text-4xl md:text-5xl font-bold mb-8">
         Turn Meal Planning from Chore to Choice
@@ -183,7 +183,7 @@
         Join thousands of home cooks who've already simplified their meal planning
       </p>
         <a href="/recipes">
-            <button class="bg-gradient-to-r from-orange-400 to-accent px-16 py-6 text-2xl font-semibold rounded-full hover:scale-105 hover:-translate-y-1 transition-all duration-300 shadow-2xl shadow-red-500/30 hover:shadow-red-500/40">
+            <button class="bg-linear-to-r from-orange-400 to-accent px-16 py-6 text-2xl font-semibold rounded-full hover:scale-105 hover:-translate-y-1 transition-all duration-300 shadow-2xl shadow-red-500/30 hover:shadow-red-500/40">
                 Get Started Now - It's Free
             </button>
         </a>

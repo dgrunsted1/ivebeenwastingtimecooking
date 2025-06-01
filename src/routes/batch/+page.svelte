@@ -573,7 +573,7 @@
                         <!-- <input placeholder="category" name="category" type="text" bind:value={cuis.category} class="input input-bordered input-xs w-56 text-center input-accent"/> -->
                         <div class="dropdown w-1/2 flex">
                             <input type="text" id="cuisine" placeholder="cuisine" tabindex="0" class="input input-bordered input-xs m-1 cursor-text w-full" bind:value={cuis.cuisine}/>
-                            <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box mt-8">
+                            <ul tabindex="0" class="dropdown-content z-1 menu p-2 shadow-sm bg-base-100 rounded-box mt-8">
                                 <div class="flex flex-col max-w-52 max-h-[50svh] overflow-y-scroll">
                                     {#each cuisines as cuisine}
                                         <li class="cursor-pointer" onclick={()=>{cuis.cuisine = cuisine.id; document.activeElement.blur();}}>{cuisine.id}</li>
