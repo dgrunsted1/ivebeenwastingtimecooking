@@ -14,8 +14,11 @@
             },
             description: "Transform scattered recipes into organized meal plans. From import to plate, we make cooking effortless.",
             buttons: {
-                primary: "Start Free Today",
-                secondary: "Watch Demo"
+                primary: {
+                    text: "Start Free Today",
+                    url: "/signup"
+                },
+                secondary: ""
             }
         },
         features: {
@@ -54,7 +57,7 @@
                 {
                     icon: "🎲",
                     title: "Menu Generator",
-                    description: "Can't decide what to cook? Our AI suggests perfect meals for you.",
+                    description: "Can't decide what to cook? We will generate a menu for you.",
                     borderColor: "border-warning"
                 },
                 {
@@ -66,7 +69,7 @@
                 {
                     icon: '🌐',
                     title: 'One-Click Recipe Capture',
-                    description: 'Found a recipe online? Capture it instantly, cleaning up the formatting and saving it to your collection.',
+                    description: 'Found a recipe online? Capture it instantly, Saving it to your collection.',
                     borderColor: "border-accent"
                 },
                 {
@@ -89,7 +92,8 @@
             heading: "Ready to Cook Smarter?",
             description: "Join thousands of home cooks who've transformed their kitchen experience. Start your journey today.",
             button: "Get Started Free",
-            footnote: "No credit card required • 30-day free trial"
+            footnote: "No credit card required • 30-day free trial",
+            url: "/signup"
         }
     };
 
@@ -171,16 +175,20 @@
                     <span class="text-primary">{content.hero.heading.part1}</span> {content.hero.heading.part2} 
                     <span class="text-accent">{content.hero.heading.part3}</span>
                 </h1>
-                <p class="text-xl text-neutral/80 leading-relaxed max-w-lg">
+                <p class="text-xl text-base-content/80 leading-relaxed max-w-lg">
                     {content.hero.description}
                 </p>
                 <div class="flex flex-col sm:flex-row gap-4">
-                    <button class="bg-primary text-white px-8 py-4 rounded-2xl font-semibold hover:bg-primary/90 hover:scale-105 transition-all duration-300 shadow-xl shadow-primary/25">
-                        {content.hero.buttons.primary}
-                    </button>
-                    <button class="border-2 border-accent text-accent px-8 py-4 rounded-2xl font-semibold hover:bg-accent hover:text-white transition-all duration-300">
-                        {content.hero.buttons.secondary}
-                    </button>
+                    <a href={content.hero.buttons.primary.url}>
+                        <button class="bg-primary text-white px-8 py-4 rounded-2xl font-semibold hover:bg-primary/90 hover:scale-105 transition-all duration-300 shadow-xl shadow-primary/25">
+                            {content.hero.buttons.primary.text}
+                        </button>
+                    </a>
+                    {#if content.hero.buttons.secondary}
+                        <button class="border-2 border-accent text-accent px-8 py-4 rounded-2xl font-semibold hover:bg-accent hover:text-white transition-all duration-300">
+                            {content.hero.buttons.secondary}
+                        </button>
+                    {/if}
                 </div>
             </div>
 
@@ -204,7 +212,7 @@
     <section class="py-20 bg-gradient-to-br from-secondary/10 to-primary/5">
         <div class="max-w-7xl mx-auto px-4">
             <div class="text-center mb-16">
-                <h2 class="text-4xl md:text-5xl font-bold text-neutral mb-6">
+                <h2 class="text-4xl md:text-5xl font-bold text-base-content mb-6">
                     {content.features.heading}
                 </h2>
                 <div class="w-24 h-1 bg-gradient-to-r from-primary to-accent mx-auto"></div>
@@ -214,8 +222,8 @@
                 {#each content.features.items as item}
                     <div class="group bg-gradient-to-br from-primary/20 to-accent/20 rounded-3xl p-8 shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 border-l-4 {item.borderColor}">
                         <div class="text-4xl mb-6 group-hover:scale-110 transition-transform duration-300">{item.icon}</div>
-                        <h3 class="text-xl font-bold text-invbase mb-4">{item.title}</h3>
-                        <p class="text-neutral">{item.description}</p>
+                        <h3 class="text-xl font-bold text-base-content mb-4">{item.title}</h3>
+                        <p class="text-base-content/80">{item.description}</p>
                     </div>
                 {/each}
             </div>
@@ -223,7 +231,7 @@
     </section>
 
     <!-- Stats Section -->
-    <section class="py-20 bg-gradient-to-r from-primary to-accent text-white">
+    <!-- <section class="py-20 bg-gradient-to-r from-primary to-accent text-white">
         <div class="max-w-6xl mx-auto px-4">
             <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
                 {#each content.stats.items as stat}
@@ -234,22 +242,24 @@
                 {/each}
             </div>
         </div>
-    </section>
+    </section> -->
 
     <!-- Final CTA -->
-    <section class="py-20 bg-base-100 text-center">
+    <section class="py-20 bg-gradient-to-r from-primary to-accent text-center">
         <div class="max-w-4xl mx-auto px-4">
-            <h2 class="text-4xl md:text-5xl font-bold text-neutral mb-8">
+            <h2 class="text-4xl md:text-5xl font-bold text-primary-content mb-8">
                 {content.cta.heading}
             </h2>
-            <p class="text-xl text-neutral/70 mb-12 max-w-2xl mx-auto">
+            <p class="text-xl text-white/70 mb-12 max-w-2xl mx-auto">
                 {content.cta.description}
             </p>
             <div class="space-y-4">
-                <button class="bg-gradient-to-r from-primary to-accent text-white px-12 py-6 rounded-2xl text-xl font-semibold hover:scale-105 hover:shadow-2xl transition-all duration-300">
-                    {content.cta.button}
-                </button>
-                <p class="text-sm text-neutral/60">{content.cta.footnote}</p>
+                <a href={content.cta.url}>
+                    <button class="bg-secondary text-neutral px-12 py-6 rounded-2xl text-xl font-semibold hover:scale-105 hover:shadow-2xl transition-all duration-300">
+                        {content.cta.button}
+                    </button>
+                </a>
+                <p class="text-sm text-base-content/60">{content.cta.footnote}</p>
             </div>
         </div>
     </section>
