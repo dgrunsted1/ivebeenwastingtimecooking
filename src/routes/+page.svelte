@@ -193,6 +193,7 @@
                 </div>
             </div>
 
+
             <!-- Right Visual -->
             <div class="relative">
                 <div class="bg-gradient-to-br from-primary/20 to-accent/20 rounded-3xl p-8 backdrop-blur-sm border border-primary/20">
