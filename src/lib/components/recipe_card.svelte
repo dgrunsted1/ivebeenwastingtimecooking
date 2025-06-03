@@ -175,7 +175,7 @@
             </div>
         </div>
     {:else}
-        <div class="card cursor-pointer h-[100vw] md:h-[30vw] relative" onkeydown={handle_click} onclick={handle_click}>
+        <div class="card cursor-pointer h-[100vw] md:h-[30vw] relative bg-base-300" onkeydown={handle_click} onclick={handle_click}>
             <figure class="bg-cover bg-no-repeat bg-center absolute inset-0 rounded-xl" style="background-image: url('{recipe.image}')"></figure>
             <div class="card-body flex flex-row p-1 justify-between mx-3 z-10">
                 <div class="flex flex-col justify-between md:p-1 my-5 w-full">

@@ -76,6 +76,22 @@
         loading.menu = false;
     });
 
+    async function reroll_menu(){
+        loading.menu = true;
+        main_recipes = recipes.filter(item => item.category == 'Main').map(item => item.id);
+        main_recs = await get_main_recs(main_recipes);
+        dessert_rec = await get_random_recipe(recipes.filter(item => item.category == 'Dessert').map(item => item.id));
+        breakfast_rec = await get_random_recipe(recipes.filter(item => item.category == 'Breakfast').map(item => item.id));
+        other_rec = await get_random_recipe(recipes.filter(item => !['Main', 'Dessert', 'Breakfast'].includes(item.category)).map(item => item.id));
+        menu_rec = main_recs.concat(dessert_rec).concat(other_rec).concat(breakfast_rec);
+        rec_mults = get_mults();
+        loading.menu = false;
+    }
+
+    async function get_most_frequent_cuisine(){
+        
+    }
+
     function last_month(){
         const today = new Date()
         today.setMonth(today.getMonth() - 1)
@@ -197,10 +213,10 @@
     <div class="flex w-full">
         <div class="flex flex-col items-center md:flex-row w-full">
             {#if !$currentUser}
-                <div class="flex h-[calc(100svh-100px)] md:h-[calc(100svh-125px)] justify-center w-full"><span class="loading loading-bars loading-lg"></span></div>
+                <div class="flex h-[calc(100svh-110px)] md:h-[calc(100svh-125px)] justify-center w-full"><span class="loading loading-bars loading-lg"></span></div>
             {:else}
                 <!-- info -->
-                <div class="flex flex-col md:flex-row h-[calc(100svh-100px)] md:h-[calc(100svh-75px)] overflow-y-auto w-full justify-center md:gap-x-5 md:m-5 {tab == 'info' ? '' : 'hidden'}">
+                <div class="flex flex-col md:flex-row h-[calc(100svh-110px)] md:h-[calc(100svh-75px)] overflow-y-auto w-full justify-center md:gap-x-5 md:m-5 {tab == 'info' ? '' : 'hidden'}">
                     <div class="flex flex-col h-1/3 mx-auto md:mx-0 my-2">
                         {#if $currentUser.avatar != ""}
                             <img src={$currentUser.avatar} alt="avatar" class="" />
@@ -231,14 +247,14 @@
                     </div>
                 </div>
                 <!-- settings -->
-                <div class="flex h-[calc(100svh-100px)] md:max-h-[300px] overflow-y-auto w-full md:max-w-[600px] md:m-auto {tab == 'settings' ? '' : 'hidden'}">
+                <div class="flex h-[calc(100svh-110px)] md:max-h-[300px] overflow-y-auto w-full md:max-w-[600px] md:m-auto {tab == 'settings' ? '' : 'hidden'}">
                     <label class="label cursor-pointer space-x-2 mx-2">
                         <input type="checkbox" class="toggle toggle-primary" bind:checked={$flagsStore.is_compact} onclick={toggle_compact}/>
                         <span class="label-text">compact cards</span>
                     </label>
                 </div>
                 <!-- stats -->
-                <div class="flex h-[calc(100svh-100px)] md:h-[300px] overflow-y-auto w-full md:max-w-[600px] m-auto {tab == 'stats' ? '' : 'hidden'}">
+                <div class="flex h-[calc(100svh-110px)] md:h-[300px] overflow-y-auto w-full md:max-w-[600px] m-auto {tab == 'stats' ? '' : 'hidden'}">
                     <div class="flex flex-col space-y-5 my-5 h-full min-w-56 items-start justify-center mx-2">
                         {#if fave.item}
                             <p>favorite recipe: {fave.item.expand.recipe.title} ({fave.cnt})</p>
@@ -248,7 +264,7 @@
                     </div>
                 </div>
                 <!-- Recipe -->
-                <div class="flex h-[calc(100svh-100px)] md:h-[calc(100svh-75px)] overflow-y-auto w-full {tab == 'recipe' ? '' : 'hidden'}">
+                <div class="flex h-[calc(100svh-110px)] md:h-[calc(100svh-75px)] overflow-y-auto w-full {tab == 'recipe' ? '' : 'hidden'}">
                     {#if recipes.length > 5}
                         <div class="flex md:space-x-4 flex-col items-center h-full w-full">
                             <div class="flex justify-evenly flex-col md:flex-row h-full w-full">
@@ -294,7 +310,8 @@
                                                         <div class=" flex justify-center mt-1"><a class="btn btn-primary btn-xs" href={recipe_rec.url} target="_blank">original recipe</a></div>
                                                     {/if}    
                                                     <div class=" flex justify-center mt-1"><button class="btn btn-primary btn-xs" onclick={window.location = `/cook_recipe/${recipe_rec.url_id}/${recipe_rec.servings}`} onkeydown={window.location = `/cook_recipe/${recipe_rec.url_id}/${recipe_rec.servings}`}>cook</button></div>
-                                                    <div class=" flex justify-center mt-1"><button class="btn btn-primary btn-xs" onclick={window.location = `/menu/${recipe_rec.id}`} onkeydown={window.location = `/cook_recipe/${recipe_rec.url_id}/${recipe_rec.servings}`}>create menu</button></div>
+                                                    <div class=" flex justify-center mt-1"><button class="btn btn-primary btn-xs" onclick={window.location = `/menu/${recipe_rec.id}`} onkeydown={window.location = `/menu/${recipe_rec.url_id}/${recipe_rec.servings}`}>create menu</button></div>
+                                                    <div class=" flex justify-center mt-1"><button class="btn btn-primary btn-xs" onclick={async ()=>{recipe_rec = await get_random_recipe(recipes.map(item => item.id))}}>Reroll</button></div>
                                                 </div>    
                                             </div>
                                         </div>
@@ -312,12 +329,13 @@
                     {/if}
                 </div>
                 <!-- menu -->
-                <div class="flex h-[calc(100svh-100px)] md:h-[calc(100svh-110px)] overflow-y-auto w-full {tab == 'menu' ? '' : 'hidden'}">
-                    <div class="flex justify-center w-full md:max-w-[600px] m-auto">
+                <div class="flex h-[calc(100svh-110px)] md:h-[calc(100svh-120px)] overflow-y-auto w-full {tab == 'menu' ? '' : 'hidden'}">
+                    <div class="flex justify-center w-full md:max-w-[600px] m-auto flex-col">
                         {#if loading.menu}
-                            <div class="flex h-[500px] items-center"><span class="loading loading-bars loading-lg"></span></div>
+                            <div class="flex h-[500px] items-center m-auto"><span class="loading loading-bars loading-lg md:loading-xl"></span></div>
                         {:else}
                             {#if menu_rec.length}
+                                <div class=" flex justify-center mt-1"><button class="btn btn-primary btn-xs" onclick={reroll_menu}>Reroll</button></div>
                                 <Menu 
                                     bind:menu_title={menu_title} 
                                     menu={menu_rec} 
@@ -332,7 +350,7 @@
                     </div>
                 </div>
                 <!-- payment -->
-                <div class="flex h-[calc(100svh-100px)] md:h-[calc(100svh-75px)] overflow-y-auto w-full {tab == 'payment' ? '' : 'hidden'}">
+                <div class="flex h-[calc(100svh-110px)] md:h-[calc(100svh-75px)] overflow-y-auto w-full {tab == 'payment' ? '' : 'hidden'}">
                     <div class="flex flex-col space-y-2 my-5 h-full min-w-56 items-center justify-center">
                         {#if !$currentUser.subscribed}
                                 <a href="https://buy.stripe.com/00gdUb2g90fc4Tu4gg" class="btn btn-primary btn-md w-36">Subscribe</a>

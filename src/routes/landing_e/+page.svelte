@@ -92,8 +92,7 @@
             heading: "Ready to Cook Smarter?",
             description: "Join thousands of home cooks who've transformed their kitchen experience. Start your journey today.",
             button: "Get Started Free",
-            footnote: "No credit card required",
-            // footnote: "No credit card required • 30-day free trial",
+            footnote: "No credit card required • 30-day free trial",
             url: "/signup"
         }
     };
@@ -192,7 +191,6 @@
                     {/if}
                 </div>
             </div>
-
 
             <!-- Right Visual -->
             <div class="relative">
