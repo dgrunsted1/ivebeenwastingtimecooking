@@ -195,7 +195,7 @@
 
 
             <!-- Right Visual -->
-            <div class="relative">
+            <div class="relative pb-5">
                 <div class="bg-gradient-to-br from-primary/20 to-accent/20 rounded-3xl p-8 backdrop-blur-sm border border-primary/20">
                     <div class="grid grid-cols-2 gap-4">
                         {#each featureCards as card}
@@ -257,7 +257,7 @@
             </p>
             <div class="space-y-4">
                 <a href={content.cta.url}>
-                    <button class="bg-secondary text-neutral px-12 py-6 rounded-2xl text-xl font-semibold hover:scale-105 hover:shadow-2xl transition-all duration-300">
+                    <button class="bg-secondary border-base-100 border-black border-2 text-base-100 px-12 py-6 rounded-2xl text-xl font-semibold hover:scale-105 hover:shadow-2xl transition-all duration-300">
                         {content.cta.button}
                     </button>
                 </a>
