@@ -113,10 +113,10 @@
     {#if !edit}
         <div class="my-auto">
             <form method='POST' oninput={fetch_recipe} class="text-center w-full flex flex-col gap-5">
-                <input placeholder="Link to recipe" name="url" type="text" class="input input-bordered input-xs text-center input-accent mx-2 no-underline"/>
+                <input placeholder="Link to recipe" name="url" type="text" class="input input-bordered input-md md:input-lg text-center input-accent m-auto no-underline w-full md:w-1/2"/>
                 {#if !loading}
-                    <p>or</p>
-                    <button class="btn btn-primary btn-lg m-auto" onclick={()=>{edit = true}}>Input Recipe</button>
+                    <div class="divider w-full md:w-1/2 m-auto">OR</div>
+                    <button class="btn btn-primary btm-md md:btn-lg m-auto w-full md:w-1/2" onclick={()=>{edit = true}}>Input Recipe</button>
                 {:else}
                     <div class="flex h-[110px] w-full justify-center items-center">
                         <span id="loading" class="loading loading-bars loading-lg"></span>

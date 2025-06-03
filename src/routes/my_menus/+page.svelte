@@ -221,7 +221,7 @@
                     type="menu"  
                 />
             </div>
-            <div id="menus" class="h-[calc(100svh-55px)] md:h-[calc(100svh-90px)] overflow-y-auto rounded-md md:border-none w-full space-y-2">
+            <div id="menus" class="h-[calc(100svh-60px)] md:h-[calc(100svh-90px)] overflow-y-auto rounded-md md:border-none w-full space-y-2">
                 {#if loading}
                     <div class="text-center flex flex-col justify-center items-center space-y-5 mx-2 md:mx-auto md:text-4xl h-full w-full"><span class="loading loading-bars loading-lg"></span></div>
                 {:else if no_results_found}

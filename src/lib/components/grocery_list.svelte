@@ -403,7 +403,7 @@
         {/if}
     </div>
     <div class="md:mx-3">
-        <div id="list" class="grocery_list h-[calc(100svh-150px)] md:h-[calc(100svh-105px)] overflow-y-auto px-2 py-4">
+        <div id="list" class="grocery_list h-[calc(100svh-165px)] md:h-[calc(100svh-105px)] overflow-y-auto px-2 py-4">
             {#if grocery_list.length > 0}
                 {#each grocery_list as item, i}
                     {#if edit}
