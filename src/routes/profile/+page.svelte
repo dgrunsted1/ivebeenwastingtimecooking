@@ -34,6 +34,7 @@
     let avg_recipes = $state(0);
     let month_menus = $state(0);
     let tab = $state("info"); // info, stats, recipe, menu
+    let most_freq_cuisine = $state("");
 
     onMount(async () => {
         if (!$currentUser){
@@ -53,6 +54,8 @@
         });
         fave = getMostFrequent(recipe_log_result.items);
         avg_recipes = get_avg_recipes(recipe_log_result.items);
+        most_freq_cuisine = get_most_frequent_cuisine(recipe_log_result.items);
+        console.log(most_freq_cuisine);
         const menu_log_result = await pb.collection('menu_log').getList(1, 250, {
             filter: `user = "${$currentUser.id}" && date_completed > "${last_month()}"`,
             expand: `menu`,
@@ -66,17 +69,10 @@
         recipes = recipe_result.items;
         recipe_rec = await get_random_recipe(recipe_result.items.map(item => item.id));
         loading.recipe = false;
-        main_recipes = recipe_result.items.filter(item => item.category == 'Main').map(item => item.id);
-        main_recs = await get_main_recs(main_recipes);
-        dessert_rec = await get_random_recipe(recipe_result.items.filter(item => item.category == 'Dessert').map(item => item.id));
-        breakfast_rec = await get_random_recipe(recipe_result.items.filter(item => item.category == 'Breakfast').map(item => item.id));
-        other_rec = await get_random_recipe(recipe_result.items.filter(item => !['Main', 'Dessert', 'Breakfast'].includes(item.category)).map(item => item.id));
-        menu_rec = main_recs.concat(dessert_rec).concat(other_rec).concat(breakfast_rec);
-        rec_mults = get_mults();
-        loading.menu = false;
+        roll_menu();
     });
 
-    async function reroll_menu(){
+    async function roll_menu(){
         loading.menu = true;
         main_recipes = recipes.filter(item => item.category == 'Main').map(item => item.id);
         main_recs = await get_main_recs(main_recipes);
@@ -88,8 +84,22 @@
         loading.menu = false;
     }
 
-    async function get_most_frequent_cuisine(){
-        
+    function get_most_frequent_cuisine(recipes){
+        const frequencyMap = new Map();
+        let maxItem = recipes[0];
+        let maxCount = 1;
+
+        for (const item of recipes) {
+            const count = (frequencyMap.get(item.expand.recipe.cuisine) || 0) + 1;
+            frequencyMap.set(item.expand.recipe.cuisine, count);
+            if (count > maxCount) {
+                maxCount = count;
+                maxItem = item.expand.recipe.cuisine;
+            }
+        }
+        console.log(frequencyMap);
+        console.log(maxCount);
+        return maxItem;
     }
 
     function last_month(){
@@ -261,6 +271,7 @@
                         {/if}
                         <p>you average {avg_recipes} recipes per week</p>
                         <p>you have completed {month_menus} menus in the last month</p>
+                        <p>your favorite cuisine is {most_freq_cuisine}</p>
                     </div>
                 </div>
                 <!-- Recipe -->
@@ -335,7 +346,7 @@
                             <div class="flex h-[500px] items-center m-auto"><span class="loading loading-bars loading-lg md:loading-xl"></span></div>
                         {:else}
                             {#if menu_rec.length}
-                                <div class=" flex justify-center mt-1"><button class="btn btn-primary btn-xs" onclick={reroll_menu}>Reroll</button></div>
+                                <div class=" flex justify-center mt-1"><button class="btn btn-primary btn-xs" onclick={roll_menu}>Reroll</button></div>
                                 <Menu 
                                     bind:menu_title={menu_title} 
                                     menu={menu_rec} 
