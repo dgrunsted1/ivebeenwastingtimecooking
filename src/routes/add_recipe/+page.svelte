@@ -1,6 +1,6 @@
 <script>
     import ImportRecipe from "/src/lib/components/import_recipe.svelte";
-    import { currentUser, pb, auth_refresh } from '/src/lib/pocketbase.js';
+    import { currentUser, pb, auth_refresh, post } from '/src/lib/pocketbase.js';
     import { process_ingr, process_directions } from '/src/lib/process_recipe.js';
     import { deserialize } from '$app/forms';
     import { onMount } from "svelte";
@@ -57,29 +57,34 @@
             return;
         }
         loading = true;
-        const data = new FormData(this);
+        // const data = new FormData(this);
 
-        const response = await fetch(this.action, {
-            method: 'POST',
-            body: data
-        });
-
-        /** @type {import('@sveltejs/kit').ActionResult} */
-        const result = deserialize(await response.text());
-        if (result.data.err) {
-            show_alert(result.data.err.msg, "error", result.data.err.title);
-            e.srcElement.value = "";
-        } else if (result.type === 'success') {
-            result.data.expand.ingr_list = process_ingr(result.data.expand.ingr_list);
-            result.data.url = e.srcElement.value;
-            result.data.directions = process_directions(result.data.directions);
-            recipe = result.data;
-            const recipe_exist = await check_recipe_exists(recipe.title);
-            if (recipe_exist){
-                show_alert("You have already added this recipe", "warning", "Recipe already exists");
-            }
-            edit = true;
+        // const response = await fetch(this.action, {
+        //     method: 'POST',
+        //     body: data
+        // });
+        const data = {
+            url: e.target.value
         }
+        console.log({data});
+        const response = await post(data, 'api/get_recipe')
+        console.log(response);
+        // /** @type {import('@sveltejs/kit').ActionResult} */
+        // const result = deserialize(await response.text());
+        // if (result.data.err) {
+        //     show_alert(result.data.err.msg, "error", result.data.err.title);
+        //     e.srcElement.value = "";
+        // } else if (result.type === 'success') {
+        //     result.data.expand.ingr_list = process_ingr(result.data.expand.ingr_list);
+        //     result.data.url = e.srcElement.value;
+        //     result.data.directions = process_directions(result.data.directions);
+        //     recipe = result.data;
+        //     const recipe_exist = await check_recipe_exists(recipe.title);
+        //     if (recipe_exist){
+        //         show_alert("You have already added this recipe", "warning", "Recipe already exists");
+        //     }
+        //     edit = true;
+        // }
         loading = false;
     }
 
