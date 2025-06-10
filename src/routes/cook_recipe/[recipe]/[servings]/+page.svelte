@@ -236,19 +236,31 @@
         <meta property="og:type" content="website" />
     </svelte:head>
 
-    <div id="cook_recipe" class="flex flex-col md:m-2 md:pb-10">
-        <div class="img_info_container flex flex-col md:flex-row items-center justify-center">
-            <div class="img_container w-full md:w-auto flex flex-col">
-                <img src={recipe.image} alt={recipe.title} class="max-h-52 max-w-52 md:max-w-96 md:max-h-96 rounded-xl m-auto"/>
+    <div id="cook_recipe" class="flex flex-col md:pb-10">
+        <div class="img_info_container flex flex-col items-center justify-center bg-cover bg-no-repeat bg-center" style="background-image: url({recipe.image})">
+            <div class="img_container w-full md:w-auto flex flex-col h-52">
             </div>
-            <div class="info_container w-full md:w-1/2 flex flex-col m-1 space-y-2 md:space-y-4">
-                <div class="title_container mx-auto my-2">
-                    <div class="title w-full md:text-xl">{recipe.title}</div>
+            <div class="w-full bg-gradient-to-b from-transparent to-base-100/50 h-10"></div>
+            <div class="info_container w-full flex flex-col space-y-2 md:space-y-4 bg-gradient-to-b from-base-100/50 via-base-100/90 to-base-100 px-5 md:px-20">
+                <div class="title_container my-2">
+                    <div class="title w-full text-4xl">{recipe.title}</div>
                 </div>
-                <div class="description_container m-auto w-5/6">
-                    <div class="desc text-xs md:text-sm" >{recipe.description}</div>
+                <div class="description_container">
+                    <div class="desc text-xs md:text-sm line-clamp-1">{recipe.description}</div>
+                    <!-- <div class="desc text-xs md:text-sm" >{recipe.description}</div> -->
                 </div>
-                <div class="flex justify-evenly items-center">
+                
+                <div class="flex justify-between">
+                    <div class="">{recipe.author}</div>
+                    <div class="content-center text-xs"><input type="text" class="input input-primary input-sm w-10 p-1 mx-2 text-center" bind:value={servings} onclick={(e) => {e.currentTarget.select()}}/>servings</div>
+                </div>
+                <div class="misc flex justify-between">
+                    <div class="content-center text-xs">{recipe.category}</div>
+                    <div class="content-center text-xs">{recipe.cuisine}</div>
+                    <div class="content-center text-xs">{recipe.country}</div>
+                    <div class="content-center text-xs">{recipe.time}</div>
+                </div>  
+                <div class="flex justify-evenly items-center my-5">
                     {#if recipe.url}
                         <div class=" flex justify-center mt-1"><a class="btn btn-primary btn-xs md:btn-sm" href={recipe.url} target="_blank">original recipe</a></div>
                     {/if}    
@@ -268,17 +280,7 @@
                     {:else if $currentUser}
                         <input type="checkbox" class="checkbox checkbox-primary checkbox-lg p-1" id={recipe.id} onclick={stopPropagation(log_made(recipe.id, $currentUser.id))}>
                     {/if}
-                </div>
-                <div class="flex justify-evenly">
-                    <div class="content-center">{recipe.category}</div>
-                    <div class="content-center">{recipe.cuisine}</div>
-                    <div class="content-center">{recipe.country}</div>
-                </div>
-                <div class="misc flex justify-evenly content-center">
-                    <div class="content-center">{recipe.author}</div>
-                    <div class="content-center">{recipe.time}</div>
-                    <div class="content-center"><input type="text" class="input input-primary input-sm w-10 p-1 mx-2 text-center" bind:value={servings} onclick={(e) => {e.currentTarget.select()}}/>servings</div>
-                </div>   
+                </div> 
             </div>
         </div>
         <div class="ingr_directions_container flex flex-col md:flex-row justify-center w-full items-center">
