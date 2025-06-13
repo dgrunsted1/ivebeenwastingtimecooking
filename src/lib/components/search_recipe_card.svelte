@@ -125,7 +125,7 @@
                     {/if}
                     <div class="flex w-full">
                         {#if !edit_serv}
-                            <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow rounded-bl">
+                            <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow rounded-tl rounded-bl">
                                 {#if isNaN(recipe.servings)}
                                     {servings}
                                 {:else}
@@ -140,7 +140,7 @@
                                 {/if}
                             </div>
                         {:else}
-                            <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow rounded-bl">
+                            <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow rounded-tl rounded-bl">
                                 {#if recipe.time}
                                     {recipe.time}
                                 {:else}

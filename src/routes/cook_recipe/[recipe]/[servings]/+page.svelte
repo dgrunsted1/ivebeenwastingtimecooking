@@ -247,7 +247,6 @@
                 </div>
                 <div class="description_container">
                     <div class="desc text-xs md:text-sm line-clamp-1">{recipe.description}</div>
-                    <!-- <div class="desc text-xs md:text-sm" >{recipe.description}</div> -->
                 </div>
                 
                 <div class="flex justify-between">
@@ -283,8 +282,9 @@
                 </div> 
             </div>
         </div>
-        <div class="ingr_directions_container flex flex-col md:flex-row justify-center w-full items-center">
-            <div id="ingredient_list" class="flex flex-col h-fit w-full md:w-2/5 m-2 mb-0 max-h-[calc(40vh)] md:max-h-[calc(64vh)] overflow-y-auto border border-primary rounded-md py-5 md:py-4">
+        <div class="ingr_directions_container flex flex-col md:flex-row justify-center items-center mx-1">
+            <div id="ingredient_list" class=" flex flex-col h-fit w-full md:w-2/5 m-2 mb-0 max-h-[calc(40vh)] md:max-h-[calc(64vh)] overflow-y-auto border border-primary rounded-md">
+                <div class="sticky top-0 h-5 w-full bg-gradient-to-b from-base-100 to-transparent flex-shrink-0"></div>
                 {#if ingrs}
                     {#each ingrs as ingr}
                         {#if ingr}
@@ -299,9 +299,11 @@
                         {/if}
                     {/each}
                 {/if}
+                <div class="sticky bottom-0 h-5 w-full bg-gradient-to-b from-transparent to-base-100 flex-shrink-0"></div>
             </div>
             <div class="flex md:hidden"><Grip/></div>
-            <div class="flex flex-col directions_list md:w-3/5 h-fit  max-h-[calc(40vh)] md:max-h-[calc(64vh)] overflow-y-auto border border-primary rounded-md cursor-pointer py-5">
+            <div class="flex flex-col directions_list md:w-3/5 h-fit  max-h-[calc(40vh)] md:max-h-[calc(64vh)] overflow-y-auto border border-primary rounded-md cursor-pointer">
+                <div class="sticky top-0 h-5 w-full bg-gradient-to-b from-base-100 to-transparent flex-shrink-0"></div>
                 {#each recipe.directions as curr, i}
                 <div class="flex justify-between items-center mr-2">
                     <button class="step flex items-center justify-left gap-x-1 md:gap-x-3 md:mx-2 p-1 w-fit" onclick={(e) => {e.currentTarget.classList.toggle('blur-sm'); }} onkeydown={(e) => {e.currentTarget.classList.toggle('blur-sm'); }}>
@@ -320,6 +322,7 @@
                             <div class="divider my-px md:my-1 "></div>
                     {/if}
                 {/each}
+                <div class="sticky bottom-0 h-5 w-full bg-gradient-to-b from-transparent to-base-100 flex-shrink-0"></div>
             </div>
         </div>
         <div class="notes_container form-control m-2 md:mt-5 md:mx-5 space-y-2 flex items-center">
