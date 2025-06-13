@@ -456,17 +456,17 @@
                 {#if is_owner}
                     <div class="dropdown dropdown-top">
                         <label tabindex="-1" for="save_menu" class="btn btn-primary btn-sm md:btn-sm">options</label>
-                        <ul tabindex="-1" name="save_menu" class="dropdown-content z-1 menu p-2 shadow-sm bg-base-100 rounded-box w-max bg-primary">
-                            <li class="btn btn-sm btn-primary p-0"><button class="p-0" onclick={edit_groceries}>
+                        <ul tabindex="-1" name="save_menu" class="dropdown-content z-1 menu bg-transparent rounded-box w-max space-y-1">
+                            <li class="btn btn-sm btn-primary p-0"><button class="p-0 px-1" onclick={edit_groceries}>
                                 edit
                             </button></li>
-                            <li class="btn btn-sm btn-primary p-0"><button class="p-0" onclick={uncheck_list}>
+                            <li class="btn btn-sm btn-primary p-0"><button class="p-0 px-1" onclick={uncheck_list}>
                                 uncheck
                             </button></li>
-                            <li class="btn btn-sm btn-primary p-0"><button class="p-0" onclick={reset_list}>
+                            <li class="btn btn-sm btn-primary p-0"><button class="p-0 px-1" onclick={reset_list}>
                                 reset
                             </button></li>
-                            <li class="btn btn-sm btn-primary p-0"><button class="p-0" onclick={share_list}>
+                            <li class="btn btn-sm btn-primary p-0"><button class="p-0 px-1" onclick={share_list}>
                                 share
                             </button></li>
                         </ul>

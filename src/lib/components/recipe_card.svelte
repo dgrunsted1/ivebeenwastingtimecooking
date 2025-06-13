@@ -110,7 +110,7 @@
             <figure class="w-1/4 bg-cover bg-no-repeat bg-center" style="background-image: url('{recipe.image}')"></figure>
             <div class="card-body h-full flex flex-row p-1 w-1/2 justify-between">
                 <div class="flex flex-col justify-between md:p-1 w-full">
-                    <h2 id={recipe.id} class="card-title text-sm text-ellipsis overflow-hidden line-clamp-2">{recipe.title}</h2>
+                    <h2 id={recipe.id} class="card-title text-sm text-ellipsis overflow-hidden line-clamp-3">{recipe.title}</h2>
                     {#if edit_serv}
                         <div class="flex items-center space-x-1">
                             <input type="text" name="servings" class="input input-xs input-bordered input-primary w-12 text-center p-0" value={servings} onblur={handle_servings} onclick={(e) => {e.currentTarget.select()}}/><label for="servings" class="text-sm ">servings</label>

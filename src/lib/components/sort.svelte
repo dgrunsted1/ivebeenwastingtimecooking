@@ -10,11 +10,11 @@
     let sort_opts = $derived((type == "menu") ? sort_opts_menus : sort_opts_recipes);
 </script>
 
-<div class="dropdown dropdown-top md:dropdown-bottom dropdown-end">
+<div class="dropdown dropdown-top dropdown-end md:dropdown-bottom">
     <label tabindex="-1" for="sort_mobile" class="btn m-0 btn-primary btn-xs md:btn-sm">{sort_val}</label>
-    <ul tabindex="-1" name="sort_mobile" class="dropdown-content z-100 menu p-2 shadow-sm bg-base-100 rounded-box w-max bg-primary">
+    <ul tabindex="-1" name="sort_mobile" class="dropdown-content z-100 menu p-0 bg-transparent rounded-box w-max space-y-1">
         {#each sort_opts as opt}
-            <li class="btn btn-xs {opt == sort_val ? 'btn-neutral': 'btn-primary'}"><button onclick={update_sort}>{opt}</button></li>
+            <li class="btn btn-xs {opt == sort_val ? 'btn-primary text-primary-content': 'btn-neutral text-neutral-content'}"><button onclick={update_sort}>{opt}</button></li>
         {/each}
     </ul>
 </div>

@@ -20,7 +20,7 @@
                     <div class="skeleton h-4 w-full"></div>
                 </div>
             </div>
-        </div>
+        </div> 
     {:else}
         <div class="card card-side bg-base-200 h-24 md:h-28 card-bordered border-primary cursor-pointer mx-1">
             <div class="flex items-center gap-4 w-full m-5">

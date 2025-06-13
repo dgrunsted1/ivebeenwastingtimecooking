@@ -340,7 +340,7 @@
                                 />
                             {/if}
                         {/each}
-                        <button id="add" class="btn btn-lg btn-primary w-fit p-2 flex m-auto rounded-[20px]" onclick={add_recipe_modal}><Plus size={12}/></button>
+                        <button id="add" class="btn btn-xl ccontent-center btn-primary w-fit p-2 flex m-auto rounded-[20px]" onclick={add_recipe_modal}><Plus size={12}/></button>
                     {:else if loading}
                         <div id="menu_loading" class="w-full flex justify-center content-center h-full">
                             <span class="loading loading-bars loading-lg"></span>

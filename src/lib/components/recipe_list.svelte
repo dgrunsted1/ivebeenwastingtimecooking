@@ -314,7 +314,7 @@
     </div>
 </div>
 
-<div id="recipes" class="{scroll_size} overflow-y-auto space-y-2 rounded-md md:border-none py-2">
+<div id="recipes" class="{scroll_size} overflow-y-auto space-y-2">
     {#if display_recipes && display_recipes.length}
         {#each display_recipes as curr, i}
         <RecipeCard 
