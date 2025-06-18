@@ -249,15 +249,15 @@
     <!-- Final CTA -->
     <section class="py-20 bg-gradient-to-r from-primary to-accent text-center">
         <div class="max-w-4xl mx-auto px-4">
-            <h2 class="text-4xl md:text-5xl font-bold text-primary-content mb-8">
+            <h2 class="text-4xl md:text-5xl font-bold text-black mb-8">
                 {content.cta.heading}
             </h2>
-            <p class="text-xl text-white/70 mb-12 max-w-2xl mx-auto">
+            <p class="text-xl text-black mb-12 max-w-2xl mx-auto">
                 {content.cta.description}
             </p>
             <div class="space-y-4">
                 <a href={content.cta.url}>
-                    <button class="bg-secondary border-base-100 border-black border-2 text-base-100 px-12 py-6 rounded-2xl text-xl font-semibold hover:scale-105 hover:shadow-2xl transition-all duration-300">
+                    <button class="bg-secondary border-base-100 border-black border-2 text-black px-12 py-6 rounded-2xl text-xl font-semibold hover:scale-105 hover:shadow-2xl transition-all duration-300">
                         {content.cta.button}
                     </button>
                 </a>
