@@ -257,7 +257,7 @@
             </p>
             <div class="space-y-4">
                 <a href={content.cta.url}>
-                    <button class="bg-secondary border-base-100 border-black border-2 text-black px-12 py-6 rounded-2xl text-xl font-semibold hover:scale-105 hover:shadow-2xl transition-all duration-300">
+                    <button class="bg-secondary text-black px-12 py-6 rounded-2xl text-xl font-semibold hover:scale-105 hover:shadow-2xl transition-all duration-300">
                         {content.cta.button}
                     </button>
                 </a>
