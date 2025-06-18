@@ -291,8 +291,8 @@
     <meta property="og:type" content="website" />
 </svelte:head>
 
-    <div id="main">
-        <div class="flex justify-center pb-1">
+    <div id="main" class="overflow-hidden">
+        <div class="flex justify-center pb-1 w-full">
             
             <h1 class="text-xl h-6 text-ellipsis overflow-hidden text-center">
                 {#if $page.params.user_name && todays_menu.expand}
@@ -301,9 +301,9 @@
                 {todays_menu.title ? todays_menu.title+` Menu` : "Menu"}
             </h1>
         </div>
-        <div id="content" class="flex flex-col md:flex-row md:space-x-3 md:mx-2">
+        <div id="content" class="flex w-[200%] md:w-full flex-row-reverse md:flex-row transition-transform duration-300 ease-in-out {tab == 'recipe_list' ? '-translate-x-1/2' : 'translate-x-0 md:translate-x-0'} md:space-x-3 md:mx-2">
             {#if todays_menu.expand || loading}
-            <div id="left_column" class="{tab == "recipe_list" ? "" : "hidden md:flex"}  md:w-1/2">
+            <div id="left_column" class="w-1/2">
                 <div id="recipes" class="h-[calc(100svh-113px)] md:h-[calc(100svh-75px)] overflow-y-auto w-full space-y-2">
                     {#if todays_menu.expand}
                         {#each todays_menu.expand.recipes as curr, i}
@@ -352,7 +352,7 @@
                     {/if}
                 </div>
             </div>
-            <div id="right_column" class="{tab == "grocery_list" ? "" : "hidden"} md:flex md:w-1/2 ml-1 mr-2">
+            <div id="right_column" class="w-1/2">
                 {#if todays_menu && mode == "menu"}
                     {#if grocery_list.length}
                         <GroceryList 

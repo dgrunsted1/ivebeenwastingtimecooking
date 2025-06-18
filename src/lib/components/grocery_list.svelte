@@ -381,7 +381,7 @@
     }
 </script>
 
-<div id="list" class="flex flex-col w-full">
+<div id="list" class="flex flex-col w-full space-y-1">
     <div id="header" class="hidden md:flex justify-between items-center mt-0">
         {#if grocery_list.length > 0}
             <div>
@@ -403,7 +403,7 @@
         {/if}
     </div>
     <div class="md:mx-3">
-        <div id="list" class="grocery_list h-[calc(100svh-165px)] md:h-[calc(100svh-105px)] overflow-y-auto px-2 py-4">
+        <div id="list" class="grocery_list h-[calc(100svh-155px)] md:h-[calc(100svh-105px)] overflow-y-auto px-2 py-4">
             {#if grocery_list.length > 0}
                 {#each grocery_list as item, i}
                     {#if edit}
@@ -452,7 +452,7 @@
                 {#if interactable}<div id="update_status" class="text-xs">{status}</div>{/if}
                 <div id="count" class="text-xs text-nowrap">{grocery_list.reduce((count, item) => count + (item.checked ? 0 : 1), 0)}/{grocery_list.length} Items</div>
             </div>
-            <div class="flex items-center space-x-4 mx-1 my-2 w-full justify-end">
+            <div class="flex items-center space-x-4 mx-1 w-full justify-end">
                 {#if is_owner}
                     <div class="dropdown dropdown-top">
                         <label tabindex="-1" for="save_menu" class="btn btn-primary btn-sm md:btn-sm">options</label>
