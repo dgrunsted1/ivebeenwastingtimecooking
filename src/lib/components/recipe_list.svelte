@@ -1,7 +1,7 @@
 <script>
     import RecipeCard from "./recipe_card.svelte";
     import SearchInput from "./search.svelte";
-    import { pb } from '/src/lib/pocketbase';
+    import { post } from '/src/lib/pocketbase';
     import { update_fav_made } from '/src/lib/save_recipe.js';
     import { sort_recipes } from '/src/lib/sort.js';
     import Sort from "../../lib/components/sort.svelte";
@@ -51,9 +51,15 @@
         let tmp = []
         for (let recipe of recipes){
             if (recipe.id == e.id) {
-                let delete_recipe = confirm(`Are you sure you want to delete your recipe "${recipe.title}"?`);
+                let delete_recipe = confirm(`Are you sure you want to delete your recipe: "${recipe.title}"?`);
                 if (delete_recipe){
-                    await pb.collection('recipes').delete(e.id);
+                    const result = await post({recipe_id: e.id}, `api/delete_recipe`);
+                    console.log({result})
+                    if (!result){
+                        tmp.push(recipe);
+                    }
+                } else {
+                    tmp.push(recipe);
                 }
             } else {
                 tmp.push(recipe);
