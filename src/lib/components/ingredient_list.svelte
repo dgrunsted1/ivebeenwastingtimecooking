@@ -2,14 +2,15 @@
     import { ingrs_to_string } from '/src/lib/groceries.js'
 
     let { 
-        grocery_list = $bindable([])
+        grocery_list = $bindable([]),
+        height = "h-[calc(100svh-210px)] md:h-[calc(100svh-210px)]"
     } = $props();
 
 </script>
 
 <div id="list" class="flex flex-col w-full">
     <div class="md:mx-3">
-        <div class="grocery_list h-[calc(100svh-210px)] md:h-[calc(100svh-210px)] overflow-y-auto px-2 py-4">
+        <div class="grocery_list {height} overflow-y-auto px-2 py-4">
             {#if grocery_list.length > 0}
                 {#each grocery_list as item, i}
                         <p class="text">{ingrs_to_string([item])}</p>

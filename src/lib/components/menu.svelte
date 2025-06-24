@@ -314,6 +314,7 @@
     {:else if tab == "grocery_list"}
         <IngredientList 
             {grocery_list}
+            {height}
         />
     {/if}
 </div>

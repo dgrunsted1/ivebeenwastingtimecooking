@@ -290,6 +290,7 @@
                     {update_mult}
                     {remove_from_menu}
                     {update_title}
+                    height="h-[calc(100svh-210px)] md:h-[calc(100svh-180px)]"
                 />
             {/if}
         </div>

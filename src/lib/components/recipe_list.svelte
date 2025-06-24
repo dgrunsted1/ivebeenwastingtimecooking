@@ -33,7 +33,7 @@
     let search_val = $state("");
     let display_recipes = $derived(sort_recipes(sort_val, filter_recipes(search(search_val))));
     let delay_timer;
-    let scroll_size = $derived($page.url.pathname.includes(`/today`) ? `h-[calc(80svh-120px)] md:h-[calc(80svh-120px)]` : `h-[calc(100svh-168px)] md:h-[calc(100svh-135px)]`);
+    let scroll_size = $derived($page.url.pathname.includes(`/today`) ? `h-[calc(80svh-120px)] md:h-[calc(80svh-120px)]` : `h-[calc(100svh-168px)] md:h-[calc(100svh-145px)]`);
 
     
     let display_cats = $derived(update_diplay_cats());

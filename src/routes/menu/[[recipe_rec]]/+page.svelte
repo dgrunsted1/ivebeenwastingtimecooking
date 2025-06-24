@@ -206,6 +206,7 @@
                             {update_mult}
                             {update_title}
                             remove_from_menu={check_item}
+                            height="h-[calc(100svh-210px)] md:h-[calc(100svh-205px)]"
                         />
                     {:else}
                         <NoteCard msg={`select recipes to add to your menu`}/>

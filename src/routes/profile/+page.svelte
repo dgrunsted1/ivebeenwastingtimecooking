@@ -340,7 +340,7 @@
                     {/if}
                 </div>
                 <!-- menu -->
-                <div class="flex h-[calc(100svh-110px)] md:h-[calc(100svh-120px)] overflow-y-auto w-full {tab == 'menu' ? '' : 'hidden'}">
+                <div class="flex w-full {tab == 'menu' ? '' : 'hidden'}">
                     <div class="flex justify-center w-full md:max-w-[600px] m-auto flex-col">
                         {#if loading.menu}
                             <div class="flex h-[500px] items-center m-auto"><span class="loading loading-bars loading-lg md:loading-xl"></span></div>
@@ -354,7 +354,7 @@
                                     {update_mult} 
                                     {update_title} 
                                     {total_servings}
-                                    height={"h-[calc(100svh-220px)] md:h-[calc(100svh-250px)]"}
+                                    height={"h-[calc(100svh-280px)] md:h-[calc(100svh-300px)]"}
                                 />
                             {/if}
                         {/if}
