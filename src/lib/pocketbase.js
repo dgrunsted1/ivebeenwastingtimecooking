@@ -43,7 +43,7 @@ export const post = async function(data_in, url_str) {
             },
             body: data
         });
-        return true;
+        return await response.json();
     } catch (error) {
         console.log(error);
     }

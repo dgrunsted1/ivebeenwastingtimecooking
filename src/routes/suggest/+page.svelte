@@ -10,7 +10,7 @@
     let recipe_rec = $state({});
     let rec_mults = $state({});
     let menu_rec = $state([]);
-    let cats = $state([{cat: "main", cuisine: "any", recipe: null}, {cat: "main", cuisine: "any", recipe: null},{cat: "main", cuisine: "any", recipe: null}, {cat: "breafast", cuisine: "any", recipe: null}, {cat: "dessert", cuisine: "any", recipe: null}]);
+    let cats = $state([{cat: "main", cuisine: "any", recipe: null}, {cat: "main", cuisine: "any", recipe: null},{cat: "main", cuisine: "any", recipe: null}, {cat: "breakfast", cuisine: "any", recipe: null}, {cat: "dessert", cuisine: "any", recipe: null}]);
     let categories = $state([]);
     let loading = $state({
         user: true,
@@ -54,7 +54,8 @@
             let data = {...cats[i]};
             delete data.recipe;
             const result = await post(data, 'api/random_recipe');
-            console.log(result);
+            cats[i].recipe = result.recipe;
+            console.log(result.recipe);
         }
         // main_recipes = recipes.filter(item => item.category == 'Main').map(item => item.id);
         // main_recs = await get_main_recs(main_recipes);
@@ -207,35 +208,51 @@
                 <!-- menu -->
                 <div class="flex flex-col space-y-2 w-full {tab == 'menu' ? '' : 'hidden'}">
                     {#each cats as curr, i}
-                        <div class="flex w-full justify-evenly content-center">
-                            <div class="dropdown dropdown-top dropdown-start md:dropdown-bottom">
-                                <label tabindex="-1" for="sort_mobile" class="btn m-0 btn-primary btn-xs md:btn-sm">{curr.cat}</label>
-                                <ul tabindex="-1" name="sort_mobile" class="dropdown-content z-100 menu bg-transparent rounded-box w-max space-y-1">
+                        <div class="flex w-full justify-around content-center items-center flex-col md:flex-row space-y-3">
+                            <div class="dropdown dropdown-bottom dropdown-start md:dropdown-bottom h-fit w-[90%] md:w-30">
+                                <label tabindex="-1" for="sort_mobile" class="btn m-0 btn-primary btn-xs md:btn-sm w-full">{curr.cat}</label>
+                                <ul tabindex="-1" name="sort_mobile" class="dropdown-content z-100 menu bg-transparent rounded-box space-y-1 w-max">
                                     {#each categories as opt}
                                         <li class="btn btn-xs {opt == curr.cat ? 'btn-primary text-primary-content': 'btn-neutral text-neutral-content'}"><button id={i} onclick={update_cat}>{opt}</button></li>
                                     {/each}
                                 </ul>
                             </div>
-                            <div class="dropdown dropdown-top dropdown-start md:dropdown-bottom">
-                                <label tabindex="-1" for="sort_mobile" class="btn m-0 btn-primary btn-xs md:btn-sm">{curr.cuisine}</label>
-                                <ul tabindex="-1" name="sort_mobile" class="dropdown-content z-100 menu bg-transparent rounded-box w-max space-y-1">
+                            <div class="dropdown dropdown-bottom dropdown-start md:dropdown-bottom h-fit w-[90%] md:w-30">
+                                <label tabindex="-1" for="sort_mobile" class="btn m-0 btn-primary btn-xs md:btn-sm w-full">{curr.cuisine}</label>
+                                <ul tabindex="-1" name="sort_mobile" class="dropdown-content z-100 menu bg-transparent rounded-box space-y-1 w-max">
                                     {#each cuisines as opt}
                                         <li class="btn btn-xs {opt == curr.cuisine ? 'btn-primary text-primary-content': 'btn-neutral text-neutral-content'}"><button id={i} onclick={update_cuisine}>{opt}</button></li>
                                     {/each}
                                 </ul>
                             </div>
+                            <button class="btn btn-primary btn-sm">reroll</button>
                             {#if curr.recipe}
-                                <RecipeCard 
-                                    recipe={curr.recipe} 
-                                    checked={is_checked(display_recipes[i].id)} 
-                                    servings={display_recipes[i].servings}
-                                    type="menu"
-                                    toggle_check_box={handle_check} 
-                                    toggle_heart={update_fav}
-                                    delete_recipe={delete_recipe}
-                                    toggle_thumb={update_made}
-                                    card_click={view}
-                                />
+                                <!-- svelte-ignore a11y_no_static_element_interactions-->
+
+                                <div class="card card-side bg-base-300 h-24 md:h-28 cursor-pointer mx-1 w-100">
+                                    <figure class="w-1/4 bg-cover bg-no-repeat bg-center" style="background-image: url('{curr.recipe.image}')"></figure>
+                                    <div class="card-body h-full flex flex-row p-1 w-1/2 justify-between">
+                                        <div class="flex flex-col justify-between md:p-1 w-full">
+                                            <h2 id={curr.recipe.id} class="card-title text-sm text-ellipsis overflow-hidden line-clamp-2">{curr.recipe.title}</h2>
+                                            <h5 id={curr.recipe.id} class="text-xs text-neutral text-ellipsis overflow-hidden line-clamp-2">{curr.recipe.description}</h5>
+                                            <div class="flex w-full">
+                                                <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow rounded-tl rounded-bl">
+                                                    {#if curr.recipe.time}
+                                                        {curr.recipe.time}
+                                                    {:else}
+                                                        no time
+                                                    {/if}
+                                                </div>
+                                                <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow">
+                                                    {curr.recipe.category}
+                                                </div>
+                                                <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow rounded-tr rounded-br">
+                                                    {curr.recipe.cuisine}
+                                                </div>
+                                            </div>                    
+                                        </div>
+                                    </div>
+                                </div>
                             {/if}
                         </div>
                     {/each}
