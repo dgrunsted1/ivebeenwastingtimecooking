@@ -237,7 +237,7 @@
     </svelte:head>
 
     <div id="cook_recipe" class="flex flex-col md:pb-10">
-        <div class="img_info_container flex flex-col items-center justify-center bg-cover bg-no-repeat bg-center" style="background-image: url({recipe.image})">
+        <div class="img_info_container flex flex-col items-center justify-center bg-contain bg-no-repeat bg-center" style="background-image: url('{recipe.image}')">
             <div class="img_container w-full md:w-auto flex flex-col h-52">
             </div>
             <div class="w-full bg-gradient-to-b from-transparent to-base-100/40 h-10"></div>
