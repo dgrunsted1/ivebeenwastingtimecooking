@@ -298,7 +298,7 @@
             {/if}
             {todays_menu.title ? todays_menu.title+` Menu` : "Menu"}
         </h1>
-        <div id="content" class="flex w-[200%] md:w-full flex-row-reverse md:flex-row transition-transform duration-300 ease-in-out {tab == 'recipe_list' ? '-translate-x-1/2 md:translate-x-0' : 'translate-x-0 md:translate-x-0'} md:space-x-3 md:mx-2">
+        <div id="content" class="flex w-[200%] md:w-auto flex-row-reverse md:flex-row transition-transform duration-300 ease-in-out {tab == 'recipe_list' ? '-translate-x-1/2 md:translate-x-0' : 'translate-x-0 md:translate-x-0'} md:space-x-3 md:mx-2">
             {#if todays_menu.expand || loading}
             <div id="left_column" class="w-1/2">
                 <div id="recipes" class="h-[calc(100svh-113px)] md:h-[calc(100svh-75px)] overflow-y-auto w-full space-y-2 border-t border-b border-base-300 md:border-none py-2">
