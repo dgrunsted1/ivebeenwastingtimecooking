@@ -2,7 +2,6 @@
     import { onMount } from 'svelte';
     import { pb, currentUser, auth_refresh, post } from '/src/lib/pocketbase.js';
     import { get_servings } from '/src/lib/recipe_util.js';
-    import RecipeCard from "/src/lib/components/recipe_card.svelte";
     import Alerts from "../../lib/components/alerts.svelte";
 
     let main_recipes = $state([]);
@@ -10,8 +9,12 @@
     let recipe_rec = $state({});
     let rec_mults = $state({});
     let menu_rec = $state([]);
-    let cats = $state([{cat: "main", cuisine: "any", recipe: null}, {cat: "main", cuisine: "any", recipe: null},{cat: "main", cuisine: "any", recipe: null}, {cat: "breakfast", cuisine: "any", recipe: null}, {cat: "dessert", cuisine: "any", recipe: null}]);
-    let categories = $state([]);
+    let cats = $state([ {cat: "Main", cuisine: "any", recipe: null, cat_display: [], cuisine_display: []}, 
+                        {cat: "Main", cuisine: "any", recipe: null, cat_display: [], cuisine_display: []},
+                        {cat: "Main", cuisine: "any", recipe: null, cat_display: [], cuisine_display: []},
+                        {cat: "Breakfast", cuisine: "any", recipe: null, cat_display: [], cuisine_display: []},
+                        {cat: "Dessert", cuisine: "any", recipe: null, cat_display: [], cuisine_display: []}]);
+    let categories = $state(["any"]);
     let loading = $state({
         user: true,
         menu: true,
@@ -21,7 +24,7 @@
     let menu_title = $state("New Menu");
     let alert = $state({show: false, msg: "", title: "", type: "warning"});
     let tab = $state("menu"); // info, stats, recipe, menu
-    let cuisines = $state([]);
+    let cuisines = $state(["any"]);
 
     onMount(async () => {
         if (!$currentUser){
@@ -51,11 +54,11 @@
     async function roll_menu(){
         loading.menu = true;
         for (let i = 0; i < cats.length; i++){
-            let data = {...cats[i]};
-            delete data.recipe;
+            const data = {cat: cats[i].cat, cuisine: cats[i].cuisine};
             const result = await post(data, 'api/random_recipe');
             cats[i].recipe = result.recipe;
-            console.log(result.recipe);
+            cats[i].cat_display = ["any"].concat(result.categories.map((e) => { return e.name}));
+            cats[i].cuisine_display = ["any"].concat(result.cuisines.map((e) => { return e.name }));
         }
         // main_recipes = recipes.filter(item => item.category == 'Main').map(item => item.id);
         // main_recs = await get_main_recs(main_recipes);
@@ -116,16 +119,37 @@
         tab = e.target.id;
     }
 
-    function update_cat(e){
+    async function update_cat(e){
         cats[e.target.id].cat = e.target.innerHTML;
         document.activeElement.blur();
-        //get new recipe
+        if (cats[e.target.id].recipe.category != e.target.innerHTML){
+            const data = {cat: cats[e.target.id].cat, cuisine: cats[e.target.id].cuisine};
+            const result = await post(data, 'api/random_recipe');
+            cats[e.target.id].recipe = result.recipe;
+            cats[e.target.id].cat_display = ["any"].concat(result.categories.map((e) => { return e.name}));
+            cats[e.target.id].cuisine_display = ["any"].concat(result.cuisines.map((e) => { return e.name }));
+        }
     }
 
-    function update_cuisine(e){
+    async function update_cuisine(e){
         cats[e.target.id].cuisine = e.target.innerHTML;
         document.activeElement.blur();
-        //get new recipe
+        if (cats[e.target.id].recipe.cuisine != e.target.innerHTML){
+            const data = {cat: cats[e.target.id].cat, cuisine: cats[e.target.id].cuisine};
+            const result = await post(data, 'api/random_recipe');
+            cats[e.target.id].recipe = result.recipe;
+            cats[e.target.id].cat_display = ["any"].concat(result.categories.map((e) => { return e.name }));
+            cats[e.target.id].cuisine_display = ["any"].concat(result.cuisines.map((e) => { return e.name }));
+        }
+    }
+
+    async function reroll(e){
+        const data = {cat: cats[e.target.id].cat, cuisine: cats[e.target.id].cuisine};
+        document.activeElement.blur();
+        const result = await post(data, 'api/random_recipe');
+        cats[e.target.id].recipe = result.recipe;
+        cats[e.target.id].cat_display = ["any"].concat(result.categories.map((e) => { return e.name }));
+        cats[e.target.id].cuisine_display = ["any"].concat(result.cuisines.map((e) => { return e.name }));
     }
 </script>
 
@@ -209,23 +233,23 @@
                 <div class="flex flex-col space-y-2 w-full {tab == 'menu' ? '' : 'hidden'}">
                     {#each cats as curr, i}
                         <div class="flex w-full justify-around content-center items-center flex-col md:flex-row space-y-3">
-                            <div class="dropdown dropdown-bottom dropdown-start md:dropdown-bottom h-fit w-[90%] md:w-30">
+                            <div id={curr.id} class="dropdown dropdown-bottom dropdown-center md:dropdown-bottom h-fit w-[90%] md:w-30">
                                 <label tabindex="-1" for="sort_mobile" class="btn m-0 btn-primary btn-xs md:btn-sm w-full">{curr.cat}</label>
-                                <ul tabindex="-1" name="sort_mobile" class="dropdown-content z-100 menu bg-transparent rounded-box space-y-1 w-max">
-                                    {#each categories as opt}
+                                <ul tabindex="-1" name="sort_mobile" class="dropdown-content z-100 menu bg-transparent rounded-box space-y-1 w-full">
+                                    {#each curr.cat_display as opt}
                                         <li class="btn btn-xs {opt == curr.cat ? 'btn-primary text-primary-content': 'btn-neutral text-neutral-content'}"><button id={i} onclick={update_cat}>{opt}</button></li>
                                     {/each}
                                 </ul>
                             </div>
-                            <div class="dropdown dropdown-bottom dropdown-start md:dropdown-bottom h-fit w-[90%] md:w-30">
+                            <div id={curr.id} class="dropdown dropdown-bottom dropdown-center md:dropdown-bottom h-fit w-[90%] md:w-30">
                                 <label tabindex="-1" for="sort_mobile" class="btn m-0 btn-primary btn-xs md:btn-sm w-full">{curr.cuisine}</label>
-                                <ul tabindex="-1" name="sort_mobile" class="dropdown-content z-100 menu bg-transparent rounded-box space-y-1 w-max">
-                                    {#each cuisines as opt}
+                                <ul tabindex="-1" name="sort_mobile" class="dropdown-content z-100 menu bg-transparent rounded-box space-y-1 w-full md:w-max">
+                                    {#each curr.cuisine_display as opt}
                                         <li class="btn btn-xs {opt == curr.cuisine ? 'btn-primary text-primary-content': 'btn-neutral text-neutral-content'}"><button id={i} onclick={update_cuisine}>{opt}</button></li>
                                     {/each}
                                 </ul>
                             </div>
-                            <button class="btn btn-primary btn-sm">reroll</button>
+                            <button id={i} class="btn btn-primary btn-xs md:btn-sm w-[90%] md:w-30" onclick={reroll}>reroll</button>
                             {#if curr.recipe}
                                 <!-- svelte-ignore a11y_no_static_element_interactions-->
 
@@ -246,8 +270,14 @@
                                                 <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow">
                                                     {curr.recipe.category}
                                                 </div>
-                                                <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow rounded-tr rounded-br">
+                                                <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow">
                                                     {curr.recipe.cuisine}
+                                                </div>
+                                                <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow">
+                                                    {curr.recipe.ingr_num} ingredients
+                                                </div>
+                                                <div class="text-[10px] md:text-[12px] border border-primary text-ellipsis whitespace-nowrap overflow-hidden h-fit pl-1 text-nowrap text-center basis-12 grow rounded-tr rounded-br">
+                                                    {curr.recipe.directions_num} directions
                                                 </div>
                                             </div>                    
                                         </div>
