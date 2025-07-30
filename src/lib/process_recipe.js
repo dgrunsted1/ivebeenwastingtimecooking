@@ -177,7 +177,7 @@ export const process_directions = function(in_lines) {
         for (let j = 0; j < line_arr.length; j++){
             let sentence = line_arr[j].trim();
 
-            while (sentence.match(new RegExp(conv_unit_string, 'i'))){
+            while (sentence.match(new RegExp(conv_unit_string, 'i')) && line_arr[j+1]){
                 
                 sentence = sentence+". "+line_arr[j+1].trim();
                 j++;
