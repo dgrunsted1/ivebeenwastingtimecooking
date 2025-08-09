@@ -26,7 +26,8 @@
         update_mult,
         update_title,
         remove_from_menu,
-        height = "h-[calc(100svh-210px)] md:h-[calc(100svh-160px)]"
+        height = "h-[calc(100svh-210px)] md:h-[calc(100svh-160px)]",
+        clear_menu
     } = $props();
 
     let tab = $state("recipe_list");
@@ -230,6 +231,9 @@
 <div id="menu" class="md:h-full w-full cursor-default">
     <div class="flex items-center p-3 justify-between">
         <input type="text" class="input input-bordered border-primary input-xs w-2/3" value={menu_title} onblur={handle_title}/>
+        {#if $page.url.pathname == "/menu"}
+            <button class="btn btn-sm btn-primary" onclick={clear_menu}>clear</button>
+        {/if}
         {#if $page.url.pathname == "/menu" || $page.url.pathname == "/profile"}
             <div class="dropdown dropdown-end">
                 <label tabindex="-1" for="save_menu" class="btn m-1 btn-primary btn-xs md:btn-sm">save menu</label>

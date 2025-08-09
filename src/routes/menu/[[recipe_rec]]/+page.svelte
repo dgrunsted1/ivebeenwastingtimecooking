@@ -89,6 +89,13 @@
         }
     }
 
+    function clear_menu(){
+        for (let recipe of user_recipes){
+            recipe.checked = false;
+        }
+        mults = {};
+    }
+
     function update_title(e){
         menu_title = e.title;
     }
@@ -186,6 +193,7 @@
                                 {update_mult} 
                                 {update_title}
                                 remove_from_menu={check_item}
+                                {clear_menu}
                             />
                         {:else}
                             <NoteCard msg={`select recipes to add to your menu`}/>
@@ -207,6 +215,7 @@
                             {update_title}
                             remove_from_menu={check_item}
                             height="h-[calc(100svh-210px)] md:h-[calc(100svh-205px)]"
+                            {clear_menu}
                         />
                     {:else}
                         <NoteCard msg={`select recipes to add to your menu`}/>
