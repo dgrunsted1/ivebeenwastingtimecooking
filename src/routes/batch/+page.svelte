@@ -15,6 +15,7 @@
     let unset_cuis = [];
     let cuisines = [];
     let grocery_list_test = [];
+    let url_id_results = [];
 
     const tables = ["menus_strict", "grocery_lists", "ingredients_strict", "menu_log_strict", "grocery_items", "recipes_log_strict", "recipes_strict", "sub_recipes"];
 
@@ -75,15 +76,13 @@
     }
         
     const update_recipe_url_ids = async function (){
-        return;
         const recipes = await pb.collection('recipes').getFullList({sort: `-created`});
         for (let i = 0; i < recipes.length; i++){
+            url_id_results.unshift("fixing"+recipes[i].title)
             const url_id = await get_url_id(recipes[i]);
             const data = { "url_id": url_id };
             const updated_record = await pb.collection('recipes').update(recipes[i].id, data);
-        }
-
-            
+        }    
     }
 
     const get_url_id = async function (recipe){
@@ -91,13 +90,15 @@
         url_id = url_id.replaceAll(" ", "_");
         let new_url_id = "";
         try {
-            new_url_id = url_id;
+            new_url_id = url_id + "_" + Math.floor(Math.random() * 9000);
             let same_url_id = await pb.collection('recipes').getFirstListItem(`url_id="${new_url_id}"`);
-            let cnt = 1;
-            while (true){
-                new_url_id = url_id+`_${cnt}`;
+            let found = true
+            while (found && same_url_id.items.length){
+                new_url_id = url_id + "_" + Math.floor(Math.random() * 9000);
                 same_url_id = await pb.collection('recipes').getFirstListItem(`url_id="${new_url_id}"`);
-                cnt++;
+                if (!same_url_id.items.length) {
+                    found = false
+                }
             }
         } catch (e){
             return new_url_id;
@@ -586,6 +587,14 @@
             </div>
         </div>
         <div>
+            <div class="flex m-10 flex-col p-10 border rounded-lg max-w-96">
+                <div class="btn btn-primary btn-sm" onclick={update_recipe_url_ids} onkeydown={test_merge}>url_ids</div>
+                <ul>
+                    {#each url_id_results as curr}
+                        <div>{curr}</div>
+                    {/each}
+                </ul>
+            </div>
             <div class="flex m-10 flex-col p-10 border rounded-lg">
                 <div class="btn btn-primary btn-sm" onclick={test_merge} onkeydown={test_merge}>test merge</div>
                 <div class="flex flex-col">
