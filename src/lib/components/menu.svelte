@@ -1,7 +1,7 @@
 <script>
     import { onMount } from 'svelte';
     import IngredientList from "/src/lib/components/ingredient_list.svelte";
-    import { currentUser, pb } from '/src/lib/pocketbase';
+    import { currentUser, pb, post } from '/src/lib/pocketbase';
     import { page } from '$app/stores';
     import { get_grocery_list } from '/src/lib/merge_ingredients.js';
     import { get_total_time } from '/src/lib/recipe_util.js';
@@ -44,12 +44,13 @@
         overflow_len = ($page.url.pathname == "/menu") ? `max-h-[60vh]` : `max-h-[60vh]`;
     });
 
-    $effect(() => {
+    $effect(async () => {
         if (!menu_title.length || menu_title == "New Menu"){
             let title = (menu.length < 2) ? "New Menu" : generate_menu_title();
             if (title == menu_title) return;
             update_title({title: title, id: id});
         }
+        const result = await post({list: JSON.stringify(grocery_list)}, `api/grocery_list`);
     });
 
     function update_sub_recipes(){
