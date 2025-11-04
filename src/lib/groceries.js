@@ -1,6 +1,7 @@
 import { pb } from '/src/lib/pocketbase';
 
 export const create_grocery_list = async function(grocery_list, menu_id){
+    let item_ids = [];
     let items = [];
     for (let i = 0; i < grocery_list.length; i++) {
         if (grocery_list[i].name){
@@ -15,22 +16,26 @@ export const create_grocery_list = async function(grocery_list, menu_id){
             };
         
             const record_item = await pb.collection('grocery_items').create(data_item);
-            items.push(record_item.id);
+            items.push(record_item);
+            item_ids.push(record_item.id);
         }
     }
+
     const data_list = {
-        "items": items,
+        "items": item_ids,
         "active": true,
         "menu": menu_id
     };
-    
     const record_list = await pb.collection('grocery_lists').create(data_list);
+
     const menu_data = {
         "grocery_list": record_list.id
     };
-    
     const record_menu = await pb.collection('menus').update(menu_id, menu_data);
-    return record_menu.id;
+
+    const list_result = await pb.collection('grocery_lists').getOne(record_list.id, {expand: 'items, items.ingrs, items.ingrs.recipe'});
+    items = list_result.expand.items;
+    return {id: record_menu.id, list: items};
 }
 
 export const update_grocery_list = async function(grocery_list, id){

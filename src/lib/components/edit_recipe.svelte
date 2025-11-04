@@ -2,7 +2,7 @@
     import { currentUser, pb } from '/src/lib/pocketbase';
     import { onMount } from 'svelte';
     import { page } from '$app/stores';
-    import { update_image_upload, update_ingr, update_recipe_data, update_fav_made } from '/src/lib/save_recipe.js';
+    import { update_image_upload, update_ingr, create_ingr, update_recipe_data, update_fav_made, delete_ingr } from '/src/lib/save_recipe.js';
     import { process_ingr, process_directions } from '/src/lib/process_recipe.js';
     import ThumbUp from "/src/lib/icons/ThumbUp.svelte";
     import Heart from "/src/lib/icons/Heart.svelte";
@@ -23,7 +23,8 @@
         recipe,
         save = $bindable(false),
         show_alert,
-        done_editing
+        done_editing,
+        create_n_subscribe_ingr
     } = $props();
     let categories = $state([]);
     
@@ -120,8 +121,9 @@
         }
     }
 
-    function add_ingr(){
-        recipe.expand.ingr_list[recipe.expand.ingr_list.length] = {amount: 1, unit: "", name: "", original:[""]};
+    async function add_ingr(){
+        const ingr = await create_ingr({amount: 1, unit: "", ingredient: "new ingredient", original:[""], recipe: recipe.id}, recipe.id);
+        await create_n_subscribe_ingr(ingr.id);
     }
 
     function add_dir(e){
@@ -239,6 +241,12 @@
             update_recipe_data(recipe.id, data);
         }, 1000);
     }
+
+    const handle_delete_ingr = async function(ingr){
+        if (window.confirm(`Are you sure you want to remove ${ingr.ingredient}?`)) {
+            await delete_ingr(ingr.id);
+        }
+    }
 </script>
 
 <div id="recipe" class="flex flex-col pt-10">
@@ -351,7 +359,7 @@
                             <input type="text" class="ingr_amount input input-bordered input-xs px-1 mr-1 w-10 text-center h-fit" id={recipe.expand.ingr_list[i].id} data-type="quantity" value={recipe.expand.ingr_list[i].quantity} oninput={handle_update_ingr_data}>
                             <input type="text" class="ingr_unit input input-bordered input-xs px-1 mr-1 w-16 text-center h-fit" id={recipe.expand.ingr_list[i].id}  data-type="unit" value={recipe.expand.ingr_list[i].unit} oninput={handle_update_ingr_data}>
                             <input type="text" class="ingr_name input input-bordered input-xs px-1 mr-1 w-80 h-fit" id={recipe.expand.ingr_list[i].id}  data-type="ingredient" value={recipe.expand.ingr_list[i].ingredient} oninput={handle_update_ingr_data}>
-                            <button id={recipe.expand.ingr_list[i].id} class="btn btn-xs w-6 p-0 btn-accent"><Delete size={4}/></button>
+                            <button id={recipe.expand.ingr_list[i].id} class="btn btn-xs w-6 p-0 btn-accent" onclick={handle_delete_ingr(recipe.expand.ingr_list[i])}><Delete size={4}/></button>
                         </div>
                 {/each}
                 <div class="flex justify-center mt-2">

@@ -122,19 +122,40 @@
         for (let i = 0; i < user_recipes.length; i++){
             if (user_recipes[i].id == data.record.id){
                 user_recipes[i] = {...data.record, expand:user_recipes[i].expand};
+                
+                const ingredientIds = new Set(user_recipes[i].expand.ingr_list.map(ing => ing.id));
+                const idSet = new Set(data.record.ingr_list);
+
+                const missingFromIngredients = data.record.ingr_list.filter(id => !ingredientIds.has(id));
+
+                const missingFromIds = user_recipes[i].expand.ingr_list
+                    .map(ing => ing.id)
+                    .filter(id => !idSet.has(id));
+
+                for (let j = 0; j < missingFromIds.length; j++){
+                    user_recipes[i].expand.ingr_list = user_recipes[i].expand.ingr_list.filter(ing => ing.id !== missingFromIds[j]);
+                }
+
+                for (let j = 0; j < missingFromIngredients.length; j++){
+                    const ingrRecord = await pb.collection('ingredients').getOne(missingFromIngredients[j]);
+                    user_recipes[i].expand.ingr_list.push(ingrRecord);
+                    await create_n_subscribe_ingr(ingrRecord.id);
+                }
                 break;
             }
         }        
     }
 
+    async function create_n_subscribe_ingr(ingr_id){
+        pb.realtime.subscribe(`ingredients/${ingr_id}`, handle_update_ingr)
+    }
+
     async function handle_update_ingr(data){   
-        console.log(data)
         for (let i = 0; i < user_recipes.length; i++){
             if (user_recipes[i].id == edit_id){
                 for (let j = 0; j < user_recipes[i].expand.ingr_list.length; j++){
                     if (user_recipes[i].expand.ingr_list[j].id == data.record.id){
                         user_recipes[i].expand.ingr_list[j] = {...data.record};
-                        console.log(user_recipes[i].expand.ingr_list[j]);
                         break;
                     }
                 }
@@ -232,6 +253,7 @@
                                         recipe={edit_recipe}
                                         {update_recipe}
                                         done_editing={() => edit_modal_recipe = false}
+                                        create_n_subscribe_ingr={create_n_subscribe_ingr}
                                     />
                                 {:else}
                                     <DisplayRecipe
