@@ -33,7 +33,7 @@
             pb.realtime.subscribe(`menus/${result_list.items[0].id}`, (data) => {
                 const tmp = {...data.record, expand: todays_menu.expand};
                 todays_menu = tmp;
-            });
+            }, {expand: `recipes`});
             todays_menu = result_list.items[0];
             for (let i in todays_menu.sub_recipes){
                for (let j in todays_menu.sub_recipes[i]){
@@ -45,7 +45,9 @@
             todays_menu.expand.recipes = todays_menu.expand.recipes.sort(sort_by_made);
             if (!todays_menu.expand.grocery_list || !todays_menu.expand.grocery_list.expand.items){
                 grocery_list = get_grocery_list(todays_menu, todays_menu.servings, todays_menu.sub_recipes);
-                grocery_list_id = create_grocery_list(grocery_list, todays_menu.id);
+                const temp = await create_grocery_list(grocery_list, todays_menu.id);
+                grocery_list_id = temp.id;
+                grocery_list = temp.list;
             } else {
                 grocery_list = groupBySimilarity(todays_menu.expand.grocery_list.expand.items);
                 grocery_list_id = todays_menu.expand.grocery_list.id;
@@ -105,7 +107,6 @@
             tab = "recipe_list";
         }
         loading = false;
-        get_user_recipes();
     });
 
     async function get_user_recipes(){
@@ -136,7 +137,7 @@
             
         return await pb.collection('menus').getList(1, 1, {
             filter,
-            expand: `recipes,recipes.notes,recipes.ingr_list, grocery_list, grocery_list.items, grocery_list.items.ingrs${$page.params.user_name ? ', user' : ''}`
+            expand: `recipes,recipes.notes,recipes.ingr_list, grocery_list, grocery_list.items, grocery_list.items.ingrs, grocery_list.items.ingrs.recipe${$page.params.user_name ? ', user' : ''}`
         });
     }
 
@@ -249,6 +250,7 @@
     }
 
     const add_recipe_modal = (e) => {
+        get_user_recipes();
         my_modal_3.showModal();
     }
 
@@ -284,7 +286,7 @@
 </script>
 
 <svelte:head>
-    <meta property="og:title" content={$page.params.user_name ? `${$page.params.user_name}'s Menu` : `Menu`} />
+    <meta property="og:title" content={$page.params.user_name ? `${$page.params.user_name}'s ${todays_menu.title} Menu` : `Menu`} />
     <meta property="og:description" content={$page.params.user_name ? `${$page.params.user_name}'s current recipes and grocery list.` : `Current recipes and grocery list.`} />
     <meta property="og:image" content="static/ChefBookIconV2.png" />
     <meta property="og:url" content="https://www.ivebeenwastingtimecooking.com/recipes" />

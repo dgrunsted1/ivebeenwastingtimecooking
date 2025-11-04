@@ -54,7 +54,6 @@
                 let delete_recipe = confirm(`Are you sure you want to delete your recipe: "${recipe.title}"?`);
                 if (delete_recipe){
                     const result = await post({recipe_id: e.id}, `api/delete_recipe`);
-                    console.log({result})
                     if (!result){
                         tmp.push(recipe);
                     }

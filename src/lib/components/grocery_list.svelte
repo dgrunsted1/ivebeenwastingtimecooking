@@ -379,6 +379,16 @@
         my_modal_1.close();
         new_item = {qty: null, unit: "", name: ""};
     }
+
+    const get_recipe_name = (item) => {
+        if (item.expand && item.expand.ingrs && item.expand.ingrs.length > 0 && item.expand.ingrs[0].expand && item.expand.ingrs[0].expand.recipe && item.expand.ingrs[0].expand.recipe.length > 0){
+            const recipe = item.expand.ingrs[0].expand.recipe[0];
+            if (recipe){
+                return recipe.title;
+            }
+        }
+        return "";
+    }
 </script>
 
 <div id="list" class="flex flex-col w-full space-y-1">
@@ -423,7 +433,7 @@
                         >
                             {#if status != "none"}<input type="checkbox" class="hidden md:flex checkbox checkbox-primary checkbox-lg p-1" id={item.id} bind:checked={item.checked} onchange={check_item_handle}>{/if}
                             <div class="flex">
-                                <p class="text {item.id == dragged_item || item.id == dragged_over ? `text-xl` : ``}">{ingrs_to_string([item])}</p>
+                                <div class="text flex space-x-2{item.id == dragged_item || item.id == dragged_over ? ` text-xl` : ``}"><p>{ingrs_to_string([item])}</p><p class="text-neutral text-xs">{get_recipe_name(item)}</p></div>
                             </div>
                             {#if status != "none"}<input type="checkbox" class="md:hidden checkbox checkbox-primary checkbox-lg p-1" id={item.id} bind:checked={item.checked} onchange={check_item_handle}>{/if}
                         </div>

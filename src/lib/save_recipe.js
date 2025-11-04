@@ -1,137 +1,7 @@
 import { pb, post } from '/src/lib/pocketbase';
 
-function get_mins(time_in){
-    if (!time_in) return 0;
-    let mins = 0;
-    let min_result = time_in.match(/(\d+) [mins|minutes]/);
-    if (min_result){
-        mins += parseInt(min_result[1]);
-    }
 
-    let hr_result = time_in.match(/(\d+) [hrs|hours|hour|hr]/);
-    if (hr_result){
-        mins += parseInt(hr_result[1]) * 60;
-    }
-    return mins;
-}
 
-async function get_ingr_ids(recipe){
-    let ingr_ids = [];
-    for (let i = 0; i < recipe.expand.ingr_list.length; i++){
-        if (!recipe.expand.ingr_list[i].removed){
-            if (recipe.expand.ingr_list[i].id){
-                const db_ingr = await pb.collection('ingredients').getOne(recipe.expand.ingr_list[i].id);
-                if (db_ingr.quantity != recipe.expand.ingr_list[i].quantity || 
-                db_ingr.ingredient != recipe.expand.ingr_list[i].ingredient || 
-                db_ingr.unit != recipe.expand.ingr_list[i].unit){
-
-                    if (recipe.expand.ingr_list[i].recipe && recipe.expand.ingr_list[i].recipe.length > 1){
-                        const remove_from_ingr = await pb.collection('ingredients').update(recipe.expand.ingr_list[i].id, {"recipe-": [recipe.expand.ingr_list[i].id]});
-                        const new_ingr_data = {
-                            "quantity": recipe.expand.ingr_list[i].quantity,
-                            "ingredient": recipe.expand.ingr_list[i].ingredient,
-                            "unit": recipe.expand.ingr_list[i].unit,
-                            "unitPlural": recipe.expand.ingr_list[i].unitPlural,
-                            "symbol": recipe.expand.ingr_list[i].symbol,
-                            "recipe": [
-                                recipe.id
-                            ]
-                        };
-                        const new_ingr = await pb.collection('ingredients').create(new_ingr_data);
-                        ingr_ids.push(new_ingr.id);
-                    } else {
-                        const update_ingr_data = {
-                            "quantity": recipe.expand.ingr_list[i].quantity,
-                            "ingredient": recipe.expand.ingr_list[i].ingredient,
-                            "unit": recipe.expand.ingr_list[i].unit,
-                            "unitPlural": recipe.expand.ingr_list[i].unitPlural,
-                            "symbol": recipe.expand.ingr_list[i].symbol,
-                            "recipe": [
-                                recipe.id
-                            ]
-                        };
-                        const update_ingr = await pb.collection('ingredients').update(recipe.expand.ingr_list[i].id, update_ingr_data);
-                        ingr_ids.push(recipe.expand.ingr_list[i].id);
-                    }
-                } else {
-                    ingr_ids.push(recipe.expand.ingr_list[i].id);
-                }
-            } else {
-                const similar_ingr = await pb.collection('ingredients').getList(1, 1, { filter: `quantity='${recipe.expand.ingr_list[i].quantity}' && unit='${recipe.expand.ingr_list[i].unit}' && ingredient="${recipe.expand.ingr_list[i].ingredient}"` });
-                if (similar_ingr.items.length){
-                    const add_to_ingr = await pb.collection('ingredients').update(similar_ingr.items[0].id, {"recipe+": [recipe.id]});
-                    ingr_ids.push(similar_ingr.items[0].id);
-                }else {
-                    const new_ingr_data = {
-                        "quantity": recipe.expand.ingr_list[i].quantity,
-                        "ingredient": recipe.expand.ingr_list[i].ingredient,
-                        "unit": recipe.expand.ingr_list[i].unit,
-                        "unitPlural": recipe.expand.ingr_list[i].unitPlural,
-                        "symbol": recipe.expand.ingr_list[i].symbol,
-                        "recipe": [
-                            recipe.id
-                        ]
-                    };
-                    const new_ingr = await pb.collection('ingredients').create(new_ingr_data);
-                    ingr_ids.push(new_ingr.id);
-                }
-            }
-        } else if (recipe.expand.ingr_list[i].id) {
-            if (recipe.expand.ingr_list[i].recipe && recipe.expand.ingr_list[i].recipe.length > 1){
-                const remove_from_ingr = await pb.collection('ingredients').update(recipe.expand.ingr_list[i].id, {"recipe-": [recipe.id]});
-            } else {
-                await pb.collection('ingredients').delete(recipe.expand.ingr_list[i].id);
-            }
-        }
-    }
-    return ingr_ids;    
-}
-
-async function get_note_ids(recipe){
-    let note_ids = [];
-    if (recipe.expand && recipe.expand.notes){
-        for (let note of recipe.expand.notes){
-            if (note.id){
-                const note_record = await pb.collection('notes').update(note.id, { "content": note.content });
-                note_ids.push(note_record.id);
-            }
-        }
-    }
-
-    return note_ids;
-}
-
-function validate(recipe){
-    let err = "";
-    if (recipe.category == "Category") err += "Please pick a category.";
-    return err;
-}
-
-async function add_new_note(note_ids, note_text){
-    if (note_text){
-        const new_note_record = await pb.collection('notes').create({ content: note_text });
-        note_ids.push(new_note_record.id);
-    }
-    return note_ids;
-}
-
-const get_url_id = async function (recipe){
-    let url_id = recipe.title.trim();
-    url_id = url_id.replaceAll(" ", "_");
-    let new_url_id = "";
-    try {
-        new_url_id = url_id;
-        let same_url_id = await pb.collection('recipes').getFirstListItem(`url_id="${new_url_id}"`);
-        let cnt = 1;
-        while (true){
-            new_url_id = url_id+`_${cnt}`;
-            same_url_id = await pb.collection('recipes').getFirstListItem(`url_id="${new_url_id}"`);
-            cnt++;
-        }
-    } catch (e){
-        return new_url_id;
-    }
-}
 
 export const update_fav_made = async function (id, col, val){
     let data;
@@ -190,7 +60,11 @@ export const update_notes = async function(notes_in, new_note_in, recipe_id){
     } else {
         return [new_note_result];
     }
-} 
+}
+
+export const delete_ingr = async function(ingr_id){
+    await pb.collection('ingredients').delete(ingr_id);
+}
 
 export const update_image_upload = async (e) => {
     const fileList = e.currentTarget.files;
@@ -249,7 +123,14 @@ export const save_recipe_new = async function(e, recipe, user_id, new_note){
 }
 
 export const update_ingr = function(id, data){
+    
     pb.collection('ingredients').update(id, data);
+}
+
+export const create_ingr = async function(data, recipe_id){
+    const ingr = await pb.collection('ingredients').create(data);
+    const recipe_update = await pb.collection('recipes').update(recipe_id, {"ingr_list+": ingr.id});
+    return ingr;
 }
 
 export const update_recipe_data = function(id, data){
