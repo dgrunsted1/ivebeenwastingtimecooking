@@ -439,12 +439,13 @@
                         </div>
                         <div class="grocery_item select-none flex md:hidden space-x-3 justify-end md:justify-start items-center {item.id == dragged_item && item.id != dragged_over ? `border border-error rounded-lg p-1` : ``} {item.id == dragged_over ? `border border-primary rounded-lg p-1` : ``}">
                             {#if status != "none"}<input type="checkbox" class="hidden md:flex checkbox checkbox-primary checkbox-lg p-1" id={item.id} bind:checked={item.checked} onchange={check_item_handle}>{/if}
-                            <div class="flex"
+                            <div class="flex flex-col"
                                 ontouchstart={touch_start}
                                 ontouchmove={touch_move}
                                 ontouchend={touch_end}
                                 ontouchcancel={touch_cancel}>
                                 <p class="text {item.id == dragged_item || item.id == dragged_over ? `text-xl` : ``}">{ingrs_to_string([item])}</p>
+                                <p class="text-neutral text-xs text-center">{get_recipe_name(item)}</p>
                             </div>
                             {#if status != "none"}<input type="checkbox" class="md:hidden checkbox checkbox-primary checkbox-lg p-1" id={item.id} bind:checked={item.checked} onchange={check_item_handle}>{/if}
                         </div>
