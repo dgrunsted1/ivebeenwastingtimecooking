@@ -121,6 +121,20 @@
         e.srcElement.parentNode.parentNode.blur();
     }
 
+    const reorder_list = (e) => {
+        let checked = [];
+        let unchecked = [];
+        for (let i = 0; i < grocery_list.length; i++){
+            if (grocery_list[i].checked){
+                checked.push(grocery_list[i]);
+            } else {
+                unchecked.push(grocery_list[i]);
+            }
+        }
+        grocery_list = unchecked.concat(checked);
+        e.srcElement.parentNode.parentNode.blur();
+    }
+
     const add_new_item = async () => {
         if (!new_item.name) return;
         const data = {
@@ -476,6 +490,7 @@
                 {/if}
             </button>
             {#if is_owner}<button id="uncheck" class="btn btn-xs btn-primary" onclick={uncheck_list}>uncheck</button>{/if}
+            {#if is_owner}<button id="reorder" class="btn btn-xs btn-primary" onclick={reorder_list}>reorder</button>{/if}
             {#if is_owner}<button id="reset" class="btn btn-xs btn-primary" onclick={reset_list}>reset</button>{/if}
             {#if is_owner}<button class="btn btn-xs btn-primary" onclick={share_list}>share</button>{/if}
             {#if interactable}<button id="edit" class="btn btn-xs btn-primary" onclick={edit_groceries}><EditIcon/></button>{/if}
@@ -577,6 +592,9 @@
                             </button></li>
                             <li class="btn btn-sm btn-primary p-0"><button class="p-0 px-1" onclick={uncheck_list}>
                                 uncheck
+                            </button></li>
+                            <li class="btn btn-sm btn-primary p-0"><button class="p-0 px-1" onclick={reorder_list}>
+                                reorder
                             </button></li>
                             <li class="btn btn-sm btn-primary p-0"><button class="p-0 px-1" onclick={reset_list}>
                                 reset
