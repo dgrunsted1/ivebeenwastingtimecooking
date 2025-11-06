@@ -8,9 +8,6 @@
     import Plus from "/src/lib/icons/Plus.svelte";
     import Clear from "/src/lib/icons/Clear.svelte";
 
-
-
-
     let { 
         grocery_list = $bindable([]), 
         status = $bindable(), 
@@ -36,6 +33,15 @@
     let scrollInterval = null;
     const EDGE_THRESHOLD = 60;
     let isAutoScrolling = true;
+
+    // Swipe-to-delete states
+    let swipeStates = $state({});
+    let swipeStartX = null;
+    let swipeStartY = null;
+    let currentSwipeId = null;
+    const SWIPE_THRESHOLD = 50; // Minimum distance for swipe
+    const DELETE_BUTTON_WIDTH = 80; // Width of delete button area
+
     const copy_to_clipboard = () => {
         let copy_text = "";
         let first = true;
@@ -78,6 +84,8 @@
             if (delete_item){
                 grocery_list = temp_arr;
                 delete_grocery_item(id);
+                // Reset swipe state after deletion
+                delete swipeStates[id];
             }
         }
     }
@@ -242,7 +250,69 @@
             dragged_over = "";
             dragged_item = "";
         }
-    } 
+    }
+
+    // Swipe-to-delete handlers
+    const swipe_start = (e, itemId) => {
+        swipeStartX = e.touches[0].clientX;
+        swipeStartY = e.touches[0].clientY;
+        currentSwipeId = itemId;
+        
+        // Initialize swipe state if it doesn't exist
+        if (!swipeStates[itemId]) {
+            swipeStates[itemId] = { translateX: 0, isOpen: false };
+        }
+    }
+
+    const swipe_move = (e, itemId) => {
+        if (swipeStartX === null || currentSwipeId !== itemId) return;
+        
+        const currentX = e.touches[0].clientX;
+        const currentY = e.touches[0].clientY;
+        const diffX = swipeStartX - currentX;
+        const diffY = Math.abs(swipeStartY - currentY);
+        
+        // Only handle horizontal swipes (not vertical scrolling)
+        if (diffY > 10 && Math.abs(diffX) < diffY) {
+            return;
+        }
+        
+        // Prevent vertical scrolling during horizontal swipe
+        if (Math.abs(diffX) > 10) {
+            e.preventDefault();
+        }
+        
+        // Only allow left swipes (positive diffX)
+        if (diffX > 0) {
+            const translateX = Math.min(diffX, DELETE_BUTTON_WIDTH);
+            swipeStates[itemId] = { translateX, isOpen: false };
+        } else if (swipeStates[itemId].isOpen) {
+            // Allow closing with right swipe
+            const translateX = Math.max(0, DELETE_BUTTON_WIDTH + diffX);
+            swipeStates[itemId] = { translateX, isOpen: translateX > 0 };
+        }
+    }
+
+    const swipe_end = (e, itemId) => {
+        if (swipeStartX === null || currentSwipeId !== itemId) return;
+        
+        const currentState = swipeStates[itemId];
+        
+        // Determine if swipe should open or close
+        if (currentState.translateX > SWIPE_THRESHOLD) {
+            swipeStates[itemId] = { translateX: DELETE_BUTTON_WIDTH, isOpen: true };
+        } else {
+            swipeStates[itemId] = { translateX: 0, isOpen: false };
+        }
+        
+        swipeStartX = null;
+        swipeStartY = null;
+        currentSwipeId = null;
+    }
+
+    const close_swipe = (itemId) => {
+        swipeStates[itemId] = { translateX: 0, isOpen: false };
+    }
 
     const touch_start = (e) => {
         // Store the initial touch position
@@ -297,7 +367,7 @@
                     scrollInterval = null;
                     isAutoScrolling = false;
                 }
-            }, 16); // ~60fps
+            }, 16);
         } else if (touchY > scrollRect.bottom - EDGE_THRESHOLD) {
             isAutoScrolling = true;
             scrollInterval = setInterval(() => {
@@ -309,7 +379,7 @@
                     scrollInterval = null;
                     isAutoScrolling = false;
                 }
-            }, 16); // ~60fps
+            }, 16);
         }
     }
 
@@ -424,6 +494,7 @@
                             {#if status != "none"}<button class="btn btn-sm p-1 btn-accent" onclick={() => remove_item(item.id)}><DeleteIcon/></button>{/if}
                         </div>
                     {:else}
+                        <!-- Desktop version with drag-and-drop -->
                         <!-- svelte-ignore a11y_no_static_element_interactions -->
                         <div class="grocery_item select-none hidden md:flex space-x-3 justify-end md:justify-start items-center {item.id == dragged_item && item.id != dragged_over ? `border border-error rounded-lg p-1` : ``} {item.id == dragged_over ? `border border-primary rounded-lg p-1` : ``}"
                             draggable="true"
@@ -435,19 +506,52 @@
                             <div class="flex">
                                 <div class="text flex space-x-2{item.id == dragged_item || item.id == dragged_over ? ` text-xl` : ``}"><p>{ingrs_to_string([item])}</p><p class="text-neutral text-xs">{get_recipe_name(item)}</p></div>
                             </div>
+                            {#if status != "none"}
+                                <div class="hidden md:flex justify-end h-full items-center flex-grow">
+                                    <button class="btn btn-sm max-h-full btn-square flex btn-error" onclick={() => remove_item(item.id)}>
+                                        <DeleteIcon/>
+                                    </button>
+                                </div>
+                            {/if}
                             {#if status != "none"}<input type="checkbox" class="md:hidden checkbox checkbox-primary checkbox-lg p-1" id={item.id} bind:checked={item.checked} onchange={check_item_handle}>{/if}
                         </div>
-                        <div class="grocery_item select-none flex md:hidden space-x-3 justify-end md:justify-start items-center {item.id == dragged_item && item.id != dragged_over ? `border border-error rounded-lg p-1` : ``} {item.id == dragged_over ? `border border-primary rounded-lg p-1` : ``}">
-                            {#if status != "none"}<input type="checkbox" class="hidden md:flex checkbox checkbox-primary checkbox-lg p-1" id={item.id} bind:checked={item.checked} onchange={check_item_handle}>{/if}
-                            <div class="flex flex-col"
-                                ontouchstart={touch_start}
-                                ontouchmove={touch_move}
-                                ontouchend={touch_end}
-                                ontouchcancel={touch_cancel}>
-                                <p class="text {item.id == dragged_item || item.id == dragged_over ? `text-xl` : ``}">{ingrs_to_string([item])}</p>
-                                <p class="text-neutral text-xs text-center">{get_recipe_name(item)}</p>
+                        
+                        <!-- Mobile version with swipe-to-delete -->
+                        <div class="grocery_item select-none flex md:hidden relative content-center overflow-hidden {item.id == dragged_item && item.id != dragged_over ? `border border-error rounded-lg` : ``} {item.id == dragged_over ? `border border-primary rounded-lg` : ``}">
+                            <!-- Delete button background -->
+                             <div class="absolute right-0 top-0 bottom-0 flex justify-center h-full items-center">
+                                <button class="btn btn-sm max-h-full btn-square flex btn-error" onclick={() => remove_item(item.id)}>
+                                    <DeleteIcon/>
+                                </button>
+                             </div>
+                            
+                            
+                            <!-- Swipeable content -->
+                            <!-- svelte-ignore a11y_no_static_element_interactions -->
+                            <div class="flex space-x-3 justify-end items-center bg-base-100 w-full transition-transform duration-200 ease-out"
+                                style="transform: translateX(-{swipeStates[item.id]?.translateX || 0}px)"
+                                ontouchstart={(e) => swipe_start(e, item.id)}
+                                ontouchmove={(e) => swipe_move(e, item.id)}
+                                ontouchend={(e) => swipe_end(e, item.id)}>
+                                {#if status != "none"}<input type="checkbox" class="hidden md:flex checkbox checkbox-primary checkbox-lg p-1" id={item.id} bind:checked={item.checked} onchange={check_item_handle}>{/if}
+                                <div class="flex flex-col flex-1 py-1"
+                                    ontouchstart={touch_start}
+                                    ontouchmove={touch_move}
+                                    ontouchend={touch_end}
+                                    ontouchcancel={touch_cancel}>
+                                    <p class="text {item.id == dragged_item || item.id == dragged_over ? `text-xl` : ``}">{ingrs_to_string([item])}</p>
+                                    <p class="text-neutral text-xs text-center">{get_recipe_name(item)}</p>
+                                </div>
+                                {#if status != "none"}<input type="checkbox" class="md:hidden checkbox checkbox-primary checkbox-lg p-1" id={item.id} bind:checked={item.checked} onchange={check_item_handle}>{/if}
                             </div>
-                            {#if status != "none"}<input type="checkbox" class="md:hidden checkbox checkbox-primary checkbox-lg p-1" id={item.id} bind:checked={item.checked} onchange={check_item_handle}>{/if}
+                            
+                            <!-- Delete button overlay (clickable when swiped) -->
+                            {#if swipeStates[item.id]?.isOpen}
+                                <!-- svelte-ignore a11y_no_static_element_interactions -->
+                                <div class="absolute right-0 top-0 bottom-0 w-20 flex items-center justify-center cursor-pointer z-10"
+                                    onclick={() => remove_item(item.id)}>
+                                </div>
+                            {/if}
                         </div>
                     {/if}
                     {#if i != grocery_list.length-1}
@@ -508,7 +612,6 @@
         <div class="flex items-center m-2 justify-end space-x-1">
             <div class="modal-action mt-0 w-full">
                 <form method="dialog" class="flex w-full justify-between items-center">
-                    <!-- if there is a button in form, it will close the modal -->
                     <button class="btn btn-sm btn-circle content-center" onclick={close_modal}><Clear size="w-10 h-10" color="fill-error/75"/></button>
                     {#if !dragged_item}
                         <button id="enter_click" class="btn btn-sm btn-primary" onclick={add_new_item}>Add & Close</button>
