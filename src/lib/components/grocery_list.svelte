@@ -563,14 +563,6 @@
                                 </div>
                                 {#if status != "none"}<input type="checkbox" class="md:hidden checkbox checkbox-primary checkbox-lg p-1" id={item.id} bind:checked={item.checked} onchange={check_item_handle}>{/if}
                             </div>
-                            
-                            <!-- Delete button overlay (clickable when swiped) -->
-                            {#if swipeStates[item.id]?.isOpen}
-                                <!-- svelte-ignore a11y_no_static_element_interactions -->
-                                <div class="absolute right-0 top-0 bottom-0 w-20 flex items-center justify-center cursor-pointer z-10"
-                                    onclick={() => remove_item(item.id)}>
-                                </div>
-                            {/if}
                         </div>
                     {/if}
                     {#if i != grocery_list.length-1}
