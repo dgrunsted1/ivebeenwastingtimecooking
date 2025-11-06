@@ -201,7 +201,9 @@
 
     async function reset_list(){
         grocery_list = get_grocery_list(todays_menu, todays_menu.servings, todays_menu.sub_recipes);
-        grocery_list.id = await create_grocery_list(grocery_list, todays_menu.id);
+        const temp = await create_grocery_list(grocery_list, todays_menu.id);
+        grocery_list = temp.list
+        grocery_list.id = temp.id
     }
 
     async function toggle_made(e){
