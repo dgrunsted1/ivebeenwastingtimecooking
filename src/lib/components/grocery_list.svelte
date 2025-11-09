@@ -466,9 +466,13 @@
 
     const get_recipe_name = (item) => {
         if (item.expand && item.expand.ingrs && item.expand.ingrs.length > 0 && item.expand.ingrs[0].expand && item.expand.ingrs[0].expand.recipe && item.expand.ingrs[0].expand.recipe.length > 0){
-            const recipe = item.expand.ingrs[0].expand.recipe[0];
-            if (recipe){
-                return recipe.title;
+            let recipe_titles = "";
+            for (let i = 0; i < item.expand.ingrs.length; i++){
+                if (i == 0) recipe_titles = item.expand.ingrs[i].expand.recipe[0].title;
+                else if (!recipe_titles.includes(item.expand.ingrs[i].expand.recipe[0].title)) recipe_titles += " + " + item.expand.ingrs[i].expand.recipe[0].title;
+            }
+            if (recipe_titles){
+                return recipe_titles;
             }
         }
         return "";

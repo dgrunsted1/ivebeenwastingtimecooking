@@ -55,7 +55,6 @@
         fave = getMostFrequent(recipe_log_result.items);
         avg_recipes = get_avg_recipes(recipe_log_result.items);
         most_freq_cuisine = get_most_frequent_cuisine(recipe_log_result.items);
-        console.log(most_freq_cuisine);
         const menu_log_result = await pb.collection('menu_log').getList(1, 250, {
             filter: `user = "${$currentUser.id}" && date_completed > "${last_month()}"`,
             expand: `menu`,
@@ -97,8 +96,6 @@
                 maxItem = item.expand.recipe.cuisine;
             }
         }
-        console.log(frequencyMap);
-        console.log(maxCount);
         return maxItem;
     }
 
