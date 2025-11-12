@@ -285,7 +285,6 @@ const verbs = [
 	];
 
 export const merge_v1 = function(ingrs) {
-	console.log("Merging", ingrs);
     let grocery_list = [];
     let skipped = [];
 	for(let item of ingrs){
@@ -341,7 +340,6 @@ export const merge_v1 = function(ingrs) {
 				tmp.name = item.name;
 			}
 			grocery_list.splice(grocery_list.indexOf(match), 1);
-			console.log("combining", match, "with", item, "to get", tmp);
 			grocery_list.push(tmp);
 		}else {
 			let tmp = {};
@@ -691,7 +689,6 @@ const areUnitsCompatible = (unit1, unit2) => {
 };
 
 export const merge = function(ingrs) {
-//   console.log("Merging", ingrs);
   let grocery_list = [];
   for (let item of ingrs) {
     if (!item.name) continue;

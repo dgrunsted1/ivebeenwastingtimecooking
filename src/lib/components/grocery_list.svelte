@@ -105,6 +105,14 @@
         }, 500);
     }
 
+    const edit_item_modal = (e) => {
+        const id = e.currentTarget.id;
+        const updated_item = grocery_list.filter(item => item.id == id)[0];
+        new_item = updated_item;
+        my_modal_1.showModal();
+        document.getElementById("modal_ingr").focus();
+    }
+
     const reset_list = (e) => {
         let reset_list = confirm("Are you sure you want to reset your grocery list?");
         if (reset_list){
@@ -151,6 +159,18 @@
         grocery_list.unshift(record);
         new_item = {qty: null, unit: "", name: ""};
         document.getElementById("modal_ingr").focus();
+    }
+
+    const update_item = async () => {
+        if (!new_item.name) return;
+        const data = {
+            "qty": new_item.qty,
+            "unit": new_item.unit,
+            "name": new_item.name
+        };
+        const record = await pb.collection('grocery_items').update(new_item.id, data);
+        new_item = {qty: null, unit: "", name: ""};
+        my_modal_1.close();
     }
 
     const edit_groceries = (e) => {
@@ -256,6 +276,8 @@
         if (e.key == "Enter" && !merge_disabled()){
             if (dragged_item){
                 merge_items(e);
+            }else if (new_item.id) {
+                update_item(e);
             } else {
                 add_new_item(e);
             }  
@@ -516,11 +538,12 @@
                     {:else}
                         <!-- Desktop version with drag-and-drop -->
                         <!-- svelte-ignore a11y_no_static_element_interactions -->
-                        <div class="grocery_item select-none hidden md:flex space-x-3 justify-end md:justify-start items-center {item.id == dragged_item && item.id != dragged_over ? `border border-error rounded-lg p-1` : ``} {item.id == dragged_over ? `border border-primary rounded-lg p-1` : ``}"
+                        <div id={item.id} class="grocery_item select-none hidden md:flex space-x-3 justify-end md:justify-start items-center {item.id == dragged_item && item.id != dragged_over ? `border border-error rounded-lg p-1` : ``} {item.id == dragged_over ? `border border-primary rounded-lg p-1` : ``}"
                             draggable="true"
                             ondragover={drag_over}
                             ondragstart={drag_start}
                             ondragend={drag_end}
+                            ondblclick={edit_item_modal}
                         >
                             {#if status != "none"}<input type="checkbox" class="hidden md:flex checkbox checkbox-primary checkbox-lg p-1" id={item.id} bind:checked={item.checked} onchange={check_item_handle}>{/if}
                             <div class="flex">
@@ -554,11 +577,12 @@
                                 ontouchmove={(e) => swipe_move(e, item.id)}
                                 ontouchend={(e) => swipe_end(e, item.id)}>
                                 {#if status != "none"}<input type="checkbox" class="hidden md:flex checkbox checkbox-primary checkbox-lg p-1" id={item.id} bind:checked={item.checked} onchange={check_item_handle}>{/if}
-                                <div class="flex flex-col flex-1 py-1 flex-shrink"
+                                <div id={item.id} class="flex flex-col flex-1 py-1 flex-shrink"
                                     ontouchstart={touch_start}
                                     ontouchmove={touch_move}
                                     ontouchend={touch_end}
-                                    ontouchcancel={touch_cancel}>
+                                    ontouchcancel={touch_cancel}
+                                    ondblclick={edit_item_modal}>
                                     <p class="text w-fit {item.id == dragged_item || item.id == dragged_over ? `text-xl` : ``}">{ingrs_to_string([item])}</p>
                                     <p class="text-neutral text-xs text-center w-fit">{get_recipe_name(item)}</p>
                                 </div>
@@ -627,15 +651,17 @@
         <div class="flex items-center m-2 justify-end space-x-1">
             <div class="modal-action mt-0 w-full">
                 <form method="dialog" class="flex w-full justify-between items-center">
-                    <button class="btn btn-sm btn-circle content-center" onclick={close_modal}><Clear size="w-10 h-10" color="fill-error/75"/></button>
-                    {#if !dragged_item}
+                    <button type="button" class="btn btn-sm btn-circle content-center" onclick={close_modal}><Clear size="w-10 h-10" color="fill-error/75"/></button>
+                    {#if !dragged_item && !new_item.id}
                         <button id="enter_click" class="btn btn-sm btn-primary" onclick={add_new_item}>Add & Close</button>
+                    {:else if new_item.id}
+                        <button id="enter_click" class="btn btn-sm btn-primary" onclick={update_item}>Save</button>
                     {:else}
                         <button id="enter_click" class="btn btn-sm btn-primary" onclick={merge_items} disabled={merge_disabled()}>Merge</button>
                     {/if}
                 </form>
             </div>
-            {#if !dragged_item}
+            {#if !dragged_item && ! new_item.id}
                 <button class="btn btn-primary btn-sm" onclick={add_new_item}>add</button>
             {/if}
         </div>

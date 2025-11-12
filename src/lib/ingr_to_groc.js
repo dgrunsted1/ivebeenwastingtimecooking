@@ -27,16 +27,12 @@ nlp.extend({
 });
 
 export function get_grocery_item_name(name){
-    // console.log("----------------------------------");
-    // console.log(name);
     // Clean up the input
     let cleaned = name.toLowerCase().trim();
 
     let text = cleaned.replace(/\([^)]*\)/g, '');
     let texta = text.replace(/["""''½⅓⅔¼¾⅛⅜⅝⅞]/g, '');
     let textb = texta.replace(/[\d+|.\d+]/g, '');
-    // text = text.replace(/^\-/g, '');
-    // console.log(text);
     let textc = nlp(textb).nouns().out('text');
     let textd = textc.replace(/[,|;|.](.*)/g, '');
     let removed = textd;
@@ -47,7 +43,6 @@ export function get_grocery_item_name(name){
     descriptiveWords.forEach(word => {
       removed = removed.replace(new RegExp(`\\b${word}\\b`, 'gi'), '');
     });
-    // console.log(text);
     removed = removed.replace(/\s\s+/g, ' ');
     const cleanDoc = nlp(removed);
     let mainNoun = cleanDoc.out('text').trim();
