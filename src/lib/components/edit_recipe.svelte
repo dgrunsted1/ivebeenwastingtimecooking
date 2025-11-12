@@ -218,10 +218,7 @@
     const handle_update_ingr_data = function(e){
         clearTimeout(delay_timer);
         delay_timer = setTimeout(() => {
-            console.log(e.target);
-            console.log(e.target.dataset.type);
             const data = {[e.target.dataset.type]: e.target.value};
-            console.log(data);
             update_ingr(e.target.id, data);
         }, 1000);
         
