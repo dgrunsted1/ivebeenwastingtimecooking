@@ -685,7 +685,6 @@ const areUnitsCompatible = (unit1, unit2) => {
 export const merge = function(ingrs) {
 //   console.log("Merging", ingrs);
   let grocery_list = [];
-  
   for (let item of ingrs) {
     if (!item.name) continue;
     
@@ -742,8 +741,7 @@ export const merge = function(ingrs) {
       
       // Replace the existing item
       grocery_list[matchIndex] = mergedItem;
-      console.log("Combining", bestMatch, "with", item, "to get", mergedItem);
-      
+
     } else {
       // Add as new item
       const newItem = {
@@ -761,6 +759,5 @@ export const merge = function(ingrs) {
       grocery_list.push(newItem);
     }
   }
-  
   return grocery_list;
 };
