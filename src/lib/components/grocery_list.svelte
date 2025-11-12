@@ -110,7 +110,9 @@
         const updated_item = grocery_list.filter(item => item.id == id)[0];
         new_item = updated_item;
         my_modal_1.showModal();
-        document.getElementById("modal_ingr").focus();
+        delay_timer = setTimeout(function() {
+            document.getElementById("modal_ingr").focus();
+        }, 100);
     }
 
     const reset_list = (e) => {
@@ -185,7 +187,9 @@
 
     const add_item_modal = () => {
         my_modal_1.showModal();
-        document.getElementById("modal_ingr").focus();
+        delay_timer = setTimeout(function() {
+            document.getElementById("modal_ingr").focus();
+        }, 100);
     }
 
     const share_list = (e) => {
