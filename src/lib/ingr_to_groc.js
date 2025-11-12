@@ -51,10 +51,8 @@ export function get_grocery_item_name(name){
     removed = removed.replace(/\s\s+/g, ' ');
     const cleanDoc = nlp(removed);
     let mainNoun = cleanDoc.out('text').trim();
-    if (mainNoun === '' && name) {
-        console.log("name", name, "cleaned", cleaned, "text", text, "texta", texta, "textb", textb, "textc", textc, "textd", textd, "removed", removed, nlp(name).nouns().out('text'))
-    }
-    return mainNoun;
+    if (mainNoun) return mainNoun;
+    return name;
 }
 
 export function merge_grocery_items(ingr_list){
