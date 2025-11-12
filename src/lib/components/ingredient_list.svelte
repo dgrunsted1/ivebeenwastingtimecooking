@@ -13,7 +13,7 @@
         <div class="grocery_list {height} overflow-y-auto px-2 py-4">
             {#if grocery_list.length > 0}
                 {#each grocery_list as item, i}
-                        <p class="text">{ingrs_to_string([item])}</p>
+                        <p class="text ml-2 md:ml-5">{ingrs_to_string([item])}</p>
                     {#if i != grocery_list.length-1}
                         <div class="divider my-0 h-3"></div>
                     {/if}
