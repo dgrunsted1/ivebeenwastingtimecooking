@@ -292,6 +292,14 @@ export const merge = function(ingrs) {
 		let conv_match = false;
 		if (grocery_list) {
 			for (let i = 0; i < grocery_list.length; i++) {
+				/**
+				 * checks every ingredient against every item in the grocery list
+				 * the grocery list starts with no items
+				 * if:
+				 * ingredient and grocery list item both have a unit and qty || both dont have either
+				 * &&
+				 * the names match exactly || the name of one contains the other but not if the matched word contains "un+", "+ed", "sugar" and "powdered sugar"  
+				 */
 				if (((item.unit && item.qty && grocery_list[i].unit && grocery_list[i].qty) || (!item.unit && !item.qty && !grocery_list[i].unit && !grocery_list[i].qty)) && ((strip_parens(grocery_list[i].name) === strip_parens(item.name)) || 
 				   (grocery_list[i].name.includes(item.name) && !grocery_list[i].name.includes("un" + item.name) && !grocery_list[i].name.includes(item.name + "ed") && grocery_list[i].name !== "sugar" && grocery_list[i].name !== "powdered sugar") || 
 				   (item.name.includes(grocery_list[i].name) && !item.name.includes("un" + grocery_list[i].name) && !item.name.includes(grocery_list[i].name + "ed") && item.name !== "sugar" && item.name !== "powdered sugar"))) {
