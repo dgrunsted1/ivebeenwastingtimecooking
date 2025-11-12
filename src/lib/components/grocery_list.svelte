@@ -468,8 +468,9 @@
         if (item.expand && item.expand.ingrs && item.expand.ingrs.length > 0 && item.expand.ingrs[0].expand && item.expand.ingrs[0].expand.recipe && item.expand.ingrs[0].expand.recipe.length > 0){
             let recipe_titles = "";
             for (let i = 0; i < item.expand.ingrs.length; i++){
-                if (i == 0) recipe_titles = item.expand.ingrs[i].expand.recipe[0].title;
-                else if (!recipe_titles.includes(item.expand.ingrs[i].expand.recipe[0].title)) recipe_titles += " + " + item.expand.ingrs[i].expand.recipe[0].title;
+                const title = item.expand.ingrs[i].expand.recipe[0].title.split(' ').slice(0, 3).join(' ');
+                if (i == 0) recipe_titles = title;
+                else if (!recipe_titles.includes(item.expand.ingrs[i].expand.recipe[0].title)) recipe_titles += " + " + title;
             }
             if (recipe_titles){
                 return recipe_titles;
