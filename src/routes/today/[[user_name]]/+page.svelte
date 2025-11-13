@@ -64,24 +64,16 @@
             for (let i = 0; i < grocery_list.length; i++){
                 pb.realtime.subscribe(`grocery_items/${grocery_list[i].id}`, async (data) => {
                     if (data.action != "delete"){
-                        const tmp = await pb.collection('ingredients').getList(1, 50, {
-                            filter: `id = '${data.record.ingrs.join(`' || id='`)}'`
-                        });
                         grocery_list = grocery_list.map(item => {
                             if (item.id === data.record.id) {
-                                return {
-                                    ...data.record,
-                                    expand: {
-                                        ingrs: tmp.items
-                                    }
-                                };
+                                return data.record;
                             }
                             return item;
                         });
                     } else {
                         grocery_list = grocery_list.filter(item => item.id != data.record.id);
                     }
-                });
+                }, {expand: `ingrs, ingrs.recipe`});
                 if (grocery_list[i].checked){
                     checked.push(grocery_list[i]);
                 } else {

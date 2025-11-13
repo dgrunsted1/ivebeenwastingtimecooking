@@ -603,7 +603,7 @@
     </div>
     <div id="header" class="flex md:hidden justify-between items-center mt-0">
         {#if grocery_list.length > 0 && interactable}
-            <div>
+            <div class="mx-1">
                 {#if interactable}<div id="update_status" class="text-xs">{status}</div>{/if}
                 <div id="count" class="text-xs text-nowrap">{grocery_list.reduce((count, item) => count + (item.checked ? 0 : 1), 0)}/{grocery_list.length} Items</div>
             </div>
