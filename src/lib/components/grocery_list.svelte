@@ -1,6 +1,5 @@
 <script>
     import DeleteIcon from "/src/lib/icons/DeleteIcon.svelte";
-    import EditIcon from "/src/lib/icons/EditIcon.svelte";
     import CheckMark from "/src/lib/icons/CheckMark.svelte";
     import { delete_grocery_item, ingrs_to_string, update_grocery_item } from '/src/lib/groceries.js'
     import { combine } from '/src/lib/merge_ingredients.js'
@@ -16,7 +15,6 @@
         reset_grocery_list,
         check_grocery_item
     } = $props();
-    let edit = $state(false);
     
     let delay_timer;
     let just_copied = $state(false);
@@ -173,11 +171,6 @@
         const record = await pb.collection('grocery_items').update(new_item.id, data);
         new_item = {qty: null, unit: "", name: ""};
         my_modal_1.close();
-    }
-
-    const edit_groceries = (e) => {
-        edit = !edit;
-        e.srcElement.parentNode.parentNode.blur();
     }
 
     const tool_tip_string = (item) => {
@@ -524,7 +517,6 @@
             {#if is_owner}<button id="reorder" class="btn btn-xs btn-primary" onclick={reorder_list}>reorder</button>{/if}
             {#if is_owner}<button id="reset" class="btn btn-xs btn-primary" onclick={reset_list}>reset</button>{/if}
             {#if is_owner}<button class="btn btn-xs btn-primary" onclick={share_list}>share</button>{/if}
-            {#if interactable}<button id="edit" class="btn btn-xs btn-primary" onclick={edit_groceries}><EditIcon/></button>{/if}
             {#if interactable}<button id="add" class="btn btn-xs btn-primary" onclick={add_item_modal}><Plus/></button>{/if}
         {/if}
     </div>
@@ -532,68 +524,60 @@
         <div id="list" class="grocery_list h-[calc(100svh-155px)] md:h-[calc(100svh-105px)] overflow-y-auto px-2 py-4 border-t border-b border-base-300 md:border-none">
             {#if grocery_list.length > 0}
                 {#each grocery_list as item, i}
-                    {#if edit}
-                        <div id={item.id} class="grocery_item flex relative my-1 tooltip {(i > 2) ? "tooltip-top": "tooltip-bottom"} space-x-2 justify-center items-center" data-tip={tool_tip_string(item)}>
-                            <input type="text" class="amount input input-bordered input-xs px-1 mr-1 w-8 text-center h-fit" bind:value={item.qty} onkeyup={edit_item}>
-                            <input type="text" class="unit input input-bordered input-xs px-1 mr-1 w-20 text-center h-fit" bind:value={item.unit} onkeyup={edit_item}>
-                            <textarea class="name input input-bordered input-xs px-1 mr-1 w-3/4 h-fit" bind:value={item.name} onkeyup={edit_item} bind:this={item.input}></textarea>
-                            {#if status != "none"}<button class="btn btn-sm p-1 btn-accent" onclick={() => remove_item(item.id)}><DeleteIcon/></button>{/if}
+                    
+                    <!-- Desktop version with drag-and-drop -->
+                    <!-- svelte-ignore a11y_no_static_element_interactions -->
+                    <div id={item.id} class="grocery_item select-none hidden md:flex space-x-3 justify-end md:justify-start items-center {item.id == dragged_item && item.id != dragged_over ? `border border-error rounded-lg p-1` : ``} {item.id == dragged_over ? `border border-primary rounded-lg p-1` : ``}"
+                        draggable="true"
+                        ondragover={drag_over}
+                        ondragstart={drag_start}
+                        ondragend={drag_end}
+                        ondblclick={edit_item_modal}
+                    >
+                        {#if status != "none"}<input type="checkbox" class="hidden md:flex checkbox checkbox-primary checkbox-lg p-1" id={item.id} bind:checked={item.checked} onchange={check_item_handle}>{/if}
+                        <div class="flex">
+                            <div class="text flex space-x-2{item.id == dragged_item || item.id == dragged_over ? ` text-xl` : ``}"><p>{ingrs_to_string([item])}</p><p class="text-neutral text-xs content-center">{get_recipe_name(item)}</p></div>
                         </div>
-                    {:else}
-                        <!-- Desktop version with drag-and-drop -->
-                        <!-- svelte-ignore a11y_no_static_element_interactions -->
-                        <div id={item.id} class="grocery_item select-none hidden md:flex space-x-3 justify-end md:justify-start items-center {item.id == dragged_item && item.id != dragged_over ? `border border-error rounded-lg p-1` : ``} {item.id == dragged_over ? `border border-primary rounded-lg p-1` : ``}"
-                            draggable="true"
-                            ondragover={drag_over}
-                            ondragstart={drag_start}
-                            ondragend={drag_end}
-                            ondblclick={edit_item_modal}
-                        >
-                            {#if status != "none"}<input type="checkbox" class="hidden md:flex checkbox checkbox-primary checkbox-lg p-1" id={item.id} bind:checked={item.checked} onchange={check_item_handle}>{/if}
-                            <div class="flex">
-                                <div class="text flex space-x-2{item.id == dragged_item || item.id == dragged_over ? ` text-xl` : ``}"><p>{ingrs_to_string([item])}</p><p class="text-neutral text-xs content-center">{get_recipe_name(item)}</p></div>
-                            </div>
-                            {#if status != "none"}
-                                <div class="hidden md:flex justify-end h-full items-center flex-grow">
-                                    <button class="btn btn-sm max-h-full btn-square flex btn-error" onclick={() => remove_item(item.id)}>
-                                        <DeleteIcon/>
-                                    </button>
-                                </div>
-                            {/if}
-                            {#if status != "none"}<input type="checkbox" class="md:hidden checkbox checkbox-primary checkbox-lg p-1" id={item.id} bind:checked={item.checked} onchange={check_item_handle}>{/if}
-                        </div>
-                        
-                        <!-- Mobile version with swipe-to-delete -->
-                        <div class="grocery_item select-none flex md:hidden relative content-center overflow-hidden {item.id == dragged_item && item.id != dragged_over ? `border border-error rounded-lg` : ``} {item.id == dragged_over ? `border border-primary rounded-lg` : ``}">
-                            <!-- Delete button background -->
-                             <div class="absolute right-0 top-0 bottom-0 flex justify-center h-full items-center">
+                        {#if status != "none"}
+                            <div class="hidden md:flex justify-end h-full items-center flex-grow">
                                 <button class="btn btn-sm max-h-full btn-square flex btn-error" onclick={() => remove_item(item.id)}>
                                     <DeleteIcon/>
                                 </button>
-                             </div>
-                            
-                            
-                            <!-- Swipeable content -->
-                            <!-- svelte-ignore a11y_no_static_element_interactions -->
-                            <div class="flex space-x-3 justify-end items-center bg-base-100 w-full transition-transform duration-200 ease-out"
-                                style="transform: translateX(-{swipeStates[item.id]?.translateX || 0}px)"
-                                ontouchstart={(e) => swipe_start(e, item.id)}
-                                ontouchmove={(e) => swipe_move(e, item.id)}
-                                ontouchend={(e) => swipe_end(e, item.id)}>
-                                {#if status != "none"}<input type="checkbox" class="hidden md:flex checkbox checkbox-primary checkbox-lg p-1" id={item.id} bind:checked={item.checked} onchange={check_item_handle}>{/if}
-                                <div id={item.id} class="flex flex-col flex-1 py-1 flex-shrink"
-                                    ontouchstart={touch_start}
-                                    ontouchmove={touch_move}
-                                    ontouchend={touch_end}
-                                    ontouchcancel={touch_cancel}
-                                    ondblclick={edit_item_modal}>
-                                    <p class="text w-fit {item.id == dragged_item || item.id == dragged_over ? `text-xl` : ``}">{ingrs_to_string([item])}</p>
-                                    <p class="text-neutral text-xs text-center w-fit">{get_recipe_name(item)}</p>
-                                </div>
-                                {#if status != "none"}<input type="checkbox" class="md:hidden checkbox checkbox-primary checkbox-lg p-1" id={item.id} bind:checked={item.checked} onchange={check_item_handle}>{/if}
                             </div>
+                        {/if}
+                        {#if status != "none"}<input type="checkbox" class="md:hidden checkbox checkbox-primary checkbox-lg p-1" id={item.id} bind:checked={item.checked} onchange={check_item_handle}>{/if}
+                    </div>
+                    
+                    <!-- Mobile version with swipe-to-delete -->
+                    <div class="grocery_item select-none flex md:hidden relative content-center overflow-hidden {item.id == dragged_item && item.id != dragged_over ? `border border-error rounded-lg` : ``} {item.id == dragged_over ? `border border-primary rounded-lg` : ``}">
+                        <!-- Delete button background -->
+                            <div class="absolute right-0 top-0 bottom-0 flex justify-center h-full items-center">
+                            <button class="btn btn-sm max-h-full btn-square flex btn-error" onclick={() => remove_item(item.id)}>
+                                <DeleteIcon/>
+                            </button>
+                            </div>
+                        
+                        
+                        <!-- Swipeable content -->
+                        <!-- svelte-ignore a11y_no_static_element_interactions -->
+                        <div class="flex space-x-3 justify-end items-center bg-base-100 w-full transition-transform duration-200 ease-out"
+                            style="transform: translateX(-{swipeStates[item.id]?.translateX || 0}px)"
+                            ontouchstart={(e) => swipe_start(e, item.id)}
+                            ontouchmove={(e) => swipe_move(e, item.id)}
+                            ontouchend={(e) => swipe_end(e, item.id)}>
+                            {#if status != "none"}<input type="checkbox" class="hidden md:flex checkbox checkbox-primary checkbox-lg p-1" id={item.id} bind:checked={item.checked} onchange={check_item_handle}>{/if}
+                            <div id={item.id} class="flex flex-col flex-1 py-1 flex-shrink"
+                                ontouchstart={touch_start}
+                                ontouchmove={touch_move}
+                                ontouchend={touch_end}
+                                ontouchcancel={touch_cancel}
+                                ondblclick={edit_item_modal}>
+                                <p class="text w-fit {item.id == dragged_item || item.id == dragged_over ? `text-xl` : ``}">{ingrs_to_string([item])}</p>
+                                <p class="text-neutral text-xs text-center w-fit">{get_recipe_name(item)}</p>
+                            </div>
+                            {#if status != "none"}<input type="checkbox" class="md:hidden checkbox checkbox-primary checkbox-lg p-1" id={item.id} bind:checked={item.checked} onchange={check_item_handle}>{/if}
                         </div>
-                    {/if}
+                    </div>
                     {#if i != grocery_list.length-1}
                         <div class="divider my-0 h-3"></div>
                     {/if}
@@ -612,9 +596,6 @@
                     <div class="dropdown dropdown-top">
                         <label tabindex="-1" for="save_menu" class="btn btn-primary btn-sm md:btn-sm">options</label>
                         <ul tabindex="-1" name="save_menu" class="dropdown-content z-1 menu bg-transparent rounded-box w-max space-y-1">
-                            <li class="btn btn-sm btn-primary p-0"><button class="p-0 px-1" onclick={edit_groceries}>
-                                edit
-                            </button></li>
                             <li class="btn btn-sm btn-primary p-0"><button class="p-0 px-1" onclick={uncheck_list}>
                                 uncheck
                             </button></li>
@@ -629,10 +610,6 @@
                             </button></li>
                         </ul>
                     </div>
-                {:else}
-                    <button class="btn btn-sm btn-primary" onclick={edit_groceries}>
-                        edit
-                    </button>
                 {/if}
                 <button id="copy" class="btn btn-sm btn-primary cursor-copy" onclick={copy_to_clipboard}>
                     {#if just_copied}
