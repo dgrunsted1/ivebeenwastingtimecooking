@@ -43,10 +43,10 @@
         <div class="img_container md:w-1/2">
             <img src={recipe.image} alt={recipe.title} class="max-h-52 md:max-h-96 rounded-xl m-auto"/>
         </div>
-        <div class="info_container w-full md:w-1/2 flex flex-col space-y-2 pl-2">
+        <div class="info_container w-full md:w-1/2 flex flex-col md:pl-2">
             {#if recipe.title}
-                <div class="title_container flex justify-around">
-                    <div class="title md:w-4/5 text-md md:text-xl">{recipe.title}</div>
+                <div class="title_container flex justify-center">
+                    <div class="title md:w-4/5 text-md md:text-xl text-center">{recipe.title}</div>
                 </div>
                 <hr class="m-3"/>
             {/if}
@@ -54,7 +54,7 @@
                 <div class="h-fit w-full">
                     <div class="desc text-xs md:text-sm text-center md:text-left">{recipe.description}</div>
                 </div>
-                <hr class="m-3"/>
+                <hr class="m-3 border-primary"/>
             {/if}
             <div class="flex justify-evenly text-xs">
                 {#if recipe.author}
@@ -104,19 +104,21 @@
     </div>
     <div class="ingr_directions_container flex flex-col md:w-4/5 m-auto space-y-6">
         <div>
-            <div class="text-sm">Ingredients</div>
-            <div id="ingredient_list" class="flex flex-col m-2 border rounded-md w-fit m-auto py-1">
+            <div class="text-md ">Ingredients</div>
+            <div id="ingredient_list" class="flex flex-col m-2 w-fit m-auto py-1">
                 {#if recipe.expand && recipe.expand.ingr_list}
                     {#each recipe.expand.ingr_list as ingr, i}
                         {#if ingr}
-                            <div class="ingr_row flex w-full space-x-1 items-center px-5">
-                                <div class="ingr_amount text-xs md:text-sm my-1 text-center md:w-9">{ingr.quantity ? ingr.quantity : ""}</div>
-                                <div class="ingr_unit md:w-24 text-center text-xs md:text-sm my-1">{ingr.unit ? ingr.unit : ""}</div>
-                                <div class="ingr_name md:w-7/10 text-xs md:text-sm">{ingr.ingredient ? ingr.ingredient : ""}</div>
+                            <div class="ingr_row flex w-fit space-x-1 my-2 px-5 items-center">
+                                {#if ingr.quantity}<div class="ingr_amount text-sm md:text-sm my-1 text-center">{ingr.quantity}</div>{/if}
+                                {#if ingr.unit}<div class="ingr_unit text-center text-sm md:text-sm my-1">{ingr.unit}</div>{/if}
+                                {#if ingr.ingredient}<div class="ingr_name text-sm md:text-sm">{ingr.ingredient}</div>{/if}
                             </div>
                         {/if}
                         {#if i < recipe.expand.ingr_list.length - 1}
-                            <hr class="mx-3"/>
+                            <div class="flex w-full justify-center">
+                                <hr class="w-1/6"/>
+                            </div>
                         {/if}
                     {/each}
                 {/if}
@@ -124,15 +126,17 @@
         </div>
         
         <div>
-            <div class="text-sm">Directions</div>
-            <div class="directions_list border rounded-md m-1 space-y-2">
+            <div class="text-md">Directions</div>
+            <div class="directions_list m-1 space-y-2">
                 {#each recipe.directions as curr, i}
                     <div class="step flex items-center justify-center px-2 py-1 space-x-3">
                         <label for="directions" class="flex text-right w-fit text-xs basis-12 shrink-0 justify-end">Step {i+1}</label>
-                        <p class="directions flex grow h-fit text-xs md:text-sm">{curr}</p>
+                        <p class="directions flex grow h-fit text-sm md:text-sm">{curr}</p>
                     </div>
                     {#if i < recipe.directions.length - 1}
-                        <hr class="mx-3"/>
+                        <div class="flex w-full justify-center">
+                            <hr class="w-1/6"/>
+                        </div>
                     {/if}
                 {/each}
             </div>
