@@ -319,7 +319,7 @@
                 </div>
             </div>
             <hr class="mx-3  border-primary"/>
-            <div class="w-full flex justify-evenly my-1 md:my-5">
+            <div class="w-full flex justify-evenly space-x-2 my-1 md:my-5 items-center">
                 <input id="url" type="text" class="title input input-bordered input-xs" value={recipe.url} oninput={handle_update_recipe_data} placeholder="Link to original recipe"/>
                 {#if !$page.url.pathname.includes("cook_recipe")}<button class="btn btn-primary btn-xs md:btn-sm" onclick={handle_done}>done</button>{/if}
             </div>

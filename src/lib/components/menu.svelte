@@ -229,7 +229,7 @@
 </script>
 
 <div id="menu" class="md:h-full w-full cursor-default">
-    <div class="flex items-center p-3 justify-between">
+    <div class="flex items-center p-3 justify-center space-x-2 md:justify-between">
         <input type="text" class="input input-bordered border-primary input-xs w-2/3" value={menu_title} onblur={handle_title}/>
         {#if $page.url.pathname == "/menu"}
             <button class="btn btn-sm btn-primary" onclick={clear_menu}>clear</button>
