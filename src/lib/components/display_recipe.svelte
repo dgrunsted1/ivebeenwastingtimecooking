@@ -48,7 +48,7 @@
                 <div class="title_container flex justify-center">
                     <div class="title md:w-4/5 text-md md:text-xl text-center">{recipe.title}</div>
                 </div>
-                <hr class="m-3"/>
+                <hr class="m-3 border-primary"/>
             {/if}
             {#if recipe.description}
                 <div class="h-fit w-full">
@@ -73,7 +73,7 @@
                     </div>
                 {/if}
             </div>
-            <hr class="m-3"/>
+            <hr class="m-3 border-primary"/>
             <div class="flex justify-evenly text-xs">
                 {#if recipe.category}
                     <div class="text-center w-1/3">
@@ -91,7 +91,7 @@
                     </div>
                 {/if}
             </div>
-            <hr class="m-3"/>
+            <hr class="m-3 border-primary"/>
             <div class="w-full flex justify-evenly content-center mt-1">
                 {#if recipe.url}
                     <a class="btn btn-primary btn-xs" href={recipe.url} target="_blank">original recipe</a>
@@ -117,7 +117,7 @@
                         {/if}
                         {#if i < recipe.expand.ingr_list.length - 1}
                             <div class="flex w-full justify-center">
-                                <hr class="w-1/6"/>
+                                <hr class="w-1/6 border-primary"/>
                             </div>
                         {/if}
                     {/each}
@@ -135,7 +135,7 @@
                     </div>
                     {#if i < recipe.directions.length - 1}
                         <div class="flex w-full justify-center">
-                            <hr class="w-1/6"/>
+                            <hr class="w-1/6 border-primary"/>
                         </div>
                     {/if}
                 {/each}
