@@ -247,6 +247,11 @@
             await delete_ingr(ingr.id);
         }
     }
+
+    const update_img = async function(e){
+        recipe.image = await update_image_upload(e);
+        await update_recipe_data(recipe.id, {image: recipe.image});
+    }
 </script>
 
 <div id="recipe" class="flex flex-col pt-10">
@@ -256,17 +261,17 @@
                 <div class="w-full flex flex-col relative">
                     {#if recipe.image}
                         <img src={recipe.image} alt={recipe.title} class="max-h-40 md:max-h-96 rounded-xl m-auto"/>
-                        <input type="file" name="photo" id="photo" class="w-8 md:w-10 absolute bottom-5 self-center md:h-10 opacity-0 z-10" onchange={async(e) => {recipe.image = await update_image_upload(e)}}/>
+                        <input type="file" name="photo" id="photo" class="w-8 md:w-10 absolute bottom-5 self-center md:h-10 opacity-0 z-10" onchange={update_img}/>
                         <button class="btn btn-xs md:btn-sm btn-primary w-8 md:w-10 absolute bottom-5 self-center"><Edit/></button>
                     {:else}
                         {#if !show_alert}
-                            <input type="file" name="photo" id="photo" class="absolute max-w-[605px] w-23/25 h-[225px] opacity-0" onchange={async(e) => {recipe.image = await update_image_upload(e)}}/>
+                            <input type="file" name="photo" id="photo" class="absolute max-w-[605px] w-23/25 h-[225px] opacity-0" onchange={update_img}/>
                         {/if}
                         <p class="h-52 text-center text-xl border-dashed border-2 border-primary">Drag your files here or click to browse</p>
                     {/if}
                     <div id="status"></div>
                 </div>
-                <input placeholder="Link to image" name="url" type="text" class="input input-bordered input-xs w-full text-center text-sm" value={recipe.image}/>
+                <input id="image" placeholder="Link to image" name="url" type="text" class="input input-bordered input-xs w-full text-center text-sm" value={recipe.image} oninput={handle_update_recipe_data}/>
             </div>
         </div>
         <div class="info_container md:w-1/2 mx-1 flex flex-col justify-center">
