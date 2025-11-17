@@ -38,28 +38,30 @@
                 <Heart color={(selected_categories.includes("heart")) ? "fill-primary" : "fill-neutral"}/>
         </button>
     {/if}
-    {#each display_categories as cat}
+    {#each [...display_categories].sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase())) as cat}
         <button id="category" 
             class="btn btn-xs {selected_categories.includes(cat)?'btn-primary text-black':'bg-base-300 text-neutral'} category" 
             onclick={select_cat}>
                 {cat}
         </button> 
     {/each}
-    {#each display_cuisines as cuisine}
+    {#each [...display_cuisines].sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase())) as cuisine}
         <button id="cuisine" 
             class="btn btn-xs {selected_cuisines.includes(cuisine)?'btn-primary text-black':'bg-base-300 text-neutral'} cuisine" 
             onclick={select_cat}>
                 {cuisine}
         </button> 
     {/each}
-    {#each display_authors as author}
-        <button id="author" 
-            class="btn btn-xs {selected_authors.includes(author)?'btn-primary text-black':'bg-base-300 text-neutral'} author" 
-            onclick={select_cat}>
-                {author}
-        </button> 
-    {/each}
-    {#each display_countries as country}
+    {#if display_authors}
+        {#each [...display_authors].sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase())) as author}
+            <button id="author" 
+                class="btn btn-xs {selected_authors.includes(author)?'btn-primary text-black':'bg-base-300 text-neutral'} author" 
+                onclick={select_cat}>
+                    {author}
+            </button> 
+        {/each}
+    {/if}
+    {#each [...display_countries].sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase())) as country}
         <button id="country" 
             class="btn btn-xs {selected_countries.includes(country)?'btn-primary text-black':'bg-base-300 text-neutral'} country" 
             onclick={select_cat}>
