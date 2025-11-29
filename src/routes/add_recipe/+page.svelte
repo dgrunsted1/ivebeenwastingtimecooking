@@ -1,6 +1,6 @@
 <script>
     import ImportRecipe from "/src/lib/components/import_recipe.svelte";
-    import { currentUser, pb, auth_refresh } from '/src/lib/pocketbase.js';
+    import { currentUser, pb, auth_refresh, sendImageToBackend } from '/src/lib/pocketbase.js';
     import { process_ingr, process_directions } from '/src/lib/process_recipe.js';
     import { deserialize } from '$app/forms';
     import { onMount } from "svelte";
@@ -34,6 +34,8 @@
 
     let loading = $state(false);
 
+    let recipe_url = $state("");
+
     onMount(async () => {
         if (!$currentUser) window.location.href = "/login";
         else {
@@ -51,6 +53,7 @@
     }
     
     async function fetch_recipe(e){
+        console.log(this);
         if (!$currentUser.verified){
             show_alert("Please verify your email to add recipes", "error", "Please verify your email");
             e.srcElement.value = "";
@@ -99,6 +102,19 @@
             return false;
         }
     }
+
+    const input_img = function(e) {
+        console.log("input image");
+        e.preventDefault();
+        const fileInput = document.getElementById('files');
+        const file = fileInput.files[0];
+        
+        if (file) {
+            sendImageToBackend(file);
+        }
+    }
+
+    
 </script>
 
 <svelte:head>
@@ -111,18 +127,25 @@
 
 <div class="flex flex-col max-w-5xl m-auto h-[95svh] px-2">
     {#if !edit}
-        <div class="my-auto">
+        <div class="my-auto text-center w-full flex flex-col gap-5">
             <form method='POST' oninput={fetch_recipe} class="text-center w-full flex flex-col gap-5">
-                <input placeholder="Link to recipe" name="url" type="text" class="input input-bordered input-md md:input-lg text-center input-accent m-auto no-underline w-full md:w-1/2"/>
+                {#if loading && recipe_url || !loading}
+                    <input placeholder="Link to recipe" name="url" type="text" class="input input-bordered input-md md:input-lg text-center input-primary m-auto no-underline w-full md:w-1/2"/>
+                {/if}
                 {#if !loading}
                     <div class="divider w-full md:w-1/2 m-auto">OR</div>
-                    <button class="btn btn-primary btm-md md:btn-lg m-auto w-full md:w-1/2" onclick={()=>{edit = true}}>Input Recipe</button>
+                    <button class="btn btn-primary btm-md md:btn-lg m-auto w-full md:w-1/2" onclick={()=>{edit = true}}>Input Recipe</button> 
                 {:else}
                     <div class="flex h-[110px] w-full justify-center items-center">
                         <span id="loading" class="loading loading-bars loading-lg"></span>
                     </div>
                 {/if}
             </form>
+            <div class="divider w-full md:w-1/2 m-auto">OR</div>
+            <div>
+                <label for="files" class="btn btn-primary btm-md md:btn-lg m-auto w-full md:w-1/2">Select Image</label>
+                <input type="file" name="recipe_image" class="hidden" id="files" accept="image/*" oninput={input_img}/>
+            </div> 
         </div>
     {:else}
         <ImportRecipe
