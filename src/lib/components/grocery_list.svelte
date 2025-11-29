@@ -625,7 +625,7 @@
 </div>
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <dialog id="my_modal_1" class="modal modal-top md:modal-middle" onkeydown={handle_modal_enter}>
-    <div class="modal-box flex flex-col space-y-2 p-2 md:p-5">
+    <div class="modal-box flex flex-col space-y-2 p-2 md:p-5 bg-base-200">
         <input id="modal_ingr" type="text" class="input input-bordered w-full input-sm{!is_valid_name() ? ' bg-error/50' : ''}" placeholder="ingredient" bind:value={new_item.name}>
         <input  type="text" class="input input-bordered w-full input-sm{!is_valid_qty() ? ' bg-error/50' : ''}" placeholder="quantity" bind:value={new_item.qty}>
         <input type="text" class="input input-bordered w-full input-sm{!is_valid_unit() ? ' bg-error/50' : ''}" placeholder="unit" bind:value={new_item.unit}>

@@ -113,7 +113,7 @@
     {#if !edit}
         <div class="my-auto">
             <form method='POST' oninput={fetch_recipe} class="text-center w-full flex flex-col gap-5">
-                <input placeholder="Link to recipe" name="url" type="text" class="input input-bordered input-md md:input-lg text-center input-accent m-auto no-underline w-full md:w-1/2"/>
+                <input placeholder="Link to recipe" name="url" type="text" class="input input-bordered input-md md:input-lg text-center input-primary m-auto no-underline w-full md:w-1/2"/>
                 {#if !loading}
                     <div class="divider w-full md:w-1/2 m-auto">OR</div>
                     <button class="btn btn-primary btm-md md:btn-lg m-auto w-full md:w-1/2" onclick={()=>{edit = true}}>Input Recipe</button>
