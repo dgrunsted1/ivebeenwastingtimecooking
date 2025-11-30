@@ -13,7 +13,8 @@
         grocery_list_id,
         list_owner,
         reset_grocery_list,
-        check_grocery_item
+        check_grocery_item,
+        servings,
     } = $props();
     
     let delay_timer;
@@ -497,6 +498,12 @@
         }
         return "";
     }
+
+    const get_ingr_display = (item) => {
+        const factor = servings[item.expand.recipe[0].id]/item.expand.recipe[0].servings;
+        const temp = [{ ...item, quantity: item.quantity * factor}];
+        return ingrs_to_string(temp);
+    }
 </script>
 
 <div id="list" class="flex flex-col w-full space-y-1">
@@ -624,11 +631,22 @@
     </div>
 </div>
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-<dialog id="my_modal_1" class="modal modal-top md:modal-middle" onkeydown={handle_modal_enter}>
-    <div class="modal-box flex flex-col space-y-2 p-2 md:p-5 bg-base-200">
+<dialog id="my_modal_1" class="modal modal-bottom md:modal-middle " onkeydown={handle_modal_enter}>
+    <div class="modal-box flex flex-col space-y-2 p-2 md:p-5 bg-base-200 mb-16">
         <input id="modal_ingr" type="text" class="input input-bordered w-full input-sm{!is_valid_name() ? ' bg-error/50' : ''}" placeholder="ingredient" bind:value={new_item.name}>
         <input  type="text" class="input input-bordered w-full input-sm{!is_valid_qty() ? ' bg-error/50' : ''}" placeholder="quantity" bind:value={new_item.qty}>
         <input type="text" class="input input-bordered w-full input-sm{!is_valid_unit() ? ' bg-error/50' : ''}" placeholder="unit" bind:value={new_item.unit}>
+        {#if new_item.expand && new_item.expand.ingrs && new_item.expand.ingrs.length > 0}
+            <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+            <details id="original_ingrs" class="text-sm collapse collapse-arrow content-center" tabindex="0">
+                <summary class="collapse-title"></summary>
+                <div class="collapse-content">
+                    {#each new_item.expand.ingrs as curr}
+                        <div>{get_ingr_display(curr)}</div>
+                    {/each}
+                </div>
+            </details>
+        {/if}
         <div class="flex items-center m-2 justify-end space-x-1">
             <div class="modal-action mt-0 w-full">
                 <form method="dialog" class="flex w-full justify-between items-center">

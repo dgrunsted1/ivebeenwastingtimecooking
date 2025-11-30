@@ -356,6 +356,7 @@
                             bind:status={grocery_list_status}  
                             reset_grocery_list={reset_list} 
                             check_grocery_item={handle_check_item}
+                            servings={todays_menu.servings}
                         />
                     {:else if loading} 
                         <div id="menu_loading" class="w-full flex justify-center content-center h-[calc(100svh-113px)]">
