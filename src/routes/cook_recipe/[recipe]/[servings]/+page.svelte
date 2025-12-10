@@ -33,6 +33,7 @@
     let timers = $state({});
     let alert = $state({show: false, msg: "", title: "", type: "warning"});
     let servings = $state(data.post.servings);
+    let modal_open = $state(false);
 
     const get_quantity = function(quantity, servings){
         if (isNaN(recipe.servings) || isNaN(servings)){
@@ -71,6 +72,22 @@
             });
             todays_menu = result_menu.items[0];
             update_recipe_ready();
+
+            pb.realtime.subscribe(`recipes/${recipe.id}`, function(e) {
+                if (e.action == "update"){
+                    recipe = e.record;
+                }
+            }, {
+                expand: 'notes,ingr_list'
+            });
+
+            for (let i = 0; i < recipe.expand.ingr_list.length; i++){
+                pb.realtime.subscribe(`ingredients/${recipe.expand.ingr_list[i].id}`, function(e) {
+                    if (e.action == "update"){
+                        recipe.expand.ingr_list[i] = e.record;
+                    }
+                });
+            }
         }
         sort_notes();
         set_timers();
@@ -274,7 +291,7 @@
                         {/if}
                         <button class="btn btn-xs md:btn-sm p-1 btn-ghost made flex content-center" onclick={update_made_2}><ThumbUp color={(recipe.made) ? "fill-primary" : "fill-neutral"}/></button>
                         <button class="btn btn-xs md:btn-sm p-1 btn-ghost favorite flex content-center" onclick={update_fav}><Heart color={(recipe.favorite) ? "fill-primary" : "fill-neutral"}/></button>
-                        <button class="btn btn-xs md:btn-sm btn-primary w-8 md:w-10" onclick={() => {my_modal_3.showModal(); document.getElementById('modal_content').classList.remove('hidden');}}><Edit/></button>
+                        <button class="btn btn-xs md:btn-sm btn-primary w-8 md:w-10" onclick={() => {modal_open = true; my_modal_3.showModal(); document.getElementById('modal_content').classList.remove('hidden');}}><Edit/></button>
                     {:else if $currentUser}
                         <input type="checkbox" class="checkbox checkbox-primary checkbox-lg p-1" id={recipe.id} onclick={stopPropagation(log_made(recipe.id, $currentUser.id))}>
                     {/if}
@@ -360,10 +377,12 @@
                         <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
                     </form>
                     <div id="modal_content">
-                        <EditRecipe
-                            recipe={recipe}
-                            update_recipe={(e) => {recipe = e.recipe}}
-                        />
+                        {#if modal_open}
+                            <EditRecipe
+                                recipe={recipe}
+                                update_recipe={(e) => {recipe = e.recipe}}
+                            />
+                        {/if}
                     </div>
                 </div>
             </dialog>

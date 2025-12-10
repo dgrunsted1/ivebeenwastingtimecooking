@@ -211,8 +211,10 @@
     const handle_update_recipe_data = function(e){
         clearTimeout(delay_timer);
         delay_timer = setTimeout(() => {
-            const data = {[e.target.id]: e.target.value};
-            update_recipe_data(recipe.id, data);
+            if (recipe[e.target.id] != e.target.value){
+                const data = {[e.target.id]: e.target.value};
+                update_recipe_data(recipe.id, data);
+            }
         }, 1000);
         
     }
@@ -220,8 +222,10 @@
     const handle_update_ingr_data = function(e){
         clearTimeout(delay_timer);
         delay_timer = setTimeout(() => {
-            const data = {[e.target.dataset.type]: e.target.value};
-            update_ingr(e.target.id, data);
+            if (e.target.value != recipe.expand.ingr_list.find(ingr => ingr.id == e.target.id)[e.target.dataset.type]){
+                const data = {[e.target.dataset.type]: e.target.value};
+                update_ingr(e.target.id, data);
+            }
         }, 1000);
         
     }
@@ -237,14 +241,19 @@
                     tmp.push(recipe.directions[i]);
                 }
             }
-            const data = {directions: tmp};
-            update_recipe_data(recipe.id, data);
+            if (recipe.directions[e.target.id] != e.target.value){
+                const data = {directions: tmp};
+                update_recipe_data(recipe.id, data);
+            }
         }, 1000);
     }
 
     const handle_delete_ingr = async function(ingr){
         if (window.confirm(`Are you sure you want to remove ${ingr.ingredient}?`)) {
-            await delete_ingr(ingr.id);
+            const result = await delete_ingr(ingr.id);
+            if (result){
+                recipe.expand.ingr_list = recipe.expand.ingr_list.filter(item => item.id != ingr.id);
+            }
         }
     }
 
@@ -339,7 +348,7 @@
                             <input type="text" class="ingr_amount input input-bordered input-xs px-1 mr-1 w-10 text-center h-fit" id={recipe.expand.ingr_list[i].id} data-type="quantity" value={recipe.expand.ingr_list[i].quantity} oninput={handle_update_ingr_data}>
                             <input type="text" class="ingr_unit input input-bordered input-xs px-1 mr-1 w-16 text-center h-fit" id={recipe.expand.ingr_list[i].id}  data-type="unit" value={recipe.expand.ingr_list[i].unit} oninput={handle_update_ingr_data}>
                             <input type="text" class="ingr_name input input-bordered input-xs px-1 mr-1 w-80 h-fit" id={recipe.expand.ingr_list[i].id}  data-type="ingredient" value={recipe.expand.ingr_list[i].ingredient} oninput={handle_update_ingr_data}>
-                            <button id={recipe.expand.ingr_list[i].id} class="btn btn-xs w-6 p-0 btn-accent" onclick={handle_delete_ingr(recipe.expand.ingr_list[i])}><Delete size={4}/></button>
+                            <button id={recipe.expand.ingr_list[i].id} class="btn btn-xs w-6 p-0 btn-accent" onclick={() => handle_delete_ingr(recipe.expand.ingr_list[i])}><Delete size={4}/></button>
                         </div>
                 {/each}
                 <div class="flex justify-center mt-2">

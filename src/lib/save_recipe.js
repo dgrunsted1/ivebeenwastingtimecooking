@@ -63,7 +63,8 @@ export const update_notes = async function(notes_in, new_note_in, recipe_id){
 }
 
 export const delete_ingr = async function(ingr_id){
-    await pb.collection('ingredients').delete(ingr_id);
+    const result = await pb.collection('ingredients').delete(ingr_id);
+    return result;
 }
 
 export const update_image_upload = async (e) => {
