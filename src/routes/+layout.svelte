@@ -10,7 +10,7 @@
 	 */
 
 	/** @type {Props} */
-	let { children } = $props();
+	let { children, data = $bindable() } = $props();
 	let page_links = ($currentUser) ? [
 		{href:"/today", display: "Today"},
 		{href:"/recipes", display: "Recipes"},
@@ -23,10 +23,7 @@
 	];
 
 	onMount(async () => {
-		const flags_result = await pb.collection('flags').getList(1, 50, {
-			filter: `user = "${$currentUser.id}"`
-		});
-		flagsStore.set(flags_result.items[0]);
+		flagsStore.set(data.flags);
 	});
 </script>
 		<div class="navbar bg-base-100 fixed z-100 flex content-center min-h-0 h-6 md:h-9 relative">

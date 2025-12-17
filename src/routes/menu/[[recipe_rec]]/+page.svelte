@@ -10,8 +10,9 @@
     import Alerts from "/src/lib/components/alerts.svelte";
     import NoteCard from "/src/lib/components/note_card.svelte";
 
+    let { data = $bindable() } = $props();
 
-    let user_recipes = $state([]);
+    let user_recipes = $state(data.post.recipes);
     
     let menu_recipes = $derived(user_recipes.filter(r => r.checked));
     let mults = $state({});
@@ -32,12 +33,6 @@
                 show_error(e.message);
             }
         }
-        const result_list = await pb.collection('recipes').getList(1, 250, {
-            filter: `user="${$currentUser.id}"`,
-            expand: `notes, ingr_list`,
-            sort: `-created`
-        });
-        user_recipes = result_list.items;
         
         if ($page.params.recipe_rec != ""){
             for (let i = 0; i < user_recipes.length; i++){

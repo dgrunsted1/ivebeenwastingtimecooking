@@ -414,7 +414,6 @@ function removePunctuationSymbolsParentheses(text) {
 }
 
 export const get_grocery_list = function(menu, mults, sub_recipes) {
-
 	let grocery_list = [];
 	menu = (menu.expand && menu.expand.recipes) ? menu.expand.recipes : menu;
 	menu.forEach((recipe, i) => {

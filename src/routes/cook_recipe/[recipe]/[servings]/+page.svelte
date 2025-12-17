@@ -25,8 +25,8 @@
     let { data = $bindable() } = $props();
     let recipe = $state(data.post.recipe);
     const scroll_size = 425;
-    let user_logged_in = $state(false);
-    let todays_menu = $state();
+    let user_logged_in = $state(data.post.user_logged_in);
+    let todays_menu = $state(data.post.todays_menu);
     let recipe_ready = $state(false);
     let delay_timer;
     let toast = $state({info: null, success: null, error: null});
@@ -64,13 +64,7 @@
                 show_error(e.message);
             }
         }
-        if ($currentUser && $currentUser.id == recipe.user) {
-            user_logged_in = true;
-
-            const result_menu = await pb.collection('menus').getList(1, 1, {
-                filter: `user="${$currentUser.id}" && today=True`,
-            });
-            todays_menu = result_menu.items[0];
+        if (user_logged_in) {
             update_recipe_ready();
 
             pb.realtime.subscribe(`recipes/${recipe.id}`, function(e) {

@@ -490,7 +490,7 @@
             for (let i = 0; i < item.expand.ingrs.length; i++){
                 const title = item.expand.ingrs[i].expand.recipe[0].title.split(' ').slice(0, 3).join(' ');
                 if (i == 0) recipe_titles = title;
-                else if (!recipe_titles.includes(item.expand.ingrs[i].expand.recipe[0].title)) recipe_titles += " + " + title;
+                else if (!recipe_titles.includes(title)) recipe_titles += " + " + title;
             }
             if (recipe_titles){
                 return recipe_titles;

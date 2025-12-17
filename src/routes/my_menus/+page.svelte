@@ -11,7 +11,8 @@
     import Alerts from "../../lib/components/alerts.svelte";
     import NoteCard from "../../lib/components/note_card.svelte";
     
-    let user_menus = $state([]);
+    let { data = $bindable() } = $props();
+    let user_menus = $state(data.post.menus);
     
     let modal_menu = $state({});
     
@@ -33,12 +34,6 @@
                 show_error(e.message);
             }
         }
-        const result_list = await pb.collection('menus').getList(1, 250, {
-            filter: `user="${$currentUser.id}" && recipes:length > 0`,
-            expand: `recipes,recipes.ingr_list`,
-            sort: `-created`
-        });
-        user_menus = result_list.items;
         loading = false;
     });
 

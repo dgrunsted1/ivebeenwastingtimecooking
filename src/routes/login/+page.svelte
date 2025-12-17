@@ -21,7 +21,16 @@
     async function login() {
       try {
         const user = await pb.collection('users').authWithPassword(username, password);
-        window.location = document.referrer;
+        
+        // Explicitly save to cookie (PocketBase should do this automatically, but let's be sure)
+        document.cookie = pb.authStore.exportToCookie({
+          httpOnly: false,
+          secure: window.location.protocol === 'https:',
+          sameSite: 'lax',
+          path: '/'
+        });
+        
+        window.location.href = document.referrer || '/';
       } catch (e) {
         show_error(e.message);
       }

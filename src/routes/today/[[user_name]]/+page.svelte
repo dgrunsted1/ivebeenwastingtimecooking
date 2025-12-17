@@ -11,8 +11,9 @@
     import NoteCard from "/src/lib/components/note_card.svelte";
     import Plus from "/src/lib/icons/Plus.svelte";
     import RecipeList from "/src/lib/components/recipe_list.svelte";
-
-    let todays_menu = $state({});
+    
+    let { data = $bindable() } = $props();
+    let todays_menu = $state(data.post.menu);
     let grocery_list = $state([]);
     let grocery_list_id = $state("");
     let grocery_list_status = $state("saved");
@@ -26,15 +27,12 @@
     
     onMount(async () => {
         await handleAuth();
-        const result_list = await fetchMenuData();
-        
-        if (result_list.items[0]){
+        if (todays_menu){
             await pb.realtime.connect();
-            pb.realtime.subscribe(`menus/${result_list.items[0].id}`, (data) => {
+            pb.realtime.subscribe(`menus/${todays_menu.id}`, (data) => {
                 const tmp = {...data.record, expand: todays_menu.expand};
                 todays_menu = tmp;
             }, {expand: `recipes`});
-            todays_menu = result_list.items[0];
             for (let i in todays_menu.sub_recipes){
                for (let j in todays_menu.sub_recipes[i]){
                    if (todays_menu.sub_recipes[i][j].recipe_id && !sub_recipe_ids.includes(todays_menu.sub_recipes[i][j].recipe_id)) sub_recipe_ids.push(todays_menu.sub_recipes[i][j].recipe_id);
@@ -120,17 +118,6 @@
             const result = await auth_refresh;
             if (result.error) show_error(e.message);
         }
-    }
-
-    async function fetchMenuData() {
-        const filter = $page.params.user_name 
-            ? `user.username='${$page.params.user_name}' && today=true`
-            : `user="${$currentUser.id}" && today=True`;
-            
-        return await pb.collection('menus').getList(1, 1, {
-            filter,
-            expand: `recipes,recipes.notes,recipes.ingr_list, grocery_list, grocery_list.items, grocery_list.items.ingrs, grocery_list.items.ingrs.recipe${$page.params.user_name ? ', user' : ''}`
-        });
     }
 
     onDestroy(() => {
