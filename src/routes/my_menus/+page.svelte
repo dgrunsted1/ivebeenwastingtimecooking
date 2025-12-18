@@ -225,7 +225,7 @@
 <div class="flex flex-col w-full md:flex-row">
     {#if user_menus.length > 0 || loading || no_results_found}
         <div class="flex flex-col w-full md:w-1/2">
-            <div class="hidden md:flex justify-between mx-4">
+            <div class="hidden md:flex justify-between mx-4 items-center">
                 <div class="flex w-fit space-x-6 items-center">
                     <SearchInput 
                         {update_search}
