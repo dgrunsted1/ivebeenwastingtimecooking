@@ -1,6 +1,7 @@
 <script>
     import SearchInput from "/src/lib/components/search.svelte";
     import { currentUser, pb, auth_refresh } from '/src/lib/pocketbase.js';
+    import InfiniteScroll from "/src/lib/components/infinite_scroll.svelte";
     import { onMount } from 'svelte';
     import Menu from "/src/lib/components/menu.svelte";
     import { get_servings } from '/src/lib/recipe_util.js';
@@ -10,7 +11,8 @@
     import Sort from "../../lib/components/sort.svelte";
     import Alerts from "../../lib/components/alerts.svelte";
     import NoteCard from "../../lib/components/note_card.svelte";
-    
+    import SkeletonCard from "../../lib/components/skeleton_card.svelte";
+
     let { data = $bindable() } = $props();
     let user_menus = $state(data.post.menus);
     
@@ -22,8 +24,12 @@
     let total_servings = $derived((!modal_menu.expand) ? 0 : get_servings(modal_menu.expand.recipes, {}, modal_menu.servings));
     let delay_timer;
     let search_val = $state("");
-    
+    let newBatch = $state([]);
     let no_results_found = $state(false);
+    let refresh_loading = $state(true);
+    let menus_have_more = $state(true);
+    let total_menus_num = $state(0);
+    let page = 2;
     let alert = $state({show: false, msg: "", title: "", type: "warning"});
 
     onMount(async () => {
@@ -35,6 +41,7 @@
             }
         }
         loading = false;
+        refresh_loading = false;
     });
 
     function show_error(title){
@@ -190,6 +197,21 @@
         user_menus = sort_menus(user_menus, sort_val); 
         loading = false;
     }
+
+    async function load_more(){
+        loading = true;
+        page++;
+        const result = await pb.collection('menus').getList(page, 12, {
+            filter: `user="${$currentUser.id}" && recipes:length > 0`,
+            expand: `recipes,recipes.ingr_list`,
+            sort: `-created`
+        });
+        menus_have_more = result.page < result.totalPages;
+        total_menus_num = result.totalItems;
+        newBatch = result.items;
+        user_menus = [...user_menus, ...newBatch];
+        loading = false;
+    }
 </script>
 
 <svelte:head>
@@ -217,23 +239,31 @@
                 />
             </div>
             <div id="menus" class="h-[calc(100svh-60px)] md:h-[calc(100svh-90px)] overflow-y-auto rounded-md md:border-none w-full space-y-2">
-                {#if loading}
-                    <div class="text-center flex flex-col justify-center items-center space-y-5 mx-2 md:mx-auto md:text-4xl h-full w-full"><span class="loading loading-bars loading-lg"></span></div>
-                {:else if no_results_found}
-                    <div class="flex flex-col justify-center items-center space-y-5 bg-base-200 mx-2 md:mx-auto p-16 border-2 border-base-300 rounded-md shadow-md  md:text-4xl mt-[30vh] max-w-md">
-                        <div class="w-full flex justify-center content-center h-full">
+                {#if user_menus.length && !refresh_loading}
+                        {#each user_menus as item}
+                            <MenuCard
+                                menu={item}
+                                {delete_menu}
+                                card_click={show_menu_modal}
+                            />
+                        {/each}
+                        <div class="flex w-full h-20 justify-center">
+                            <span class="{menus_have_more ? "" : "hidden"} loading loading-bars loading-lg mx-7 self-center"></span>
+                        </div>
+                    {:else if user_menus.length == 0 && !refresh_loading}
+                        <div class="{no_results ? "" : "hidden"} w-full flex justify-center items-center h-full">
                             no results
                         </div>
-                    </div>
-                {:else}
-                    {#each user_menus as curr, i}
-                        <MenuCard
-                            bind:menu={user_menus[i]}
-                            {delete_menu}
-                            card_click={show_menu_modal}
+                    {:else}
+                        <SkeletonCard 
+                            cnt={10} 
                         />
-                    {/each}
-                {/if}
+                    {/if}
+                <InfiniteScroll
+                    has_more={menus_have_more}
+                    threshold={100}
+                    {load_more} 
+                />
             </div>
             <div class="flex md:hidden justify-between mx-1">
                 <div class="flex w-fit space-x-6 items-center">
