@@ -1,15 +1,12 @@
-import { get_parent_recipe } from '/src/lib/menu_utils.js';
-import { get_conversion_rates, conv_unit } from '/src/lib/unit_conversions.js';
+import { get_conversion_rates } from '/src/lib/unit_conversions.js';
 import convert from "convert";
-import { get_grocery_item_name } from '$lib/ingr_to_groc.js';
+import { normalizeItemName } from '$lib/ingr_to_groc.js';
 
 // remove exact words
 const prepositions = ["of", "with", "to", "in", "on", "at", "for", "by", "from", "into", "over", "under", "through", "around", "beside", "between", "among", "towards", "room", "very", "more for serving", "for serving", "melon baller", "a", "press", "freshly ground", "crack", "seeded", "pit"];
 
 const conjunctions = ["and", "or", "nor", "but", "yet", "so"];
-const remove_when_matching = ["(optional)"];
 
-let conversions_missing = [];
 // remove words where the string is contained
 const verbs = [
 		"acidulate",
@@ -284,101 +281,6 @@ const verbs = [
         "homemade"
 	];
 
-export const merge_v1 = function(ingrs) {
-    let grocery_list = [];
-    let skipped = [];
-	for(let item of ingrs){
-		if (!item.name) continue;
-		let match = false;
-		let conv_match = false;
-		if (grocery_list) {
-			for (let i = 0; i < grocery_list.length; i++) {
-				/**
-				 * checks every ingredient against every item in the grocery list
-				 * the grocery list starts with no items
-				 * if:
-				 * ingredient and grocery list item both have a unit and qty || both dont have either
-				 * &&
-				 * the names match exactly || the name of one contains the other but not if the matched word contains "un+", "+ed", "sugar" and "powdered sugar"  
-				 */
-				if (((item.unit && item.qty && grocery_list[i].unit && grocery_list[i].qty) || (!item.unit && !item.qty && !grocery_list[i].unit && !grocery_list[i].qty)) && ((strip_parens(grocery_list[i].name) === strip_parens(item.name)) || 
-				   (grocery_list[i].name.includes(item.name) && !grocery_list[i].name.includes("un" + item.name) && !grocery_list[i].name.includes(item.name + "ed") && grocery_list[i].name !== "sugar" && grocery_list[i].name !== "powdered sugar") || 
-				   (item.name.includes(grocery_list[i].name) && !item.name.includes("un" + grocery_list[i].name) && !item.name.includes(grocery_list[i].name + "ed") && item.name !== "sugar" && item.name !== "powdered sugar"))) {
-					conv_match = get_conversion_rates(item.unit, grocery_list[i].unit);
-					if (conv_match) {
-						match = grocery_list[i];
-						break;
-					}
-				}
-			}
-				
-		}
-		
-
-		if (match && !(["small", "medium", "large"].includes(match.unit) ^ ["small", "medium", "large"].includes(item.unit))
-						&& !(match.unit == "clove" ^ item.unit == "clove") && !(match.unit == "whole" ^ item.unit == "whole") &&
-						conv_match) {
-			if (!item.ingrs) item.ingrs = [];
-			let tmp = { checked: false,
-						qty: 0,
-						unit: 0,
-						name: null,
-						ingrs: match.ingrs.concat(item.ingrs),
-						expand: { ingrs: match.expand.ingrs.concat(item.expand.ingrs)}
-					};
-			if (match.unit != item.unit && conv_unit[match.unit] != item.unit && conv_unit[item.unit] != match.unit) {
-				let conv = combine(match, item);
-				tmp.qty = conv.amount;
-				tmp.unit = conv.unit;
-			} else {
-				tmp.qty = match.qty + round_amount(item.qty);
-				tmp.unit = match.unit;
-			}
-			if (match.name.length >= item.name.length){
-				tmp.name = match.name;
-			}else {
-				tmp.name = item.name;
-			}
-			grocery_list.splice(grocery_list.indexOf(match), 1);
-			grocery_list.push(tmp);
-		}else {
-			let tmp = {};
-				try{
-					if (item.qty && item.unit){
-						tmp = { checked: false,
-							qty: round_amount(item.qty),
-							unit: item.unit,
-							name: item.name,
-							ingrs: (item.ingrs) ?  item.ingrs : [],
-							expand: { ingrs: item.expand.ingrs}
-						};
-					} else {
-						tmp = { checked: false,
-							qty: round_amount(item.qty),
-							unit: item.unit,
-							name: item.name,
-							ingrs: (item.ingrs) ?  item.ingrs : [],
-							expand: { ingrs: item.expand.ingrs}
-						};
-					}
-				} catch (err) {
-					tmp = { checked: false,
-						qty: round_amount(item.qty),
-						unit: item.unit,
-						name: item.name,
-						ingrs: (item.ingrs) ?  item.ingrs : [],
-						expand: { ingrs: item.expand.ingrs}
-					};
-				}
-
-			grocery_list.push(tmp);
-		}
-	}
-    return grocery_list;
-}
-
-
-
 export const combine = (i, j) => {
 	const tmp = convert(i.qty, i.unit).to(j.unit);
 	const amount = convert(tmp+j.qty, j.unit).to("best", "imperial");
@@ -413,47 +315,34 @@ function removePunctuationSymbolsParentheses(text) {
 	return text;
 }
 
-export const get_grocery_list = function(menu, mults, sub_recipes) {
-	let grocery_list = [];
-	menu = (menu.expand && menu.expand.recipes) ? menu.expand.recipes : menu;
-	menu.forEach((recipe, i) => {
-		let mult = 1;
+/**
+ * Generates a grocery list from a menu, calculating quantities based on servings multipliers
+ */
+export const get_grocery_list = (menu, mults, sub_recipes) => {
+  const recipes = menu.expand?.recipes || menu;
+  const grocery_list = [];
 
-		if (recipe.is_sub_recipe){
-			// get parent servings to use
-			const parent_recipe = get_parent_recipe(recipe.id, menu, sub_recipes);
-			if (menu.servings) mult = parseFloat(menu.servings[parent_recipe.id]) / parseFloat(recipe.servings);
-			else if (mults && mults[parent_recipe.id]) mult = parseFloat(mults[parent_recipe.id]) / parseFloat(recipe.servings);
-		} else {
-			if (menu.servings) mult = parseFloat(menu.servings[recipe.id]) / parseFloat(recipe.servings);
-			else if (mults && mults[recipe.id]) mult = parseFloat(mults[recipe.id]) / parseFloat(recipe.servings);
-		}
-		
-		if (recipe.expand.ingr_list) {
-			for (let i = 0; i < recipe.expand.ingr_list.length; i++) {
-				let temp_item = {...recipe.expand.ingr_list[i]};
-				grocery_list.push({
-					"qty": recipe.expand.ingr_list[i].quantity * mult,
-					"unit": recipe.expand.ingr_list[i].unit,
-					"unit_plural": recipe.expand.ingr_list[i].unit_plural,
-					"name": get_grocery_item_name(recipe.expand.ingr_list[i].ingredient),
-					"checked": false,
-					"ingrs": [
-						recipe.expand.ingr_list[i].id
-					],
-					"expand": {
-						"ingrs": [
-							recipe.expand.ingr_list[i]
-						]
-					},
-					"active": true
-				});
-			}
-		} 
-	});
-	const out = groupBySimilarity(merge(grocery_list));
-	return out;
-}
+  recipes.forEach(recipe => {
+    const mult = calculateServingsMultiplier(recipe, menu, mults, sub_recipes);
+    const ingredients = recipe.expand?.ingr_list || [];
+
+    ingredients.forEach(ingredient => {
+      grocery_list.push({
+        qty: ingredient.quantity * mult,
+        unit: ingredient.unit,
+        unit_plural: ingredient.unit_plural,
+        name: normalizeItemName(ingredient.ingredient),
+        checked: false,
+        ingrs: [ingredient.id],
+        expand: { ingrs: [ingredient] },
+        active: true
+      });
+    });
+  });
+  const merged = merge(grocery_list);
+  const out = groupBySimilarity(merged);
+  return out;
+};
 
 const trim_punctuation = function(ingr_string) {
     const out = ingr_string.replace(/^[\s.,]+|[\s.,]+$/gu, '').trim();
@@ -503,56 +392,26 @@ const trim_prepositions = function(ingr_string) {
     return out;
 }
 
-export const groupBySimilarity = function(strings) {
-    // Split each string into words
-    strings = strings.sort((a, b) => b.length - a.length);
-    let stringWords = strings.map(s => removePunctuationSymbolsParentheses(s.name).split(' '));
+/**
+ * Groups grocery items by name similarity and returns flattened sorted array
+ */
+export const groupBySimilarity = (items) => {
+  const sorted = [...items].sort((a, b) => b.name.length - a.name.length);
+  const groups = [];
 
-    let groups = [];
-    for (let i = 0; i < strings.length; i++) {
-        const str1Words = stringWords[i];
-    //   // Check if this string belongs in an existing group
-        let maxSimilarity = 0;
-        let maxGroup;
-        let maxIndex;
-        for (let j = 0; j < groups.length; j++) {
-            for (let k = 0; k < groups[j].length; k++) {
-                let intersection = 0;
-                const str2Words = removePunctuationSymbolsParentheses(groups[j][k].name).split(' ');
-                str1Words.forEach(word => {
-                if (str2Words.includes(word)) {
-                    intersection++;
-                }
-                });
-                // const min_length = (str1Words.length > str2Words.length) ? str2Words.length : str1Words.length ;
-                const similarity = intersection / str1Words.length;
-                if (similarity > maxSimilarity) {
-                maxSimilarity = similarity;
-                maxGroup = j;
-                maxIndex = k;
-                }
-            }
-        }
-        
-        // If no suitable group, create a new one
-        if (maxGroup && maxSimilarity > .25) {
-            groups[maxGroup] = [...groups[maxGroup].slice(0, maxIndex), strings[i], ...groups[maxGroup].slice(maxIndex)];
-        } else {
-            groups.push([strings[i]]);
-        }
-}
+  sorted.forEach(item => {
+    const itemWords = removePunctuationSymbolsParentheses(item.name).split(' ');
+    const { groupIndex, insertIndex } = findBestGroup(itemWords, item.name, groups);
 
+    if (groupIndex !== -1) {
+      groups[groupIndex].splice(insertIndex, 0, item);
+    } else {
+      groups.push([item]);
+    }
+  });
 
-
-
-let flattened = [];
-Array.from(groups.values()).sort((a, b) => b.length - a.length).forEach(subarr => {
-    flattened.push(...subarr);
-});
-
-return flattened;
-}
-
+  return groups.flat();
+};
 
 const strip_parens = function(string) {
 	if (!string) return string;
@@ -566,26 +425,6 @@ const strip_parens = function(string) {
     }
     return out.trim();
 }
-
-
-// Helper function to normalize item names for comparison
-const normalizeItemName = (name) => {
-  if (!name) return '';
-  
-  return name
-    .toLowerCase()
-    .trim()
-    // Remove common descriptors that shouldn't prevent matching
-    .replace(/\b(fresh|organic|raw|cooked|dried|frozen|canned|whole|chopped|diced|sliced|ground)\b/g, '')
-    // Remove parenthetical content
-    .replace(/\([^)]*\)/g, '')
-    // Handle plurals
-    .replace(/ies$/, 'y')
-    .replace(/s$/, '')
-    // Remove extra whitespace
-    .replace(/\s+/g, ' ')
-    .trim();
-};
 
 // Calculate similarity between two strings using Levenshtein distance
 const calculateSimilarity = (str1, str2) => {
@@ -660,6 +499,24 @@ const areItemsSimilar = (item1, item2, threshold = 0.8) => {
   return similarity >= threshold;
 };
 
+const normalizeGarlicName = (name) => {
+  if (!name) return name;
+  const lower = name.toLowerCase().trim();
+  
+  // Match variations of garlic
+  const garlicPatterns = [
+    /^garlic\s+cloves?$/,
+    /^cloves?\s+garlic$/,
+    /^garlic$/
+  ];
+  
+  if (garlicPatterns.some(pattern => pattern.test(lower))) {
+    return 'garlic';
+  }
+  
+  return name;
+};
+
 // Check if units are compatible for merging
 const areUnitsCompatible = (unit1, unit2) => {
   if (!unit1 || !unit2) return !unit1 && !unit2; // Both must be empty
@@ -672,96 +529,161 @@ const areUnitsCompatible = (unit1, unit2) => {
   if (conv_match) return true;
   
   // Special cases that shouldn't be merged
-  const incompatibleUnits = [
-    ['small', 'medium', 'large'],
-    ['clove'],
-    ['whole']
-  ];
+  const incompatibleUnits = ['small', 'medium', 'large', 'clove', 'whole'];
   
-  for (const group of incompatibleUnits) {
-    const unit1InGroup = group.includes(unit1);
-    const unit2InGroup = group.includes(unit2);
-    if (unit1InGroup !== unit2InGroup) return false;
-  }
+	const unit1InGroup = incompatibleUnits.includes(unit1);
+	const unit2InGroup = incompatibleUnits.includes(unit2);
   
-  return false;
+  return unit1InGroup == unit2InGroup;
 };
 
-export const merge = function(ingrs) {
-  let grocery_list = [];
-  for (let item of ingrs) {
-    if (!item.name) continue;
-    
-    let matchIndex = -1;
-    let bestMatch = null;
-    let bestSimilarity = 0;
-    
-    // Find the best matching item
-    for (let i = 0; i < grocery_list.length; i++) {
-      const existing = grocery_list[i];
-      
-      // Check if items are similar and units are compatible
-      if (areItemsSimilar(item, existing) && areUnitsCompatible(item.unit, existing.unit)) {
-        const similarity = calculateSimilarity(
-          normalizeItemName(item.name), 
-          normalizeItemName(existing.name)
-        );
-        
-        if (similarity > bestSimilarity) {
-          bestSimilarity = similarity;
-          bestMatch = existing;
-          matchIndex = i;
-        }
-      }
-    }
-    
-    if (bestMatch) {
-      // Merge the items
-      const mergedItem = {
-        checked: false,
-        active: bestMatch.active || item.active,
-        qty: 0,
-        unit: bestMatch.unit,
-        name: bestMatch.name.length >= item.name.length ? bestMatch.name : item.name,
-        ingrs: [...(bestMatch.ingrs || []), ...(item.ingrs || [])],
-        expand: { 
-          ingrs: [...(bestMatch.expand?.ingrs || []), ...(item.expand?.ingrs || [])]
-        }
-      };
-      
-      // Calculate combined quantity
-      if (bestMatch.unit !== item.unit && bestMatch.unit && item.unit) {
-        try {
-          const conv = combine(bestMatch, item);
-          mergedItem.qty = conv.amount;
-          mergedItem.unit = conv.unit;
-        } catch (err) {
-          // Fallback to simple addition if conversion fails
-          mergedItem.qty = (bestMatch.qty || 0) + round_amount(item.qty || 0);
-        }
-      } else {
-        mergedItem.qty = (bestMatch.qty || 0) + round_amount(item.qty || 0);
-      }
-      
-      // Replace the existing item
-      grocery_list[matchIndex] = mergedItem;
+/**
+ * Calculates the servings multiplier for a recipe
+ */
+const calculateServingsMultiplier = (recipe, menu, mults, sub_recipes) => {
+  const targetRecipe = recipe.is_sub_recipe 
+    ? get_parent_recipe(recipe.id, menu, sub_recipes)
+    : recipe;
 
-    } else {
-      // Add as new item
-      const newItem = {
-        checked: false,
-        active: item.active,
-        qty: round_amount(item.qty),
-        unit: item.unit,
-        name: item.name,
-        ingrs: item.ingrs || [],
-        expand: { 
-          ingrs: item.expand?.ingrs || []
-        }
-      };
-      
-      grocery_list.push(newItem);
+  if (!targetRecipe) return 1;
+
+  const targetServings = menu.servings?.[targetRecipe.id] || mults?.[targetRecipe.id];
+  return targetServings ? parseFloat(targetServings) / parseFloat(recipe.servings) : 1;
+};
+
+/**
+ * Finds the parent recipe for a sub-recipe
+ */
+export const get_parent_recipe = (recipe_id, menu, sub_recipes) => {
+  for (const [parentId, subRecipeList] of Object.entries(sub_recipes)) {
+    const hasMatch = subRecipeList.some(sub => sub.recipe_id == recipe_id);
+    if (hasMatch) {
+      return menu.find(recipe => recipe.id == parentId);
     }
   }
+  return null;
+};
+
+/**
+ * Merges similar grocery items, combining quantities and units
+ */
+export const merge = (ingrs) => {
+  const grocery_list = [];
+
+  for (const item of ingrs) {
+    if (!item.name) continue;
+
+    const bestMatch = findBestMatch(item, grocery_list);
+
+    if (bestMatch) {
+      mergeItems(bestMatch.item, item, grocery_list, bestMatch.index);
+    } else {
+      addNewItem(item, grocery_list);
+    }
+  }
+
   return grocery_list;
+};
+
+/**
+ * Finds the best matching item in the grocery list
+ */
+const findBestMatch = (item, grocery_list) => {
+  let bestMatch = null;
+  let bestSimilarity = 0;
+  let bestIndex = -1;
+
+  grocery_list.forEach((existing, i) => {
+    if (!areItemsSimilar(item, existing) || !areUnitsCompatible(item.unit, existing.unit)) {
+      return;
+    }
+
+    const similarity = calculateSimilarity(
+      normalizeItemName(item.name),
+      normalizeItemName(existing.name)
+    );
+
+    if (similarity > bestSimilarity) {
+      bestSimilarity = similarity;
+      bestMatch = existing;
+      bestIndex = i;
+    }
+  });
+
+  return bestMatch ? { item: bestMatch, index: bestIndex } : null;
+};
+
+/**
+ * Merges two items together
+ */
+const mergeItems = (existing, newItem, grocery_list, index) => {
+  const merged = {
+    checked: false,
+    active: existing.active || newItem.active,
+    qty: 0,
+    unit: existing.unit,
+    name: existing.name.length >= newItem.name.length ? existing.name : newItem.name,
+    ingrs: [...(existing.ingrs || []), ...(newItem.ingrs || [])],
+    expand: {
+      ingrs: [...(existing.expand?.ingrs || []), ...(newItem.expand?.ingrs || [])]
+    }
+  };
+
+  // Calculate combined quantity with unit conversion if needed
+  if (existing.unit !== newItem.unit && existing.unit && newItem.unit) {
+    try {
+      const conv = combine(existing, newItem);
+      merged.qty = conv.amount;
+      merged.unit = conv.unit;
+    } catch (err) {
+      merged.qty = (existing.qty || 0) + round_amount(newItem.qty || 0);
+    }
+  } else {
+    merged.qty = (existing.qty || 0) + round_amount(newItem.qty || 0);
+  }
+
+  grocery_list[index] = merged;
+};
+
+/**
+ * Adds a new item to the grocery list
+ */
+const addNewItem = (item, grocery_list) => {
+  grocery_list.push({
+    checked: false,
+    active: item.active,
+    qty: round_amount(item.qty),
+    unit: item.unit,
+    name: item.name,
+    ingrs: item.ingrs || [],
+    expand: { ingrs: item.expand?.ingrs || [] }
+  });
+};
+
+/**
+ * Finds the best group for an item based on word similarity
+ */
+const findBestGroup = (itemWords, itemName, groups) => {
+  const SIMILARITY_THRESHOLD = 0.25;
+  let maxSimilarity = 0;
+  let bestGroupIndex = -1;
+  let bestInsertIndex = 0;
+
+  groups.forEach((group, groupIdx) => {
+    group.forEach((groupItem, itemIdx) => {
+      const groupWords = removePunctuationSymbolsParentheses(groupItem.name).split(' ');
+      const intersection = itemWords.filter(word => groupWords.includes(word)).length;
+      const similarity = intersection / itemWords.length;
+
+      if (similarity > maxSimilarity) {
+        maxSimilarity = similarity;
+        bestGroupIndex = groupIdx;
+        bestInsertIndex = itemIdx;
+      }
+    });
+  });
+
+  return maxSimilarity > SIMILARITY_THRESHOLD
+    ? { groupIndex: bestGroupIndex, insertIndex: bestInsertIndex }
+    : { groupIndex: -1, insertIndex: 0 };
 };

@@ -534,7 +534,7 @@
                     
                     <!-- Desktop version with drag-and-drop -->
                     <!-- svelte-ignore a11y_no_static_element_interactions -->
-                    <div id={item.id} class="grocery_item select-none hidden md:flex space-x-3 justify-end md:justify-start items-center {item.id == dragged_item && item.id != dragged_over ? `border border-error rounded-lg p-1` : ``} {item.id == dragged_over ? `border border-primary rounded-lg p-1` : ``}"
+                    <div id={item.id} class="grocery_item select-none hidden md:flex space-x-3 justify-start items-center {item.id == dragged_item && item.id != dragged_over ? `border border-error rounded-lg p-1` : ``} {item.id == dragged_over ? `border border-primary rounded-lg p-1` : ``}"
                         draggable="true"
                         ondragover={drag_over}
                         ondragstart={drag_start}
@@ -543,7 +543,10 @@
                     >
                         {#if status != "none"}<input type="checkbox" class="hidden md:flex checkbox checkbox-primary checkbox-lg p-1" id={item.id} bind:checked={item.checked} onchange={check_item_handle}>{/if}
                         <div class="flex">
-                            <div class="text flex space-x-2{item.id == dragged_item || item.id == dragged_over ? ` text-xl` : ``}"><p>{ingrs_to_string([item])}</p><p class="text-neutral text-xs content-center">{get_recipe_name(item)}</p></div>
+                            <div class="text flex flex-col space-x-2{item.id == dragged_item || item.id == dragged_over ? ` text-xl` : ``}">
+                                <p>{ingrs_to_string([item])}</p>
+                                <p class="text-neutral text-xs content-center pl-2">{get_recipe_name(item)}</p>
+                            </div>
                         </div>
                         {#if status != "none"}
                             <div class="hidden md:flex justify-end h-full items-center flex-grow">
@@ -580,7 +583,7 @@
                                 ontouchcancel={touch_cancel}
                                 ondblclick={edit_item_modal}>
                                 <p class="text w-fit {item.id == dragged_item || item.id == dragged_over ? `text-xl` : ``}">{ingrs_to_string([item])}</p>
-                                <p class="text-neutral text-xs text-center w-fit">{get_recipe_name(item)}</p>
+                                <p class="text-neutral text-xs text-center w-fit pl-2">{get_recipe_name(item)}</p>
                             </div>
                             {#if status != "none"}<input type="checkbox" class="md:hidden checkbox checkbox-primary checkbox-lg p-1" id={item.id} bind:checked={item.checked} onchange={check_item_handle}>{/if}
                         </div>

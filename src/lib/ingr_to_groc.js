@@ -26,29 +26,76 @@ nlp.extend({
     }
 });
 
-export function get_grocery_item_name(name){
-    // Clean up the input
-    let cleaned = name.toLowerCase().trim();
-
-    let text = cleaned.replace(/\([^)]*\)/g, '');
-    let texta = text.replace(/["""''½⅓⅔¼¾⅛⅜⅝⅞]/g, '');
-    let textb = texta.replace(/[\d+|.\d+]/g, '');
-    let textc = nlp(textb).nouns().out('text');
-    let textd = textc.replace(/[,|;|.](.*)/g, '');
-    let removed = textd;
-    measurements.forEach(measure => {
-      removed = removed.replace(new RegExp(`\\b${measure}s?\\b`, 'gi'), '');
-    });
-
-    descriptiveWords.forEach(word => {
-      removed = removed.replace(new RegExp(`\\b${word}\\b`, 'gi'), '');
-    });
-    removed = removed.replace(/\s\s+/g, ' ');
-    const cleanDoc = nlp(removed);
-    let mainNoun = cleanDoc.out('text').trim();
-    if (mainNoun) return mainNoun;
-    return name;
+export function normalizeItemName(name) {
+  if (!name) return '';
+  
+  // Initial cleaning
+  let cleaned = name.toLowerCase().trim();
+  
+  // Remove parenthetical content
+  cleaned = cleaned.replace(/\([^)]*\)/g, '');
+  
+  // Remove quotes and fractions
+  cleaned = cleaned.replace(/["""''½⅓⅔¼¾⅛⅜⅝⅞]/g, '');
+  
+  // Remove numbers
+  cleaned = cleaned.replace(/[\d+|.\d+]/g, '');
+  
+  // Remove common descriptors
+  cleaned = cleaned.replace(/\b(fresh|organic|raw|cooked|dried|frozen|canned|whole|chopped|diced|sliced|ground)\b/g, '');
+  
+  // Remove measurements
+  measurements.forEach(measure => {
+    cleaned = cleaned.replace(new RegExp(`\\b${measure}s?\\b`, 'gi'), '');
+  });
+  
+  // Remove descriptive words
+  descriptiveWords.forEach(word => {
+    cleaned = cleaned.replace(new RegExp(`\\b${word}\\b`, 'gi'), '');
+  });
+  
+  // Remove commas, semicolons, periods and everything after them
+  cleaned = cleaned.replace(/[,;.].*/g, '');
+  
+  // Extract nouns using NLP
+  let textc = nlp(cleaned).nouns().out('text');
+  
+  // Clean up extra whitespace
+  textc = textc.replace(/\s\s+/g, ' ').trim();
+  
+  // Handle garlic variations
+  textc = normalizeGarlicName(textc);
+  
+  // Handle plurals
+  textc = textc
+    .replace(/ies$/, 'y')
+    .replace(/s$/, '');
+  
+  // Final cleanup
+  textc = textc.replace(/\s+/g, ' ').trim();
+  
+  // Return the normalized name or original if nothing remains
+  return textc || name;
 }
+
+// Normalize garlic-related ingredient names
+const normalizeGarlicName = (name) => {
+  if (!name) return name;
+  const lower = name.toLowerCase().trim();
+  
+  // Match variations of garlic
+  const garlicPatterns = [
+    /^garlic\s+cloves?$/,
+    /^cloves?\s+garlic$/,
+    /^garlic$/
+  ];
+  
+  if (garlicPatterns.some(pattern => pattern.test(lower))) {
+    return 'garlic';
+  }
+  
+  return name;
+};
 
 export function merge_grocery_items(ingr_list){
     let groc_list = [];
