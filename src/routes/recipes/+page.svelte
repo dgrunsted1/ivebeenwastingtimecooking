@@ -90,11 +90,15 @@
         refresh_loading = false;
 	});
 
+    $effect(() => {
+        const recipe_num = (total_recipes_num > max_results) ? max_results : total_recipes_num;
+        document.getElementById("recipe_num").innerHTML = `${recipe_num} recipes`;
+    });
     async function select_cat(e){
         // TODO
         refresh_loading = true;
         scroll_to_top();
-        toggle_cat(e.currentTarget.id, e.currentTarget.innerHTML);
+        toggle_cat(e.currentTarget.id, e.currentTarget.dataset.id);
         page = 1; 
         
         newBatch = [];
@@ -154,7 +158,7 @@
         refresh_loading = true;
         scroll_to_top();
         document.activeElement.blur();
-        sort_val = e.currentTarget.innerHTML;
+        sort_val = e.currentTarget.dataset.id;
         newBatch = [];
         page = 1; 
         
@@ -295,7 +299,7 @@
                 <SearchInput 
                     {update_search}
                 />
-                <div class="mx-1 text-xs md:text-base">{(total_recipes_num > max_results) ? max_results : total_recipes_num} recipes</div>
+                <div id="recipe_num" class="mx-1 text-xs md:text-base">{(total_recipes_num > max_results) ? max_results : total_recipes_num} recipes</div>
                 <Sort
                     {sort_val}
                     {update_sort} 

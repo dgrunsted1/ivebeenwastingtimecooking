@@ -41,22 +41,25 @@
     {#each [...display_categories].sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase())) as cat}
         <button id="category" 
             class="btn btn-xs {selected_categories.includes(cat)?'btn-primary text-black':'bg-base-300 text-neutral'} category" 
-            onclick={select_cat}>
+            onclick={select_cat}
+            data-id={cat}>
                 {cat}
         </button> 
     {/each}
     {#each [...display_cuisines].sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase())) as cuisine}
         <button id="cuisine" 
             class="btn btn-xs {selected_cuisines.includes(cuisine)?'btn-primary text-black':'bg-base-300 text-neutral'} cuisine" 
-            onclick={select_cat}>
+            onclick={select_cat}
+            data-id={cuisine}>
                 {cuisine}
         </button> 
     {/each}
-    {#if display_authors}
+    {#if display_authors && display_authors.length > 0}
         {#each [...display_authors].sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase())) as author}
             <button id="author" 
                 class="btn btn-xs {selected_authors.includes(author)?'btn-primary text-black':'bg-base-300 text-neutral'} author" 
-                onclick={select_cat}>
+                onclick={select_cat}
+                data-id={author}>
                     {author}
             </button> 
         {/each}
@@ -64,7 +67,8 @@
     {#each [...display_countries].sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase())) as country}
         <button id="country" 
             class="btn btn-xs {selected_countries.includes(country)?'btn-primary text-black':'bg-base-300 text-neutral'} country" 
-            onclick={select_cat}>
+            onclick={select_cat}
+            data-id={country}>
                 {country}
         </button> 
     {/each}
